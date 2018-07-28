@@ -11,23 +11,25 @@
     <properties>
         <maven.compiler.source>9</maven.compiler.source>
         <maven.compiler.target>9</maven.compiler.target>
+        <org.springframework.boot.version>2.0.3.RELEASE</org.springframework.boot.version>
+        <org.junit.jupiter.version>5.1.0</org.junit.jupiter.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>2.0.3.RELEASE</version>
+            <version>${org.springframework.boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>2.0.3.RELEASE</version>
+            <version>${org.springframework.boot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>2.0.3.RELEASE</version>
+            <version>${org.springframework.boot.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -67,13 +69,13 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.1.0</version>
+            <version>${org.junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>5.1.0</version>
+            <version>${org.junit.jupiter.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

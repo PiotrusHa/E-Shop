@@ -4,6 +4,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -18,7 +20,8 @@ import java.util.List;
 public class Product {
 
     @Id
-    @SequenceGenerator(name="product_seq")
+    @GeneratedValue(generator = "products_sequencer", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name="products_sequencer", sequenceName = "products_seq", allocationSize = 1)
     @Column(name = "id", nullable = false, unique = true, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal id;
 
