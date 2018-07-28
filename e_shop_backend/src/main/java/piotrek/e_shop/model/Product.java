@@ -1,6 +1,15 @@
 package piotrek.e_shop.model;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -9,7 +18,8 @@ import java.util.List;
 public class Product {
 
     @Id
-    @Column(name = "id", nullable = false, unique = true)
+    @SequenceGenerator(name="product_seq")
+    @Column(name = "id", nullable = false, unique = true, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal id;
 
     @Column(name = "name", nullable = false, length = 50)
@@ -21,7 +31,7 @@ public class Product {
     @Column(name = "sold_pieces_number")
     private Integer soldPiecesNumber;
 
-    @Column(name = "price", nullable = false)
+    @Column(name = "price", nullable = false, scale = 2)
     private BigDecimal price;
 
     @Column(name = "extra_info", length = 200)
@@ -76,6 +86,22 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public String getExtraInfo() {
+        return extraInfo;
+    }
+
+    public void setExtraInfo(String extraInfo) {
+        this.extraInfo = extraInfo;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
     }
 
 }

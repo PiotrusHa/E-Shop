@@ -3,6 +3,7 @@ package piotrek.e_shop.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 
@@ -11,7 +12,8 @@ import java.math.BigDecimal;
 public class Category {
 
     @Id
-    @Column(name = "id", nullable = false, unique = true)
+    @SequenceGenerator(name="category_seq")
+    @Column(name = "id", nullable = false, unique = true, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal id;
 
     @Column(name = "name", length = 30, nullable = false, unique = true)
