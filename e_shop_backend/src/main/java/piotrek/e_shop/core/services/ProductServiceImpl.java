@@ -2,11 +2,15 @@ package piotrek.e_shop.core.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import piotrek.e_shop.api.exceptions.EntityNotFoundException;
+import piotrek.e_shop.api.services.CategoryService;
 import piotrek.e_shop.api.services.ProductService;
 import piotrek.e_shop.api.repositories.ProductRepository;
+import piotrek.e_shop.model.Category;
 import piotrek.e_shop.model.Product;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,10 +18,12 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
 
     private ProductRepository productRepository;
+    private CategoryService categoryService;
 
     @Autowired
-    public ProductServiceImpl(ProductRepository productRepository) {
+    public ProductServiceImpl(ProductRepository productRepository, CategoryService categoryService) {
         this.productRepository = productRepository;
+        this.categoryService = categoryService;
     }
 
     @Override
@@ -48,6 +54,12 @@ public class ProductServiceImpl implements ProductService {
 
     private void prepareProductToAdd(Product product) {
         product.setId(null);
+        validateCategories(product);
+    }
+
+    private void validateCategories(Product product) {
+        List<Category> categoriesFromDatabase = categoryService.validateCategories(product.getCategories());
+        product.setCategories(categoriesFromDatabase);
     }
 
     @Override
@@ -55,12 +67,13 @@ public class ProductServiceImpl implements ProductService {
         products.forEach(this::prepareProductToAdd);
         return productRepository.saveAll(products);
     }
-    
+
     @Override
     public Product update(Product product) {
         if (product.getId() == null || !productRepository.findById(product.getId()).isPresent()) {
-            //throw EntityNotFoundException
+            throw new EntityNotFoundException(Product.class, product.getId());
         }
+        validateCategories(product);
         return productRepository.save(product);
     }
 

@@ -18,4 +18,6 @@ public interface CategoryService {
 
     List<Category> saveAll(List<Category> categories);
 
+    List<Category> validateCategories(List<Category> categories);
+
 }
