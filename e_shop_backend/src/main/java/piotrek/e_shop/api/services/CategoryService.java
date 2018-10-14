@@ -12,6 +12,8 @@ public interface CategoryService {
 
     Optional<Category> findByName(String name);
 
+    List<Category> findAll();
+
     Category save(Category category);
 
     List<Category> saveAll(List<Category> categories);

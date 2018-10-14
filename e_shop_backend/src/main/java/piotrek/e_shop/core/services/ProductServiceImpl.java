@@ -26,6 +26,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public List<Product> findAll() {
+        return productRepository.findAll();
+    }
+
+    @Override
     public List<Product> findByName(String name) {
         return productRepository.findByName(name);
     }
@@ -36,13 +41,27 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Product save(Product product) {
+    public Product add(Product product) {
+        prepareProductToAdd(product);
         return productRepository.save(product);
     }
 
+    private void prepareProductToAdd(Product product) {
+        product.setId(null);
+    }
+
     @Override
-    public List<Product> saveAll(List<Product> products) {
+    public List<Product> addAll(List<Product> products) {
+        products.forEach(this::prepareProductToAdd);
         return productRepository.saveAll(products);
+    }
+    
+    @Override
+    public Product update(Product product) {
+        if (product.getId() == null || !productRepository.findById(product.getId()).isPresent()) {
+            //throw EntityNotFoundException
+        }
+        return productRepository.save(product);
     }
 
 }

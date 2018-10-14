@@ -77,7 +77,7 @@ class ProductServiceTest extends BaseServiceTest {
         when(productRepository.save(productToSave))
                 .thenReturn(productToSave);
 
-        Product result = productService.save(productToSave);
+        Product result = productService.add(productToSave);
 
         assertProduct(productToSave, result);
     }
@@ -89,7 +89,7 @@ class ProductServiceTest extends BaseServiceTest {
         when(productRepository.saveAll(productsToSave))
                 .thenReturn(productsToSave);
 
-        List<Product> result = productService.saveAll(productsToSave);
+        List<Product> result = productService.addAll(productsToSave);
 
         assertProducts(productsToSave, result);
     }

@@ -10,12 +10,16 @@ public interface ProductService {
 
     Optional<Product> findById(BigDecimal id);
 
+    List<Product> findAll();
+
     List<Product> findByName(String name);
 
     List<Product> findByCategoryName(String categoryName);
 
-    Product save(Product product);
+    Product add(Product product);
 
-    List<Product> saveAll(List<Product> products);
+    Product update(Product product);
+
+    List<Product> addAll(List<Product> products);
 
 }

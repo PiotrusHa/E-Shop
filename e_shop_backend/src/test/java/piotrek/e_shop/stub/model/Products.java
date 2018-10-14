@@ -60,7 +60,8 @@ public class Products {
         }
     }
 
-    public static List<Product> TEST_PRODUCTS = List.of(TestProductBread.PRODUCT, TestProductWith2Categories.PRODUCT,
-            TestProductWith3Categories.PRODUCT);
+    public static List<Product> TEST_PRODUCTS = List.of(TestProductBread.PRODUCT,
+                                                        TestProductWith2Categories.PRODUCT,
+                                                        TestProductWith3Categories.PRODUCT);
 
 }
