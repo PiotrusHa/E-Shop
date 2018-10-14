@@ -4,8 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import piotrek.e_shop.base.BaseServiceTest;
+import org.springframework.beans.factory.annotation.Autowired;
+import piotrek.e_shop.api.services.ProductService;
+import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Product;
+import piotrek.e_shop.model.builder.ProductBuilder;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
 import piotrek.e_shop.stub.model.Products.TestProductWith3Categories;
 
@@ -13,12 +16,17 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Product Service Test")
-class ProductServiceTest extends BaseServiceTest {
+class ProductServiceTest extends BaseTestWithDatabase {
+
+    @Autowired
+    protected ProductService productService;
+
 
     @Test
     void findById() {
@@ -60,26 +68,26 @@ class ProductServiceTest extends BaseServiceTest {
 
     @Test
     void save() {
-        Product productToSave = TestProductBread.PRODUCT;
+        Product productToSave = new ProductBuilder(TestProductBread.PRODUCT).build();
 
-        when(productRepositoryMock.save(productToSave))
-                .thenReturn(productToSave);
+        Product result = productService.add(productToSave);
 
-        Product result = productServiceDbSaveMock.add(productToSave);
-
-        assertProduct(productToSave, result);
+        assertProductWithoutId(productToSave, result);
+        assertNotNull(result.getId());
     }
 
     @Test
     void saveAll() {
-        List<Product> productsToSave = List.of(TestProductBread.PRODUCT, TestProductWith3Categories.PRODUCT);
+        List<Product> productsToSave = List.of(new ProductBuilder(TestProductBread.PRODUCT).build(),
+                                               new ProductBuilder(TestProductWith3Categories.PRODUCT).build());
 
-        when(productRepositoryMock.saveAll(productsToSave))
-                .thenReturn(productsToSave);
+        List<Product> result = productService.addAll(productsToSave);
 
-        List<Product> result = productServiceDbSaveMock.addAll(productsToSave);
-
-        assertProducts(productsToSave, result);
+        assertEquals(productsToSave.size(), result.size());
+        for (int i = 0; i < result.size(); i++) {
+            assertProductWithoutId(productsToSave.get(i), result.get(i));
+            assertNotNull(result.get(i).getId());
+        }
     }
 
 }

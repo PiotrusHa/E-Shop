@@ -23,8 +23,17 @@ public abstract class BaseTest {
         assertNotNull(actual);
 
         assertAll("product",
-                  () -> assertEquals(expected.getName(), actual.getName()),
                   () -> assertEquals(expected.getId(), actual.getId()),
+                  () -> assertProductWithoutId(expected, actual)
+        );
+    }
+
+    protected void assertProductWithoutId(Product expected, Product actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertAll("product",
+                  () -> assertEquals(expected.getName(), actual.getName()),
                   () -> assertEquals(expected.getPrice(), actual.getPrice()),
                   () -> assertEquals(expected.getAvailablePiecesNumber(), actual.getAvailablePiecesNumber()),
                   () -> assertEquals(expected.getSoldPiecesNumber(), actual.getSoldPiecesNumber()),
@@ -49,6 +58,15 @@ public abstract class BaseTest {
 
         assertAll("category",
                   () -> assertEquals(expected.getId(), actual.getId()),
+                  () -> assertCategoryWithoutId(expected, actual)
+        );
+    }
+
+    protected void assertCategoryWithoutId(Category expected, Category actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertAll("category",
                   () -> assertEquals(expected.getName(), actual.getName())
         );
     }

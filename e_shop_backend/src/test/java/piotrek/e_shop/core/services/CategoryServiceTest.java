@@ -2,9 +2,12 @@ package piotrek.e_shop.core.services;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import piotrek.e_shop.api.exceptions.EntityNotFoundException;
-import piotrek.e_shop.base.BaseServiceTest;
+import piotrek.e_shop.api.services.CategoryService;
+import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Category;
+import piotrek.e_shop.model.builder.CategoryBuilder;
 import piotrek.e_shop.stub.model.Categories.TestCategoryFood;
 import piotrek.e_shop.stub.model.Categories.TestCategoryToys;
 
@@ -14,12 +17,15 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Category Service Test")
-class CategoryServiceTest extends BaseServiceTest {
+class CategoryServiceTest extends BaseTestWithDatabase {
+
+    @Autowired
+    protected CategoryService categoryService;
 
     @Test
     void findById() {
@@ -63,33 +69,26 @@ class CategoryServiceTest extends BaseServiceTest {
 
     @Test
     void save() {
-        Category categoryToSave = new Category();
-        categoryToSave.setName(TestCategoryToys.NAME);
-        Category categorySaved = TestCategoryToys.CATEGORY;
+        Category categoryToSave = new CategoryBuilder(TestCategoryToys.NAME).build();
 
-        when(categoryRepositoryMock.save(categoryToSave))
-                .thenReturn(categorySaved);
+        Category result = categoryService.save(categoryToSave);
 
-        Category result = categoryServiceDbSaveMock.save(categoryToSave);
-
-        assertCategory(categorySaved, result);
+        assertCategoryWithoutId(categoryToSave, result);
+        assertNotNull(result.getId());
     }
 
     @Test
     void saveAll() {
-        Category categoryToSave1 = new Category();
-        categoryToSave1.setName(TestCategoryToys.NAME);
-        Category categoryToSave2 = new Category();
-        categoryToSave2.setName(TestCategoryFood.NAME);
-        List<Category> categoriesToSave = List.of(categoryToSave1, categoryToSave2);
-        List<Category> categoriesSaved = List.of(TestCategoryToys.CATEGORY, TestCategoryFood.CATEGORY);
+        List<Category> categoriesToSave = List.of(new CategoryBuilder(TestCategoryToys.NAME).build(),
+                                                  new CategoryBuilder(TestCategoryFood.NAME).build());
 
-        when(categoryRepositoryMock.saveAll(categoriesToSave))
-                .thenReturn(categoriesSaved);
+        List<Category> result = categoryService.saveAll(categoriesToSave);
 
-        List<Category> result = categoryServiceDbSaveMock.saveAll(categoriesToSave);
-
-        assertCategories(categoriesSaved, result);
+        assertEquals(categoriesToSave.size(), result.size());
+        for (int i = 0; i < result.size(); i++) {
+            assertCategoryWithoutId(categoriesToSave.get(i), result.get(i));
+            assertNotNull(result.get(i).getId());
+        }
     }
 
     @Test
