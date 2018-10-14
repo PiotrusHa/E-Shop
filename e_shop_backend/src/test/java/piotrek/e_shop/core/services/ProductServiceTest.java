@@ -25,9 +25,6 @@ class ProductServiceTest extends BaseServiceTest {
         Product expectedProduct = TestProductBread.PRODUCT;
         BigDecimal id = expectedProduct.getId();
 
-        when(productRepository.findById(id))
-                .thenReturn(Optional.of(expectedProduct));
-
         Optional<Product> result = productService.findById(id);
 
         assertTrue(result.isPresent());
@@ -38,9 +35,6 @@ class ProductServiceTest extends BaseServiceTest {
     void findByIdReturnOptionalEmpty() {
         BigDecimal id = BigDecimal.valueOf(1410);
 
-        when(productRepository.findById(id))
-                .thenReturn(Optional.empty());
-
         Optional<Product> result = productService.findById(id);
 
         assertFalse(result.isPresent());
@@ -48,11 +42,8 @@ class ProductServiceTest extends BaseServiceTest {
 
     @Test
     void findByName() {
-        List<Product> expectedProducts = List.of(TestProductBread.PRODUCT, TestProductWith3Categories.PRODUCT);
-        String name = expectedProducts.get(0).getName();
-
-        when(productRepository.findByName(name))
-                .thenReturn(expectedProducts);
+        List<Product> expectedProducts = List.of(TestProductBread.PRODUCT);
+        String name = TestProductBread.NAME;
 
         List<Product> result = productService.findByName(name);
 
@@ -62,10 +53,7 @@ class ProductServiceTest extends BaseServiceTest {
     @ParameterizedTest(name = "CategoryName: {0}")
     @MethodSource("categoryNameProvider")
     void findByCategoryName(String categoryName, List<Product> expectedResults) {
-        when(productRepository.findByName(categoryName))
-                .thenReturn(expectedResults);
-
-        List<Product> result = productService.findByName(categoryName);
+        List<Product> result = productService.findByCategoryName(categoryName);
 
         assertProducts(expectedResults, result);
     }
@@ -74,10 +62,10 @@ class ProductServiceTest extends BaseServiceTest {
     void save() {
         Product productToSave = TestProductBread.PRODUCT;
 
-        when(productRepository.save(productToSave))
+        when(productRepositoryMock.save(productToSave))
                 .thenReturn(productToSave);
 
-        Product result = productService.add(productToSave);
+        Product result = productServiceDbSaveMock.add(productToSave);
 
         assertProduct(productToSave, result);
     }
@@ -86,10 +74,10 @@ class ProductServiceTest extends BaseServiceTest {
     void saveAll() {
         List<Product> productsToSave = List.of(TestProductBread.PRODUCT, TestProductWith3Categories.PRODUCT);
 
-        when(productRepository.saveAll(productsToSave))
+        when(productRepositoryMock.saveAll(productsToSave))
                 .thenReturn(productsToSave);
 
-        List<Product> result = productService.addAll(productsToSave);
+        List<Product> result = productServiceDbSaveMock.addAll(productsToSave);
 
         assertProducts(productsToSave, result);
     }

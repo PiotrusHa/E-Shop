@@ -5,6 +5,8 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import piotrek.e_shop.api.repositories.CategoryRepository;
@@ -17,7 +19,10 @@ import static piotrek.e_shop.stub.model.Products.TEST_PRODUCTS;
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
-public abstract class BaseRepositoryTest extends BaseTest {
+@TestPropertySource(properties = {
+        "spring.datasource.url=jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"
+})
+public abstract class BaseTestWithDatabase extends BaseTest {
 
     @Autowired
     protected ProductRepository productRepository;

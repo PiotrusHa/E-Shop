@@ -23,9 +23,6 @@ class CategoryServiceTest extends BaseServiceTest {
         Category expectedCategory = TestCategoryFood.CATEGORY;
         BigDecimal id = expectedCategory.getId();
 
-        when(categoryRepository.findById(id))
-                .thenReturn(Optional.of(expectedCategory));
-
         Optional<Category> result = categoryService.findById(id);
 
         assertTrue(result.isPresent());
@@ -35,9 +32,6 @@ class CategoryServiceTest extends BaseServiceTest {
     @Test
     void findByIdReturnOptionalEmpty() {
         BigDecimal id = BigDecimal.valueOf(1410);
-
-        when(categoryRepository.findById(id))
-                .thenReturn(Optional.empty());
 
         Optional<Category> result = categoryService.findById(id);
 
@@ -49,9 +43,6 @@ class CategoryServiceTest extends BaseServiceTest {
         Category expectedCategory = TestCategoryFood.CATEGORY;
         String name = expectedCategory.getName();
 
-        when(categoryRepository.findByName(name))
-                .thenReturn(Optional.of(expectedCategory));
-
         Optional<Category> result = categoryService.findByName(name);
 
         assertTrue(result.isPresent());
@@ -62,9 +53,6 @@ class CategoryServiceTest extends BaseServiceTest {
     void findByNameReturnOptionalEmpty() {
         String name = "Example name";
 
-        when(categoryRepository.findByName(name))
-                .thenReturn(Optional.empty());
-
         Optional<Category> result = categoryService.findByName(name);
 
         assertFalse(result.isPresent());
@@ -72,26 +60,33 @@ class CategoryServiceTest extends BaseServiceTest {
 
     @Test
     void save() {
-        Category categoryToSave = TestCategoryToys.CATEGORY;
+        Category categoryToSave = new Category();
+        categoryToSave.setName(TestCategoryToys.NAME);
+        Category categorySaved = TestCategoryToys.CATEGORY;
 
-        when(categoryRepository.save(categoryToSave))
-                .thenReturn(categoryToSave);
+        when(categoryRepositoryMock.save(categoryToSave))
+                .thenReturn(categorySaved);
 
-        Category result = categoryService.save(categoryToSave);
+        Category result = categoryServiceDbSaveMock.save(categoryToSave);
 
-        assertCategory(categoryToSave, result);
+        assertCategory(categorySaved, result);
     }
 
     @Test
     void saveAll() {
-        List<Category> categoriesToSave = List.of(TestCategoryToys.CATEGORY, TestCategoryFood.CATEGORY);
+        Category categoryToSave1 = new Category();
+        categoryToSave1.setName(TestCategoryToys.NAME);
+        Category categoryToSave2 = new Category();
+        categoryToSave2.setName(TestCategoryFood.NAME);
+        List<Category> categoriesToSave = List.of(categoryToSave1, categoryToSave2);
+        List<Category> categoriesSaved = List.of(TestCategoryToys.CATEGORY, TestCategoryFood.CATEGORY);
 
-        when(categoryRepository.saveAll(categoriesToSave))
-                .thenReturn(categoriesToSave);
+        when(categoryRepositoryMock.saveAll(categoriesToSave))
+                .thenReturn(categoriesSaved);
 
-        List<Category> result = categoryService.saveAll(categoriesToSave);
+        List<Category> result = categoryServiceDbSaveMock.saveAll(categoriesToSave);
 
-        assertCategories(categoriesToSave, result);
+        assertCategories(categoriesSaved, result);
     }
 
 }
