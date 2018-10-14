@@ -7,12 +7,15 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import piotrek.e_shop.api.services.ProductService;
 import piotrek.e_shop.base.BaseTestWithDatabase;
+import piotrek.e_shop.model.Category;
 import piotrek.e_shop.model.Product;
 import piotrek.e_shop.model.builder.ProductBuilder;
+import piotrek.e_shop.stub.model.Categories;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
 import piotrek.e_shop.stub.model.Products.TestProductWith3Categories;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +29,6 @@ class ProductServiceTest extends BaseTestWithDatabase {
 
     @Autowired
     protected ProductService productService;
-
 
     @Test
     void findById() {
@@ -88,6 +90,30 @@ class ProductServiceTest extends BaseTestWithDatabase {
             assertProductWithoutId(productsToSave.get(i), result.get(i));
             assertNotNull(result.get(i).getId());
         }
+    }
+
+    @Test
+    void assignCategoryToProduct() {
+        Product existentProduct = new ProductBuilder(TestProductBread.PRODUCT).id(TestProductBread.ID).build();
+        List<Category> categories = new ArrayList<>(existentProduct.getCategories());
+        categories.add(Categories.TestCategoryToys.CATEGORY);
+        existentProduct.setCategories(categories);
+
+        Product result = productService.update(existentProduct);
+
+        assertProduct(existentProduct, result);
+    }
+
+    @Test
+    void unassignCategoryFromProduct() {
+        Product existentProduct = new ProductBuilder(TestProductBread.PRODUCT).id(TestProductBread.ID).build();
+        List<Category> categories = new ArrayList<>(existentProduct.getCategories());
+        categories.remove(0);
+        existentProduct.setCategories(categories);
+
+        Product result = productService.update(existentProduct);
+
+        assertProduct(existentProduct, result);
     }
 
 }
