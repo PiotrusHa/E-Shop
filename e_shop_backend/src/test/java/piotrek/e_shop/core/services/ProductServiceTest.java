@@ -5,12 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import piotrek.e_shop.api.exceptions.EntityNotFoundException;
 import piotrek.e_shop.api.services.ProductService;
 import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Category;
 import piotrek.e_shop.model.Product;
 import piotrek.e_shop.model.builder.ProductBuilder;
 import piotrek.e_shop.stub.model.Categories;
+import piotrek.e_shop.stub.model.Products;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
 import piotrek.e_shop.stub.model.Products.TestProductWith3Categories;
 
@@ -22,6 +24,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Product Service Test")
@@ -66,6 +70,15 @@ class ProductServiceTest extends BaseTestWithDatabase {
         List<Product> result = productService.findByCategoryName(categoryName);
 
         assertProducts(expectedResults, result);
+    }
+
+    @Test
+    void findAll() {
+        List<Product> expectedResult = Products.TEST_PRODUCTS;
+
+        List<Product> result = productService.findAll();
+
+        assertProducts(expectedResult, result);
     }
 
     @Test
@@ -114,6 +127,27 @@ class ProductServiceTest extends BaseTestWithDatabase {
         Product result = productService.update(existentProduct);
 
         assertProduct(existentProduct, result);
+    }
+
+    @Test
+    void updateWithNonexistentIdThrowEntityNotFoundException() {
+        BigDecimal nonExistentId = BigDecimal.valueOf(1000);
+        Product productToSave = new ProductBuilder(TestProductBread.PRODUCT).id(nonExistentId).build();
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> productService.update(productToSave));
+
+        assertEquals(Product.class, exception.getResourceClass());
+        assertEquals(nonExistentId, exception.getResourceId());
+    }
+
+    @Test
+    void updateWithIdNullThrowEntityNotFoundException() {
+        Product productToSave = new ProductBuilder(TestProductBread.PRODUCT).build();
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> productService.update(productToSave));
+
+        assertEquals(Product.class, exception.getResourceClass());
+        assertNull(exception.getResourceId());
     }
 
 }
