@@ -8,6 +8,7 @@ import piotrek.e_shop.api.services.CategoryService;
 import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Category;
 import piotrek.e_shop.model.builder.CategoryBuilder;
+import piotrek.e_shop.stub.model.Categories;
 import piotrek.e_shop.stub.model.Categories.TestCategoryFood;
 import piotrek.e_shop.stub.model.Categories.TestCategoryToys;
 
@@ -65,6 +66,15 @@ class CategoryServiceTest extends BaseTestWithDatabase {
         Optional<Category> result = categoryService.findByName(name);
 
         assertFalse(result.isPresent());
+    }
+
+    @Test
+    void findAll() {
+        List<Category> expectedResult = Categories.TEST_CATEGORIES;
+
+        List<Category> result = categoryService.findAll();
+
+        assertCategories(expectedResult, result);
     }
 
     @Test

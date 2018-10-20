@@ -8,7 +8,7 @@ public class EntityNotFoundException extends RuntimeException {
     private BigDecimal resourceId;
 
     public EntityNotFoundException(Class resourceClass, BigDecimal resourceId) {
-        super(String.format("Not found %s with id %s", resourceClass.getSimpleName(), resourceId.toString()));
+        super(String.format("Not found %s with id %s", resourceClass.getSimpleName(), String.valueOf(resourceId)));
         this.resourceClass = resourceClass;
         this.resourceId = resourceId;
     }

@@ -25,7 +25,6 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @CrossOrigin
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     List<Category> getAllCategories() {
         return categoryService.findAll();
