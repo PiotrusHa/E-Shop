@@ -10,7 +10,9 @@ import piotrek.e_shop.api.services.ProductService;
 import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Category;
 import piotrek.e_shop.model.Product;
+import piotrek.e_shop.model.PurchaseProduct;
 import piotrek.e_shop.model.builder.ProductBuilder;
+import piotrek.e_shop.model.builder.PurchaseProductBuilder;
 import piotrek.e_shop.stub.model.Categories;
 import piotrek.e_shop.stub.model.Products;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
@@ -148,6 +150,23 @@ class ProductServiceTest extends BaseTestWithDatabase {
 
         assertEquals(Product.class, exception.getResourceClass());
         assertNull(exception.getResourceId());
+    }
+
+    @Test
+    void updateProductsPiecesNumber() {
+        Product productToUpdate = new ProductBuilder(TestProductBread.PRODUCT).id(TestProductBread.ID).build();
+        int soldPiecesNumber = 3;
+        PurchaseProduct purchaseProduct = new PurchaseProductBuilder().product(productToUpdate)
+                                                                      .piecesNumber(soldPiecesNumber)
+                                                                      .build();
+        Product expectedProduct = new ProductBuilder(TestProductBread.PRODUCT).id(TestProductBread.ID)
+                                                                              .availablePiecesNumber(productToUpdate.getAvailablePiecesNumber() - soldPiecesNumber)
+                                                                              .soldPiecesNumber(productToUpdate.getSoldPiecesNumber() + soldPiecesNumber)
+                                                                              .build();
+
+        List<Product> products = productService.updateProductsPiecesNumber(List.of(purchaseProduct));
+
+        assertProduct(expectedProduct, products.get(0));
     }
 
 }

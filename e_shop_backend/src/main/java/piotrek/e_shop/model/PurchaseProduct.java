@@ -22,8 +22,8 @@ public class PurchaseProduct {
     @Column(name = "id", nullable = false, unique = true, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal id;
 
-    @Column(name = "purchase_price", nullable = false, scale = 2)
-    private BigDecimal purchasePrice;
+    @Column(name = "piece_price", nullable = false, scale = 2)
+    private BigDecimal piecePrice;
 
     @Column(name = "pieces_number", nullable = false)
     private Integer piecesNumber;
@@ -31,5 +31,46 @@ public class PurchaseProduct {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    public PurchaseProduct() {
+    }
+
+    public PurchaseProduct(BigDecimal piecePrice, Integer piecesNumber, Product product) {
+        this.piecePrice = piecePrice;
+        this.piecesNumber = piecesNumber;
+        this.product = product;
+    }
+
+    public BigDecimal getId() {
+        return id;
+    }
+
+    public void setId(BigDecimal id) {
+        this.id = id;
+    }
+
+    public BigDecimal getPiecePrice() {
+        return piecePrice;
+    }
+
+    public void setPiecePrice(BigDecimal piecePrice) {
+        this.piecePrice = piecePrice;
+    }
+
+    public Integer getPiecesNumber() {
+        return piecesNumber;
+    }
+
+    public void setPiecesNumber(Integer piecesNumber) {
+        this.piecesNumber = piecesNumber;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
 
 }

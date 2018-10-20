@@ -47,4 +47,68 @@ public class Bill {
     @JoinColumn(name = "bill_id")
     private List<PurchaseProduct> purchaseProducts;
 
+    public BigDecimal getId() {
+        return id;
+    }
+
+    public void setId(BigDecimal id) {
+        this.id = id;
+    }
+
+    public BigDecimal getPriceSum() {
+        return priceSum;
+    }
+
+    public void setPriceSum(BigDecimal priceSum) {
+        this.priceSum = priceSum;
+    }
+
+    public BillState getState() {
+        return state;
+    }
+
+    public void setState(BillState state) {
+        this.state = state;
+    }
+
+    public Date getPurchaseDate() {
+        return purchaseDate;
+    }
+
+    public void setPurchaseDate(Date purchaseDate) {
+        this.purchaseDate = purchaseDate;
+    }
+
+    public Date getPaymentDate() {
+        return paymentDate;
+    }
+
+    public void setPaymentDate(Date paymentDate) {
+        this.paymentDate = paymentDate;
+    }
+
+    public Date getPaymentExpirationDate() {
+        return paymentExpirationDate;
+    }
+
+    public void setPaymentExpirationDate(Date paymentExpirationDate) {
+        this.paymentExpirationDate = paymentExpirationDate;
+    }
+
+    public BigDecimal getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(BigDecimal clientId) {
+        this.clientId = clientId;
+    }
+
+    public List<PurchaseProduct> getPurchaseProducts() {
+        return purchaseProducts;
+    }
+
+    public void setPurchaseProducts(List<PurchaseProduct> purchaseProducts) {
+        this.purchaseProducts = purchaseProducts;
+    }
+
 }

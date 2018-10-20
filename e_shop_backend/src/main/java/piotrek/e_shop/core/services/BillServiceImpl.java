@@ -1,0 +1,59 @@
+package piotrek.e_shop.core.services;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import piotrek.e_shop.api.repositories.BillRepository;
+import piotrek.e_shop.api.services.BillService;
+import piotrek.e_shop.api.services.PurchaseProductService;
+import piotrek.e_shop.model.Bill;
+import piotrek.e_shop.model.BillState;
+import piotrek.e_shop.model.PurchaseProduct;
+import piotrek.e_shop.model.builder.BillBuilder;
+import piotrek.e_shop.model.dto.PurchaseProductDto;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.List;
+
+@Service
+public class BillServiceImpl implements BillService {
+
+    private BillRepository billRepository;
+    private PurchaseProductService purchaseProductService;
+    private final long paymentTime;
+
+    @Autowired
+    public BillServiceImpl(BillRepository billRepository, PurchaseProductService purchaseProductService) {
+        this.billRepository = billRepository;
+        this.purchaseProductService = purchaseProductService;
+
+        paymentTime = 100000L;  // TODO read from system parameters
+    }
+
+    @Override
+    public Bill createBill(List<PurchaseProductDto> purchaseProductDtos, BigDecimal clientId) {
+        // TODO validate client
+        List<PurchaseProduct> purchaseProducts = purchaseProductService.preparePurchaseProducts(purchaseProductDtos);
+        Bill bill = prepareBill(clientId, purchaseProducts);
+
+        return billRepository.save(bill);
+    }
+
+    private Bill prepareBill(BigDecimal clientId, List<PurchaseProduct> purchaseProducts) {
+        Date currentDate = new Date();
+        return new BillBuilder().purchaseDate(currentDate)
+                                     .state(BillState.WAITING_FOR_PAYMENT)
+                                     .clientId(clientId)
+                                     .purchaseProducts(purchaseProducts)
+                                     .paymentExpirationDate(new Date(currentDate.getTime() + paymentTime))
+                                     .priceSum(calculatePriceSum(purchaseProducts))
+                                     .build();
+    }
+
+    private BigDecimal calculatePriceSum(List<PurchaseProduct> purchaseProducts) {
+        return purchaseProducts.stream()
+                               .map(pp -> pp.getPiecePrice().multiply(BigDecimal.valueOf(pp.getPiecesNumber())))
+                               .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+}

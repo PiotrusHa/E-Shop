@@ -1,6 +1,7 @@
 package piotrek.e_shop.api.services;
 
 import piotrek.e_shop.model.Product;
+import piotrek.e_shop.model.PurchaseProduct;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,5 +22,7 @@ public interface ProductService {
     Product update(Product product);
 
     List<Product> addAll(List<Product> products);
+
+    List<Product> updateProductsPiecesNumber(List<PurchaseProduct> purchaseProducts);
 
 }

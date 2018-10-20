@@ -89,7 +89,8 @@
                 <configuration>
                     <excludes>
                         <exlude>**/Application.*</exlude>
-                        <exlude>**/model/builder/**</exlude>
+                        <exlude>**/model/**</exlude>
+                        <exlude>**/exceptions/**</exlude>
                     </excludes>
                 </configuration>
                 <executions>
