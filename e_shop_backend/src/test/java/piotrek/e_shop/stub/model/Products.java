@@ -18,8 +18,8 @@ public class Products {
             PRODUCT = new Product();
             PRODUCT.setId(ID);
             PRODUCT.setName(NAME);
-            PRODUCT.setAvailablePiecesNumber(11);
-            PRODUCT.setSoldPiecesNumber(1);
+            PRODUCT.setAvailablePiecesNumber(111);
+            PRODUCT.setSoldPiecesNumber(190);
             PRODUCT.setPrice(BigDecimal.valueOf(11.98));
             PRODUCT.setCategories(List.of(TestCategoryFood.CATEGORY));
         }
@@ -35,14 +35,30 @@ public class Products {
             PRODUCT.setId(ID);
             PRODUCT.setName(NAME);
             PRODUCT.setAvailablePiecesNumber(110);
-            PRODUCT.setSoldPiecesNumber(10);
+            PRODUCT.setSoldPiecesNumber(975);
             PRODUCT.setPrice(BigDecimal.valueOf(3.99));
             PRODUCT.setCategories(List.of());
         }
     }
 
-    public static class TestProductWith2Categories {
+    public static class TestProductDesertEagle {
         public static BigDecimal ID = BigDecimal.valueOf(3);
+        public static String NAME = "Desert Eagle";
+        public static Product PRODUCT;
+
+        static {
+            PRODUCT = new Product();
+            PRODUCT.setId(ID);
+            PRODUCT.setName(NAME);
+            PRODUCT.setAvailablePiecesNumber(13);
+            PRODUCT.setSoldPiecesNumber(100087);
+            PRODUCT.setPrice(BigDecimal.valueOf(599.99));
+            PRODUCT.setCategories(List.of());
+        }
+    }
+
+    public static class TestProductWith2Categories {
+        public static BigDecimal ID = BigDecimal.valueOf(4);
         public static String NAME = "2 categories product";
         public static Product PRODUCT;
 
@@ -59,7 +75,7 @@ public class Products {
     }
 
     public static class TestProductWith3Categories {
-        public static BigDecimal ID = BigDecimal.valueOf(4);
+        public static BigDecimal ID = BigDecimal.valueOf(5);
         public static String NAME = "3 categories product";
         public static Product PRODUCT;
 
@@ -78,6 +94,7 @@ public class Products {
 
     public static List<Product> TEST_PRODUCTS = List.of(TestProductBread.PRODUCT,
                                                         TestProductBeer.PRODUCT,
+                                                        TestProductDesertEagle.PRODUCT,
                                                         TestProductWith2Categories.PRODUCT,
                                                         TestProductWith3Categories.PRODUCT);
 
