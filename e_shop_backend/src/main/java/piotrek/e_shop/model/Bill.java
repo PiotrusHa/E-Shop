@@ -40,7 +40,7 @@ public class Bill {
     @Column(name = "payment_expiration_date", nullable = false)
     private Date paymentExpirationDate;
 
-    @Column(name = "client_id", nullable = false)
+    @Column(name = "client_id", nullable = false, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal clientId;
 
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)

@@ -2,6 +2,7 @@ package piotrek.e_shop.core.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import piotrek.e_shop.api.exceptions.UnableToPayTheBillException;
 import piotrek.e_shop.api.repositories.BillRepository;
 import piotrek.e_shop.api.services.BillService;
 import piotrek.e_shop.api.services.PurchaseProductService;
@@ -11,6 +12,7 @@ import piotrek.e_shop.model.PurchaseProduct;
 import piotrek.e_shop.model.builder.BillBuilder;
 import piotrek.e_shop.model.dto.PurchaseProductDto;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -54,6 +56,21 @@ public class BillServiceImpl implements BillService {
         return purchaseProducts.stream()
                                .map(pp -> pp.getPiecePrice().multiply(BigDecimal.valueOf(pp.getPiecesNumber())))
                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Override
+    public Bill payBill(BigDecimal billId) {
+        Bill bill = billRepository.findById(billId)
+                                  .orElseThrow(EntityNotFoundException::new);
+
+        if (bill.getState() != BillState.WAITING_FOR_PAYMENT) {
+            throw new UnableToPayTheBillException(bill.getId(), bill.getState());
+        }
+
+        bill.setState(BillState.PAID);
+        bill.setPaymentDate(new Date());
+
+        return billRepository.save(bill);
     }
 
 }

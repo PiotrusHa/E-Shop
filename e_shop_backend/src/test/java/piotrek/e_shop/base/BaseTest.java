@@ -131,7 +131,7 @@ public abstract class BaseTest {
 
         assertAll("bill",
                   () -> assertEquals(expected.getId(), actual.getId()),
-                  () -> assertBill(expected, actual)
+                  () -> assertBillWithoutId(expected, actual)
         );
     }
 

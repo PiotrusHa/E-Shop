@@ -16,6 +16,17 @@ public class BillBuilder {
         bill = new Bill();
     }
 
+    public BillBuilder(Bill bill) {
+        this();
+        this.bill.setState(bill.getState());
+        this.bill.setClientId(bill.getClientId());
+        this.bill.setPurchaseDate(bill.getPurchaseDate());
+        this.bill.setPaymentDate(bill.getPaymentDate());
+        this.bill.setPaymentExpirationDate(bill.getPaymentExpirationDate());
+        this.bill.setPriceSum(bill.getPriceSum());
+        this.bill.setPurchaseProducts(bill.getPurchaseProducts());
+    }
+
     public BillBuilder purchaseProducts(List<PurchaseProduct> purchaseProducts) {
         bill.setPurchaseProducts(purchaseProducts);
         return this;

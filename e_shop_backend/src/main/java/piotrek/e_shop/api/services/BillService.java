@@ -10,4 +10,6 @@ public interface BillService {
 
     Bill createBill(List<PurchaseProductDto> purchaseProductDtos, BigDecimal clientId);
 
+    Bill payBill(BigDecimal billId);
+
 }
