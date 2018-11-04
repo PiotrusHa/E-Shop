@@ -14,4 +14,6 @@ public interface BillService {
 
     Bill cancelBill(BigDecimal billId);
 
+    List<Bill> markBillsWithExpiredPaymentDate();
+
 }

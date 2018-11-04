@@ -147,6 +147,16 @@ public abstract class BaseTest {
         );
     }
 
+    protected void assertBills(List<Bill> expected, List<Bill> actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertEquals(expected.size(), actual.size());
+        for (int i = 0; i < expected.size(); i++) {
+            assertBill(expected.get(i), actual.get(i));
+        }
+    }
+
     /* *********************************  Creation methods *******************************************************/
 
     protected PurchaseProduct createPurchaseProductWithUpdatedProduct(Product product, int soldPiecesNumber) {

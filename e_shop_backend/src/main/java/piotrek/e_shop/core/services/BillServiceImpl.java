@@ -89,4 +89,18 @@ public class BillServiceImpl implements BillService {
         return billRepository.save(bill);
     }
 
+    @Override
+    public List<Bill> markBillsWithExpiredPaymentDate() {
+        List<Bill> billsToMark = findBillsWithWaitingForPaymentStatusAndExpiredPaymentDate();
+        billsToMark.forEach(bill -> {
+            purchaseProductService.cancelPurchaseProducts(bill.getPurchaseProducts());
+            bill.setState(BillState.PAYMENT_TIME_EXCEEDED);
+        });
+        return billsToMark;
+    }
+
+    private List<Bill> findBillsWithWaitingForPaymentStatusAndExpiredPaymentDate() {
+        return billRepository.findByStateAndPaymentExpirationDateBefore(BillState.WAITING_FOR_PAYMENT, new Date());
+    }
+
 }

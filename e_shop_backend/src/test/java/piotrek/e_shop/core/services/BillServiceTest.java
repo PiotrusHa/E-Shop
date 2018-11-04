@@ -23,11 +23,10 @@ import piotrek.e_shop.model.builder.PurchaseProductBuilder;
 import piotrek.e_shop.model.dto.PurchaseProductDto;
 import piotrek.e_shop.stub.model.Bills;
 import piotrek.e_shop.stub.model.Bills.BillWaitingForPayment;
-import piotrek.e_shop.stub.model.Products;
+import piotrek.e_shop.stub.model.Bills.BillWithExceededPaymentTimeButStatusNotSet;
 import piotrek.e_shop.stub.model.Products.TestProductBeer;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
 import piotrek.e_shop.stub.model.Products.TestProductDesertEagle;
-import piotrek.e_shop.stub.model.PurchaseProducts;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -98,6 +97,21 @@ class BillServiceTest extends BaseTestWithDatabase {
         UnableToCancelTheBillException exception = assertThrows(UnableToCancelTheBillException.class, () -> billService.cancelBill(bill.getId()));
         assertEquals(bill.getId(), exception.getBillId());
         assertEquals(bill.getState(), exception.getBillState());
+    }
+
+    @Test
+    void markBillsWithExpiredPaymentDate() {
+        List<PurchaseProduct> expectedPurchaseProducts = List.of(createPurchaseProductToCancel(TestProductBread.PRODUCT, 9),
+                                                                 createPurchaseProductToCancel(TestProductBeer.PRODUCT, 10));
+        List<Bill> expectedBills = List.of(
+                new BillBuilder(BillWithExceededPaymentTimeButStatusNotSet.BILL).id(BillWithExceededPaymentTimeButStatusNotSet.ID)
+                                                                                .state(BillState.PAYMENT_TIME_EXCEEDED)
+                                                                                .purchaseProducts(expectedPurchaseProducts)
+                                                                                .build());
+
+        List<Bill> result = billService.markBillsWithExpiredPaymentDate();
+
+        assertBills(expectedBills, result);
     }
 
     private static Stream<Arguments> billUnableToPayOrCancelProvider() {
