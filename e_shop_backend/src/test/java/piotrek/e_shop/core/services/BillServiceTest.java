@@ -9,17 +9,25 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import piotrek.e_shop.api.exceptions.UnableToCancelTheBillException;
 import piotrek.e_shop.api.exceptions.UnableToPayTheBillException;
 import piotrek.e_shop.api.services.BillService;
 import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Bill;
 import piotrek.e_shop.model.BillState;
+import piotrek.e_shop.model.Product;
 import piotrek.e_shop.model.PurchaseProduct;
 import piotrek.e_shop.model.builder.BillBuilder;
+import piotrek.e_shop.model.builder.ProductBuilder;
+import piotrek.e_shop.model.builder.PurchaseProductBuilder;
 import piotrek.e_shop.model.dto.PurchaseProductDto;
 import piotrek.e_shop.stub.model.Bills;
+import piotrek.e_shop.stub.model.Bills.BillWaitingForPayment;
+import piotrek.e_shop.stub.model.Products;
 import piotrek.e_shop.stub.model.Products.TestProductBeer;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
+import piotrek.e_shop.stub.model.Products.TestProductDesertEagle;
+import piotrek.e_shop.stub.model.PurchaseProducts;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -52,8 +60,8 @@ class BillServiceTest extends BaseTestWithDatabase {
 
    @Test
    void payBill() {
-        Bill billToPay = Bills.BillWaitingForPayment.BILL;
-        Bill expectedBill = new BillBuilder(Bills.BillWaitingForPayment.BILL).state(BillState.PAID).build();
+        Bill billToPay = BillWaitingForPayment.BILL;
+        Bill expectedBill = new BillBuilder(BillWaitingForPayment.BILL).state(BillState.PAID).build();
 
         Bill result = billService.payBill(billToPay.getId());
 
@@ -62,19 +70,50 @@ class BillServiceTest extends BaseTestWithDatabase {
    }
 
    @ParameterizedTest
-   @MethodSource("billProvider")
+   @MethodSource("billUnableToPayOrCancelProvider")
    void payBillThrowUnableToPayTheBillException(Bill bill) {
        UnableToPayTheBillException exception = assertThrows(UnableToPayTheBillException.class, () -> billService.payBill(bill.getId()));
        assertEquals(bill.getId(), exception.getBillId());
        assertEquals(bill.getState(), exception.getBillState());
    }
 
-   private static Stream<Arguments> billProvider() {
+    @Test
+    void cancelBill() {
+        Bill billToCancel = BillWaitingForPayment.BILL;
+        List<PurchaseProduct> expectedPurchaseProducts = List.of(createPurchaseProductToCancel(TestProductBeer.PRODUCT, 1),
+                                                                 createPurchaseProductToCancel(TestProductDesertEagle.PRODUCT, 1));
+        Bill expectedBill = new BillBuilder(BillWaitingForPayment.BILL).id(BillWaitingForPayment.ID)
+                                                                       .state(BillState.CANCELLED)
+                                                                       .purchaseProducts(expectedPurchaseProducts)
+                                                                       .build();
+
+        Bill result = billService.cancelBill(billToCancel.getId());
+
+        assertBill(expectedBill, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("billUnableToPayOrCancelProvider")
+    void cancelBillThrowUnableToCancelTheBillException(Bill bill) {
+        UnableToCancelTheBillException exception = assertThrows(UnableToCancelTheBillException.class, () -> billService.cancelBill(bill.getId()));
+        assertEquals(bill.getId(), exception.getBillId());
+        assertEquals(bill.getState(), exception.getBillState());
+    }
+
+    private static Stream<Arguments> billUnableToPayOrCancelProvider() {
         return Stream.of(
                 Arguments.of(Bills.BillCancelled.BILL),
                 Arguments.of(Bills.BillPaid.BILL),
                 Arguments.of(Bills.BillWithExceededPaymentTime.BILL)
         );
-   }
+    }
+
+    private PurchaseProduct createPurchaseProductToCancel(Product product, int soldPiecesNumber) {
+        return new PurchaseProductBuilder(new ProductBuilder(product).id(product.getId())
+                                                                     .availablePiecesNumber(product.getAvailablePiecesNumber() + soldPiecesNumber)
+                                                                     .soldPiecesNumber(product.getSoldPiecesNumber() - soldPiecesNumber)
+                                                                     .build(),
+                                          soldPiecesNumber).build();
+    }
 
 }

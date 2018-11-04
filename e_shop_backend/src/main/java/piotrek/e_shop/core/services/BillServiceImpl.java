@@ -2,6 +2,7 @@ package piotrek.e_shop.core.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import piotrek.e_shop.api.exceptions.UnableToCancelTheBillException;
 import piotrek.e_shop.api.exceptions.UnableToPayTheBillException;
 import piotrek.e_shop.api.repositories.BillRepository;
 import piotrek.e_shop.api.services.BillService;
@@ -69,6 +70,21 @@ public class BillServiceImpl implements BillService {
 
         bill.setState(BillState.PAID);
         bill.setPaymentDate(new Date());
+
+        return billRepository.save(bill);
+    }
+
+    @Override
+    public Bill cancelBill(BigDecimal billId) {
+        Bill bill = billRepository.findById(billId)
+                                  .orElseThrow(EntityNotFoundException::new);
+
+        if (bill.getState() != BillState.WAITING_FOR_PAYMENT) {
+            throw new UnableToCancelTheBillException(bill.getId(), bill.getState());
+        }
+
+        purchaseProductService.cancelPurchaseProducts(bill.getPurchaseProducts());
+        bill.setState(BillState.CANCELLED);
 
         return billRepository.save(bill);
     }

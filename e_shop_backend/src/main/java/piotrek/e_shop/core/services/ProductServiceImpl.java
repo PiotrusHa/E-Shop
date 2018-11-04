@@ -78,17 +78,4 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(product);
     }
 
-    @Override
-    public List<Product> updateProductsPiecesNumber(List<PurchaseProduct> purchaseProducts) {
-        purchaseProducts.forEach(purchaseProduct -> {
-            Product product = purchaseProduct.getProduct();
-            product.setAvailablePiecesNumber(product.getAvailablePiecesNumber() - purchaseProduct.getPiecesNumber());
-            product.setSoldPiecesNumber(product.getSoldPiecesNumber() + purchaseProduct.getPiecesNumber());
-        });
-        List<Product> products = purchaseProducts.stream()
-                                                 .map(PurchaseProduct::getProduct)
-                                                 .collect(Collectors.toList());
-        return productRepository.saveAll(products);
-    }
-
 }

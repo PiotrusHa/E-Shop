@@ -43,7 +43,7 @@ public class Bill {
     @Column(name = "client_id", nullable = false, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal clientId;
 
-    @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bill_id")
     private List<PurchaseProduct> purchaseProducts;
 

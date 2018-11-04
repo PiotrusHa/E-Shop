@@ -12,4 +12,6 @@ public interface BillService {
 
     Bill payBill(BigDecimal billId);
 
+    Bill cancelBill(BigDecimal billId);
+
 }

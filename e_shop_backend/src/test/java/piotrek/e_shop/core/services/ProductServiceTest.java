@@ -20,6 +20,7 @@ import piotrek.e_shop.stub.model.Products.TestProductWith3Categories;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,6 +72,7 @@ class ProductServiceTest extends BaseTestWithDatabase {
     void findByCategoryName(String categoryName, List<Product> expectedResults) {
         List<Product> result = productService.findByCategoryName(categoryName);
 
+        result.sort(Comparator.comparing(Product::getId));
         assertProducts(expectedResults, result);
     }
 
@@ -150,23 +152,6 @@ class ProductServiceTest extends BaseTestWithDatabase {
 
         assertEquals(Product.class, exception.getResourceClass());
         assertNull(exception.getResourceId());
-    }
-
-    @Test
-    void updateProductsPiecesNumber() {
-        Product productToUpdate = new ProductBuilder(TestProductBread.PRODUCT).id(TestProductBread.ID).build();
-        int soldPiecesNumber = 3;
-        PurchaseProduct purchaseProduct = new PurchaseProductBuilder().product(productToUpdate)
-                                                                      .piecesNumber(soldPiecesNumber)
-                                                                      .build();
-        Product expectedProduct = new ProductBuilder(TestProductBread.PRODUCT).id(TestProductBread.ID)
-                                                                              .availablePiecesNumber(productToUpdate.getAvailablePiecesNumber() - soldPiecesNumber)
-                                                                              .soldPiecesNumber(productToUpdate.getSoldPiecesNumber() + soldPiecesNumber)
-                                                                              .build();
-
-        List<Product> products = productService.updateProductsPiecesNumber(List.of(purchaseProduct));
-
-        assertProduct(expectedProduct, products.get(0));
     }
 
 }

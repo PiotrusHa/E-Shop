@@ -9,4 +9,6 @@ public interface PurchaseProductService {
 
     List<PurchaseProduct> preparePurchaseProducts(List<PurchaseProductDto> purchaseProductDtos);
 
+    void cancelPurchaseProducts(List<PurchaseProduct> purchaseProducts);
+
 }

@@ -23,6 +23,4 @@ public interface ProductService {
 
     List<Product> addAll(List<Product> products);
 
-    List<Product> updateProductsPiecesNumber(List<PurchaseProduct> purchaseProducts);
-
 }
