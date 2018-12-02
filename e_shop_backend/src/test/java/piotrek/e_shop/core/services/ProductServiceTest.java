@@ -10,7 +10,9 @@ import piotrek.e_shop.api.services.ProductService;
 import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Category;
 import piotrek.e_shop.model.Product;
+import piotrek.e_shop.model.PurchaseProduct;
 import piotrek.e_shop.model.builder.ProductBuilder;
+import piotrek.e_shop.model.builder.PurchaseProductBuilder;
 import piotrek.e_shop.stub.model.Categories;
 import piotrek.e_shop.stub.model.Products;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
@@ -18,6 +20,7 @@ import piotrek.e_shop.stub.model.Products.TestProductWith3Categories;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,6 +72,7 @@ class ProductServiceTest extends BaseTestWithDatabase {
     void findByCategoryName(String categoryName, List<Product> expectedResults) {
         List<Product> result = productService.findByCategoryName(categoryName);
 
+        result.sort(Comparator.comparing(Product::getId));
         assertProducts(expectedResults, result);
     }
 

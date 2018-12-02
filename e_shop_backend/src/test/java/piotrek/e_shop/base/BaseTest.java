@@ -1,10 +1,13 @@
 package piotrek.e_shop.base;
 
 import org.junit.jupiter.params.provider.Arguments;
+import piotrek.e_shop.model.Bill;
 import piotrek.e_shop.model.Category;
 import piotrek.e_shop.model.Product;
+import piotrek.e_shop.model.PurchaseProduct;
+import piotrek.e_shop.model.builder.ProductBuilder;
+import piotrek.e_shop.model.builder.PurchaseProductBuilder;
 import piotrek.e_shop.stub.model.Categories;
-import piotrek.e_shop.stub.model.Products;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
 import piotrek.e_shop.stub.model.Products.TestProductWith2Categories;
 import piotrek.e_shop.stub.model.Products.TestProductWith3Categories;
@@ -79,6 +82,97 @@ public abstract class BaseTest {
         for (int i = 0; i < expected.size(); i++) {
             assertCategory(expected.get(i), actual.get(i));
         }
+    }
+
+    protected void assertPurchaseProduct(PurchaseProduct expected, PurchaseProduct actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertAll("purchaseProduct",
+                  () -> assertEquals(expected.getId(), actual.getId()),
+                  () -> assertPurchaseProductWithoutId(expected, actual)
+        );
+    }
+
+    protected void assertPurchaseProductWithoutId(PurchaseProduct expected, PurchaseProduct actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertAll("purchaseProduct",
+                  () -> assertProduct(expected.getProduct(), actual.getProduct()),
+                  () -> assertEquals(expected.getPiecesNumber(), actual.getPiecesNumber()),
+                  () -> assertEquals(expected.getPiecePrice(), actual.getPiecePrice())
+        );
+    }
+
+    protected void assertPurchaseProducts(List<PurchaseProduct> expected, List<PurchaseProduct> actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertEquals(expected.size(), actual.size());
+        for (int i = 0; i < expected.size(); i++) {
+            assertPurchaseProduct(expected.get(i), actual.get(i));
+        }
+    }
+
+    protected void assertPurchaseProductsWithoutId(List<PurchaseProduct> expected, List<PurchaseProduct> actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertEquals(expected.size(), actual.size());
+        for (int i = 0; i < expected.size(); i++) {
+            assertPurchaseProductWithoutId(expected.get(i), actual.get(i));
+        }
+    }
+
+    protected void assertBill(Bill expected, Bill actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertAll("bill",
+                  () -> assertEquals(expected.getId(), actual.getId()),
+                  () -> assertBillWithoutId(expected, actual)
+        );
+    }
+
+    protected void assertBillWithoutId(Bill expected, Bill actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertAll("bill",
+                  () -> assertEquals(expected.getClientId(), actual.getClientId()),
+                  () -> assertEquals(expected.getState(), actual.getState()),
+                  () -> assertEquals(expected.getPriceSum(), actual.getPriceSum()),
+                  () -> assertPurchaseProductsWithoutId(expected.getPurchaseProducts(), actual.getPurchaseProducts())
+        );
+    }
+
+    protected void assertBills(List<Bill> expected, List<Bill> actual) {
+        assertNotNull(expected);
+        assertNotNull(actual);
+
+        assertEquals(expected.size(), actual.size());
+        for (int i = 0; i < expected.size(); i++) {
+            assertBill(expected.get(i), actual.get(i));
+        }
+    }
+
+    /* *********************************  Creation methods *******************************************************/
+
+    protected PurchaseProduct createPurchaseProductWithUpdatedProduct(Product product, int soldPiecesNumber) {
+        return new PurchaseProductBuilder(new ProductBuilder(product).id(product.getId())
+                                                                     .availablePiecesNumber(product.getAvailablePiecesNumber() - soldPiecesNumber)
+                                                                     .soldPiecesNumber(product.getSoldPiecesNumber() + soldPiecesNumber)
+                                                                     .build(),
+                                          soldPiecesNumber).build();
+    }
+
+    protected PurchaseProduct createPurchaseProductToCancel(Product product, int soldPiecesNumber) {
+        return new PurchaseProductBuilder(new ProductBuilder(product).id(product.getId())
+                                                                     .availablePiecesNumber(product.getAvailablePiecesNumber() + soldPiecesNumber)
+                                                                     .soldPiecesNumber(product.getSoldPiecesNumber() - soldPiecesNumber)
+                                                                     .build(),
+                                          soldPiecesNumber).build();
     }
 
     /* *********************************  Argument Providers **********************************************************/

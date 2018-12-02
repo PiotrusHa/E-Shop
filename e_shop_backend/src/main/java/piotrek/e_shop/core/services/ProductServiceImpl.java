@@ -8,11 +8,12 @@ import piotrek.e_shop.api.services.ProductService;
 import piotrek.e_shop.api.repositories.ProductRepository;
 import piotrek.e_shop.model.Category;
 import piotrek.e_shop.model.Product;
+import piotrek.e_shop.model.PurchaseProduct;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {

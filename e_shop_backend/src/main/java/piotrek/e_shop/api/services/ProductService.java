@@ -1,6 +1,7 @@
 package piotrek.e_shop.api.services;
 
 import piotrek.e_shop.model.Product;
+import piotrek.e_shop.model.PurchaseProduct;
 
 import java.math.BigDecimal;
 import java.util.List;

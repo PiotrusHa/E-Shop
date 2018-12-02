@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Product;
 
+import java.util.Comparator;
 import java.util.List;
 
 @DisplayName("Product Repository Test")
@@ -16,6 +17,7 @@ class ProductRepositoryTest extends BaseTestWithDatabase {
     void findProductsByCategoryName(String name, List<Product> expectedResults) {
         List<Product> result = productRepository.findByCategoryName(name);
 
+        result.sort(Comparator.comparing(Product::getId));
         assertProducts(expectedResults, result);
     }
 
