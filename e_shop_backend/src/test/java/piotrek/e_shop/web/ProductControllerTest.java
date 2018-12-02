@@ -34,7 +34,7 @@ class ProductControllerTest extends BaseControllerTest {
     void getAllProducts() throws Exception {
         List<Product> expectedProducts = Products.TEST_PRODUCTS;
 
-        MvcResult mvcResult = mockMvc.perform(get("/e_shop/products"))
+        MvcResult mvcResult = mockMvc.perform(get("/products"))
                                      .andExpect(status().isOk())
                                      .andReturn();
         List<Product> products = readValueAsList(mvcResult, Product.class);
@@ -48,7 +48,7 @@ class ProductControllerTest extends BaseControllerTest {
         List<Product> expectedProducts = List.of(TestProductWith2Categories.PRODUCT,
                                                  TestProductWith3Categories.PRODUCT);
 
-        MvcResult mvcResult = mockMvc.perform(get("/e_shop/products/{categoryName}", categoryName))
+        MvcResult mvcResult = mockMvc.perform(get("/products/{categoryName}", categoryName))
                                      .andExpect(status().isOk())
                                      .andReturn();
         List<Product> products = readValueAsList(mvcResult, Product.class);
@@ -61,7 +61,7 @@ class ProductControllerTest extends BaseControllerTest {
         Product productToSave = new ProductBuilder(Products.TestProductBread.PRODUCT).build();
         String productToSaveAsJson = writeValueAsJson(productToSave);
 
-        MvcResult mvcResult = mockMvc.perform(post("/e_shop/products/add")
+        MvcResult mvcResult = mockMvc.perform(post("/products/add")
                                                       .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                       .content(productToSaveAsJson))
                                      .andExpect(status().isOk())
@@ -80,7 +80,7 @@ class ProductControllerTest extends BaseControllerTest {
                 .extraInfo(changedExtraInfo).build();
         String productToSaveAsJson = writeValueAsJson(productToSave);
 
-        MvcResult mvcResult = mockMvc.perform(post("/e_shop/products/update")
+        MvcResult mvcResult = mockMvc.perform(post("/products/update")
                                                       .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                       .content(productToSaveAsJson))
                                      .andExpect(status().isOk())

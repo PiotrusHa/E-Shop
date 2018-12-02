@@ -31,7 +31,7 @@ class CategoryControllerTest extends BaseControllerTest {
     void getAllCategories() throws Exception {
         List<Category> expectedCategories = Categories.TEST_CATEGORIES;
 
-        MvcResult mvcResult = mockMvc.perform(get("/e_shop/categories"))
+        MvcResult mvcResult = mockMvc.perform(get("/categories"))
                                      .andExpect(status().isOk())
                                      .andReturn();
         List<Category> categories = readValueAsList(mvcResult, Category.class);
@@ -44,7 +44,7 @@ class CategoryControllerTest extends BaseControllerTest {
         Category categoryToSave = new CategoryBuilder(Categories.TestCategoryToys.NAME).build();
         String categoryToSaveAsJson = writeValueAsJson(categoryToSave);
 
-        MvcResult mvcResult = mockMvc.perform(post("/e_shop/categories/add")
+        MvcResult mvcResult = mockMvc.perform(post("/categories/add")
                                                       .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                       .content(categoryToSaveAsJson))
                                      .andExpect(status().isOk())

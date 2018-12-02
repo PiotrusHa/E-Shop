@@ -15,7 +15,7 @@ import piotrek.e_shop.model.Category;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "e_shop/categories", produces = APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = "categories", produces = APPLICATION_JSON_UTF8_VALUE)
 public class CategoryController {
 
     private CategoryService categoryService;

@@ -15,7 +15,7 @@ import piotrek.e_shop.model.Product;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "e_shop/products", produces = APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = "products", produces = APPLICATION_JSON_UTF8_VALUE)
 public class ProductController {
 
     private ProductService productService;

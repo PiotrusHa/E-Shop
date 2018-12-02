@@ -39,7 +39,7 @@ class BillControllerTest extends BaseControllerTest {
         int clientId = 1;
         List<Bill> expectedResult = Bills.TEST_BILLS;
 
-        MvcResult mvcResult = mockMvc.perform(get("/e_shop/bills/client/{clientId}", clientId))
+        MvcResult mvcResult = mockMvc.perform(get("/bills/client/{clientId}", clientId))
                                      .andExpect(status().isOk())
                                      .andReturn();
         List<Bill> result = readValueAsList(mvcResult, Bill.class);
@@ -53,7 +53,7 @@ class BillControllerTest extends BaseControllerTest {
         BillState state = BillState.PAID;
         List<Bill> expectedResult = List.of(BillPaid.BILL);
 
-        MvcResult mvcResult = mockMvc.perform(get("/e_shop/bills/client/{clientId}/{state}", clientId, state))
+        MvcResult mvcResult = mockMvc.perform(get("/bills/client/{clientId}/{state}", clientId, state))
                                      .andExpect(status().isOk())
                                      .andReturn();
         List<Bill> result = readValueAsList(mvcResult, Bill.class);
@@ -77,7 +77,7 @@ class BillControllerTest extends BaseControllerTest {
                                              .state(BillState.WAITING_FOR_PAYMENT)
                                              .build();
 
-        MvcResult mvcResult = mockMvc.perform(post("/e_shop/bills/client/{clientId}/create", clientId)
+        MvcResult mvcResult = mockMvc.perform(post("/bills/client/{clientId}/create", clientId)
                                                       .contentType(MediaType.APPLICATION_JSON_UTF8)
                                                       .content(dtosAsJson))
                                      .andExpect(status().isOk())
@@ -92,7 +92,7 @@ class BillControllerTest extends BaseControllerTest {
         Bill billToPay = Bills.BillWaitingForPayment.BILL;
         Bill expectedBill = new BillBuilder(Bills.BillWaitingForPayment.BILL).state(BillState.PAID).build();
 
-        MvcResult mvcResult = mockMvc.perform(patch("/e_shop/bills/{billId}/pay", billToPay.getId()))
+        MvcResult mvcResult = mockMvc.perform(patch("/bills/{billId}/pay", billToPay.getId()))
                                      .andExpect(status().isOk())
                                      .andReturn();
         Bill result = readValueAsObject(mvcResult, Bill.class);
@@ -111,7 +111,7 @@ class BillControllerTest extends BaseControllerTest {
                                                                              .purchaseProducts(expectedPurchaseProducts)
                                                                              .build();
 
-        MvcResult mvcResult = mockMvc.perform(patch("/e_shop/bills/{billId}/cancel", billToCancel.getId()))
+        MvcResult mvcResult = mockMvc.perform(patch("/bills/{billId}/cancel", billToCancel.getId()))
                                      .andExpect(status().isOk())
                                      .andReturn();
         Bill result = readValueAsObject(mvcResult, Bill.class);

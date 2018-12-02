@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "e_shop/bills", produces = APPLICATION_JSON_UTF8_VALUE)
+@RequestMapping(value = "bills", produces = APPLICATION_JSON_UTF8_VALUE)
 public class BillController {
 
     private BillService billService;
