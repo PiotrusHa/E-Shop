@@ -1,0 +1,41 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <preConditions>
+        <runningAs username="e_shop"/>
+    </preConditions>
+
+    <changeSet id="delete-all" author="piotrusha" runAlways="true">
+        <delete tableName="products_categories" />
+        <delete tableName="products" />
+        <delete tableName="categories" />
+    </changeSet>
+
+    <changeSet id="add-categories" author="piotrusha" runAlways="true">
+        <loadData tableName="categories"
+                  file="liquibase/csv/categories.csv"/>
+    </changeSet>
+
+    <changeSet id="add-products" author="piotrusha" runAlways="true">
+        <loadData tableName="products"
+                  file="liquibase/csv/products.csv" />
+    </changeSet>
+
+    <changeSet id="add-products-categories" author="piotrusha" runAlways="true">
+        <loadData tableName="products_categories"
+                  file="liquibase/csv/products_categories.csv" />
+    </changeSet>
+
+    <changeSet id="update-sequences" author="piotrusha" runAlways="true">
+        <sql dbms="h2">
+            ALTER SEQUENCE products_seq RESTART WITH (SELECT MAX(ID) FROM products);
+            CALL NEXT VALUE FOR products_seq;
+
+            ALTER SEQUENCE categories_seq RESTART WITH (SELECT MAX(ID) FROM products);
+            CALL NEXT VALUE FOR categories_seq;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

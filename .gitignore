@@ -4,3 +4,10 @@
 /e_shop_database/e_shop_database.iml
 /e_shop_database/target
 /e_shop_frontend/node_modules
+/e_shop_backend/e_shop_core/target
+/e_shop_backend/e_shop_web/target
+/e_shop_backend/e_shop_database/target
+/e_shop_backend/e_shop_web/e_shop_web.iml
+/e_shop_backend/e_shop_core/e_shop_core.iml
+/e_shop_backend/e_shop_database/target
+/e_shop_backend/e_shop_database/e_shop_database.iml
