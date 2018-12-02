@@ -34,6 +34,16 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public List<Bill> findBillsByClientId(BigDecimal clientId) {
+        return billRepository.findByClientId(clientId);
+    }
+
+    @Override
+    public List<Bill> findBillsByClientIdAndState(BigDecimal clientId, BillState state) {
+        return billRepository.findByClientIdAndState(clientId, state);
+    }
+
+    @Override
     public Bill createBill(List<PurchaseProductDto> purchaseProductDtos, BigDecimal clientId) {
         // TODO validate client
         List<PurchaseProduct> purchaseProducts = purchaseProductService.preparePurchaseProducts(purchaseProductDtos);

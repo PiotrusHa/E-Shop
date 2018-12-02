@@ -167,6 +167,14 @@ public abstract class BaseTest {
                                           soldPiecesNumber).build();
     }
 
+    protected PurchaseProduct createPurchaseProductToCancel(Product product, int soldPiecesNumber) {
+        return new PurchaseProductBuilder(new ProductBuilder(product).id(product.getId())
+                                                                     .availablePiecesNumber(product.getAvailablePiecesNumber() + soldPiecesNumber)
+                                                                     .soldPiecesNumber(product.getSoldPiecesNumber() - soldPiecesNumber)
+                                                                     .build(),
+                                          soldPiecesNumber).build();
+    }
+
     /* *********************************  Argument Providers **********************************************************/
 
     protected static Stream<Arguments> categoryNameProvider() {

@@ -15,14 +15,14 @@ import piotrek.e_shop.api.services.BillService;
 import piotrek.e_shop.base.BaseTestWithDatabase;
 import piotrek.e_shop.model.Bill;
 import piotrek.e_shop.model.BillState;
-import piotrek.e_shop.model.Product;
 import piotrek.e_shop.model.PurchaseProduct;
 import piotrek.e_shop.model.builder.BillBuilder;
-import piotrek.e_shop.model.builder.ProductBuilder;
-import piotrek.e_shop.model.builder.PurchaseProductBuilder;
 import piotrek.e_shop.model.dto.PurchaseProductDto;
 import piotrek.e_shop.stub.model.Bills;
+import piotrek.e_shop.stub.model.Bills.BillCancelled;
+import piotrek.e_shop.stub.model.Bills.BillPaid;
 import piotrek.e_shop.stub.model.Bills.BillWaitingForPayment;
+import piotrek.e_shop.stub.model.Bills.BillWithExceededPaymentTime;
 import piotrek.e_shop.stub.model.Bills.BillWithExceededPaymentTimeButStatusNotSet;
 import piotrek.e_shop.stub.model.Products.TestProductBeer;
 import piotrek.e_shop.stub.model.Products.TestProductBread;
@@ -36,6 +36,24 @@ class BillServiceTest extends BaseTestWithDatabase {
 
     @Autowired
     private BillService billService;
+
+    @Test
+    void findBillsByClientId() {
+        BigDecimal clientId = BigDecimal.ONE;
+        List<Bill> expectedResult = Bills.TEST_BILLS;
+
+        List<Bill> result = billService.findBillsByClientId(clientId);
+
+        assertBills(expectedResult, result);
+    }
+
+    @ParameterizedTest
+    @MethodSource("clientIdAndStateProvider")
+    void findBillsByClientIdAndState(BigDecimal clientId, BillState state, List<Bill> expectedResult) {
+        List<Bill> result = billService.findBillsByClientIdAndState(clientId, state);
+
+        assertBills(expectedResult, result);
+    }
 
     @Test
     void createBill() {
@@ -116,18 +134,21 @@ class BillServiceTest extends BaseTestWithDatabase {
 
     private static Stream<Arguments> billUnableToPayOrCancelProvider() {
         return Stream.of(
-                Arguments.of(Bills.BillCancelled.BILL),
-                Arguments.of(Bills.BillPaid.BILL),
-                Arguments.of(Bills.BillWithExceededPaymentTime.BILL)
+                Arguments.of(BillCancelled.BILL),
+                Arguments.of(BillPaid.BILL),
+                Arguments.of(BillWithExceededPaymentTime.BILL)
         );
     }
 
-    private PurchaseProduct createPurchaseProductToCancel(Product product, int soldPiecesNumber) {
-        return new PurchaseProductBuilder(new ProductBuilder(product).id(product.getId())
-                                                                     .availablePiecesNumber(product.getAvailablePiecesNumber() + soldPiecesNumber)
-                                                                     .soldPiecesNumber(product.getSoldPiecesNumber() - soldPiecesNumber)
-                                                                     .build(),
-                                          soldPiecesNumber).build();
+    private static Stream<Arguments> clientIdAndStateProvider() {
+        BigDecimal clientId = BigDecimal.ONE;
+        return Stream.of(
+                Arguments.of(clientId, BillState.WAITING_FOR_PAYMENT, List.of(BillWaitingForPayment.BILL,
+                                                                              BillWithExceededPaymentTimeButStatusNotSet.BILL)),
+                Arguments.of(clientId, BillState.PAID, List.of(BillPaid.BILL)),
+                Arguments.of(clientId, BillState.PAYMENT_TIME_EXCEEDED, List.of(BillWithExceededPaymentTime.BILL)),
+                Arguments.of(clientId, BillState.CANCELLED, List.of(BillCancelled.BILL))
+        );
     }
 
 }

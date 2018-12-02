@@ -14,6 +14,8 @@ public interface BillRepository extends JpaRepository<Bill, BigDecimal> {
 
     List<Bill> findByClientId(BigDecimal clientId);
 
+    List<Bill> findByClientIdAndState(BigDecimal clientId, BillState state);
+
     List<Bill> findByStateAndPaymentExpirationDateBefore(BillState state, Date paymentExpirationLimitDate);
 
 }
