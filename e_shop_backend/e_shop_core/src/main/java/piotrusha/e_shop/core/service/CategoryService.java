@@ -1,23 +1,54 @@
 package piotrusha.e_shop.core.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import piotrusha.e_shop.core.exception.EntityNotFoundException;
 import piotrusha.e_shop.core.model.Category;
+import piotrusha.e_shop.core.repository.CategoryRepository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public interface CategoryService {
+@Service
+public class CategoryService {
 
-    Optional<Category> findById(BigDecimal id);
+    private CategoryRepository categoryRepository;
 
-    Optional<Category> findByName(String name);
+    @Autowired
+    public CategoryService(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
 
-    List<Category> findAll();
+    public Optional<Category> findById(BigDecimal id) {
+        return categoryRepository.findById(id);
+    }
 
-    Category save(Category category);
+    public Optional<Category> findByName(String name) {
+        return categoryRepository.findByName(name);
+    }
 
-    List<Category> saveAll(List<Category> categories);
+    public List<Category> findAll() {
+        return categoryRepository.findAll();
+    }
 
-    List<Category> validateCategories(List<Category> categories);
+    public Category save(Category category) {
+        return categoryRepository.save(category);
+    }
+
+    public List<Category> saveAll(List<Category> categories) {
+        return categoryRepository.saveAll(categories);
+    }
+
+    public List<Category> validateCategories(List<Category> categories) {
+        List<Category> categoriesFromDatabase = new ArrayList<>();
+        categories.forEach(category -> {
+            Category categoryFromDb = findById(category.getId())
+                                        .orElseThrow(() -> new EntityNotFoundException(Category.class, category.getId()));
+            categoriesFromDatabase.add(categoryFromDb);
+        });
+        return categoriesFromDatabase;
+    }
 
 }
