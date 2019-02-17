@@ -20,6 +20,10 @@ import java.util.Optional;
 
 class ProductModificationTest {
 
+    private static final String ASSIGNED_CATEGORY = "beer";
+    private static final String CATEGORY_TO_ASSIGN1 = "category1";
+    private static final String CATEGORY_TO_ASSIGN2 = "category2";
+
     private ProductFacade productFacade;
 
     private ProductDto productToModify;
@@ -28,9 +32,10 @@ class ProductModificationTest {
     void init() {
         productFacade = new ProductConfiguration().productFacade();
 
-        String categoryName = "beer";
-        CreateProductDto createProductDto = new CreateProductDto("Tatra", BigDecimal.TEN, 123, "description", List.of(categoryName));
-        productFacade.createProductCategory(new CreateProductCategoryDto(categoryName));
+        CreateProductDto createProductDto = new CreateProductDto("Tatra", BigDecimal.TEN, 123, "description", List.of(ASSIGNED_CATEGORY));
+        productFacade.createProductCategory(new CreateProductCategoryDto(ASSIGNED_CATEGORY));
+        productFacade.createProductCategory(new CreateProductCategoryDto(CATEGORY_TO_ASSIGN1));
+        productFacade.createProductCategory(new CreateProductCategoryDto(CATEGORY_TO_ASSIGN2));
         productToModify = productFacade.createProduct(createProductDto);
     }
 
@@ -104,6 +109,83 @@ class ProductModificationTest {
 
         ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.modifyProduct(modifyProductDto));
         assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    void modifyAssignCategory() {
+        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
+                                                                  .setProductCategoriesToAssign(
+                                                                          List.of(CATEGORY_TO_ASSIGN1, CATEGORY_TO_ASSIGN2));
+        ProductDto expected = productToModify.setCategories(List.of(CATEGORY_TO_ASSIGN1, CATEGORY_TO_ASSIGN2, ASSIGNED_CATEGORY));
+
+        productFacade.modifyProduct(modifyProductDto);
+
+        Optional<ProductDto> productOpt = productFacade.findProductByProductId(productToModify.getProductId());
+        assertTrue(productOpt.isPresent());
+        assertProductDto(expected, productOpt.get());
+    }
+
+    @Test
+    void modifyAssignNonexistentCategory() {
+        String categoryName = "nonexistent category";
+        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
+                                                                  .setProductCategoriesToAssign(List.of(categoryName));
+        String expectedMessage = "Category with name " + categoryName + " does not exists.";
+
+        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.modifyProduct(modifyProductDto));
+        assertEquals(expectedMessage, e.getMessage());
+    }
+
+    @Test
+    void modifyAssignAlreadyAssignedCategory() {
+        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
+                                                                  .setProductCategoriesToAssign(List.of(ASSIGNED_CATEGORY));
+        ProductDto expected = productToModify.setCategories(List.of(ASSIGNED_CATEGORY));
+
+        productFacade.modifyProduct(modifyProductDto);
+
+        Optional<ProductDto> productOpt = productFacade.findProductByProductId(productToModify.getProductId());
+        assertTrue(productOpt.isPresent());
+        assertProductDto(expected, productOpt.get());
+    }
+
+    @Test
+    void modifyUnassignCategory() {
+        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
+                                                                  .setProductCategoriesToUnassign(List.of(ASSIGNED_CATEGORY));
+        ProductDto expected = productToModify.setCategories(List.of());
+
+        productFacade.modifyProduct(modifyProductDto);
+
+        Optional<ProductDto> productOpt = productFacade.findProductByProductId(productToModify.getProductId());
+        assertTrue(productOpt.isPresent());
+        assertProductDto(expected, productOpt.get());
+    }
+
+    @Test
+    void modifyUnassignNonexistentCategory() {
+        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
+                                                                  .setProductCategoriesToUnassign(List.of("nonexistent category"));
+        ProductDto expected = productToModify.setCategories(List.of(ASSIGNED_CATEGORY));
+
+        productFacade.modifyProduct(modifyProductDto);
+
+        Optional<ProductDto> productOpt = productFacade.findProductByProductId(productToModify.getProductId());
+        assertTrue(productOpt.isPresent());
+        assertProductDto(expected, productOpt.get());
+    }
+
+    @Test
+    void modifyUnassignNotAssignedCategory() {
+        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
+                                                                  .setProductCategoriesToUnassign(List.of(CATEGORY_TO_ASSIGN2));
+        ProductDto expected = productToModify.setCategories(List.of(ASSIGNED_CATEGORY));
+
+        productFacade.modifyProduct(modifyProductDto);
+
+        Optional<ProductDto> productOpt = productFacade.findProductByProductId(productToModify.getProductId());
+        assertTrue(productOpt.isPresent());
+        assertProductDto(expected, productOpt.get());
     }
 
 }

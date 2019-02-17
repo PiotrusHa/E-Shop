@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -15,5 +16,7 @@ public class ModifyProductDto {
     private BigDecimal productPrice;
     private String productDescription;
     private Integer productAvailablePiecesNumber;
+    private List<String> productCategoriesToAssign;
+    private List<String> productCategoriesToUnassign;
 
 }

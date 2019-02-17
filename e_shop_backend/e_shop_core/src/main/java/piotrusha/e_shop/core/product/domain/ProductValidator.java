@@ -54,7 +54,9 @@ class ProductValidator {
         if (dto.getProductAvailablePiecesNumber() != null) {
             validateAvailablePiecesNumber(dto.getProductAvailablePiecesNumber());
         }
-
+        if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign().isEmpty()) {
+            validateCategories(dto.getProductCategoriesToAssign());
+        }
     }
 
     private void validateProductId(BigDecimal productId) {

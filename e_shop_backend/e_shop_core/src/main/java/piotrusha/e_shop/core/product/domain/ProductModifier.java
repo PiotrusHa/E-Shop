@@ -4,6 +4,8 @@ import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 class ProductModifier {
 
@@ -41,6 +43,20 @@ class ProductModifier {
         if (dto.getProductDescription() != null) {
             product.setDescription(dto.getProductDescription());
         }
+        if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign()
+                                                              .isEmpty()) {
+            product.assingCategories(convertToCategories(dto.getProductCategoriesToAssign()));
+        }
+        if (dto.getProductCategoriesToUnassign() != null && !dto.getProductCategoriesToUnassign()
+                                                                .isEmpty()) {
+            product.unassignCategories(convertToCategories(dto.getProductCategoriesToUnassign()));
+        }
+    }
+
+    private List<Category> convertToCategories(List<String> categories) {
+        return categories.stream()
+                         .map(Category::new)
+                         .collect(Collectors.toList());
     }
 
     private void save(Product product) {

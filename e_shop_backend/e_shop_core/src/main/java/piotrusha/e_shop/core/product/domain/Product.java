@@ -17,6 +17,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -53,6 +54,14 @@ class Product {
             joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "category_name", referencedColumnName = "name")
     )
-    private List<Category> categories;
+    private Set<Category> categories;
+
+    void assingCategories(List<Category> categories) {
+        this.categories.addAll(categories);
+    }
+
+    void unassignCategories(List<Category> categories) {
+        this.categories.removeAll(categories);
+    }
 
 }

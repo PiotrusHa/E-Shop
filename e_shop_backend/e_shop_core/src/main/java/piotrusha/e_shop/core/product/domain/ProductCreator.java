@@ -7,6 +7,7 @@ import piotrusha.e_shop.core.product.domain.exception.ProductValidationException
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 class ProductCreator {
@@ -37,10 +38,10 @@ class ProductCreator {
 
     private Product create(CreateProductDto dto) {
         BigDecimal generatedId = productIdGenerator.generate();
-        List<Category> categories = dto.getCategories()
-                                       .stream()
-                                       .map(Category::new)
-                                       .collect(Collectors.toList());
+        Set<Category> categories = dto.getCategories()
+                                      .stream()
+                                      .map(Category::new)
+                                      .collect(Collectors.toSet());
 
         return new Product().setProductId(generatedId)
                             .setName(dto.getProductName())
