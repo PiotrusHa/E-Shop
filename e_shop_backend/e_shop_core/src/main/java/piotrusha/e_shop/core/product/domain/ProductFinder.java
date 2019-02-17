@@ -16,7 +16,7 @@ class ProductFinder {
     }
 
     Optional<ProductDto> findByProductId(BigDecimal productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByProductId(productId)
                                 .map(productConverter::toDto);
     }
 

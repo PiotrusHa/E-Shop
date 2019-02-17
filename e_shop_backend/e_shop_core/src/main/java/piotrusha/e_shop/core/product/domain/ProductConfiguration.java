@@ -14,10 +14,12 @@ class ProductConfiguration {
 
         ProductIdGenerator productIdGenerator = new ProductIdGenerator(productRepository);
         ProductConverter productConverter = new ProductConverter();
-        ProductCreator productCreator = new ProductCreator(productRepository, categoryRepository, productIdGenerator, productConverter);
+        ProductValidator productValidator = new ProductValidator(categoryRepository);
+        ProductCreator productCreator = new ProductCreator(productRepository, productValidator, productIdGenerator, productConverter);
+        ProductModifier productModifier = new ProductModifier(productRepository, productValidator);
         ProductFinder productFinder = new ProductFinder(productRepository, productConverter);
 
-        return new ProductFacade(categoryCreator, categoryFinder, productCreator, productFinder);
+        return new ProductFacade(categoryCreator, categoryFinder, productCreator, productModifier, productFinder);
     }
 
     ProductFacade productFacade() {

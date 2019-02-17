@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 class ProductCreator {
 
     private final ProductRepository productRepository;
-    private final CategoryRepository categoryRepository;
+    private final ProductValidator productValidator;
     private final ProductIdGenerator productIdGenerator;
     private final ProductConverter productConverter;
 
-    ProductCreator(ProductRepository productRepository, CategoryRepository categoryRepository, ProductIdGenerator productIdGenerator,
+    ProductCreator(ProductRepository productRepository, ProductValidator productValidator, ProductIdGenerator productIdGenerator,
                    ProductConverter productConverter) {
         this.productRepository = productRepository;
-        this.categoryRepository = categoryRepository;
+        this.productValidator = productValidator;
         this.productIdGenerator = productIdGenerator;
         this.productConverter = productConverter;
     }
@@ -32,20 +32,7 @@ class ProductCreator {
     }
 
     private void validate(CreateProductDto dto) {
-        if (Strings.isNullOrEmpty(dto.getProductName())) {
-            throw ProductValidationException.emptyName();
-        }
-        if (dto.getPrice() == null) {
-            throw ProductValidationException.emptyPrice();
-        }
-        if (dto.getAvailablePiecesNumber() == null || dto.getAvailablePiecesNumber() < 0) {
-            throw ProductValidationException.wrongAvailablePiecesNumber();
-        }
-        for (String categoryName : dto.getCategories()) {
-            if (!categoryRepository.existsByName(categoryName)) {
-                throw ProductValidationException.categoryDoesNotExists(categoryName);
-            }
-        }
+        productValidator.validate(dto);
     }
 
     private Product create(CreateProductDto dto) {

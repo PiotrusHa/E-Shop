@@ -18,7 +18,7 @@ class InMemoryProductRepository implements ProductRepository {
     }
 
     @Override
-    public Optional<Product> findById(BigDecimal id) {
+    public Optional<Product> findByProductId(BigDecimal id) {
         return Optional.ofNullable(map.get(id));
     }
 

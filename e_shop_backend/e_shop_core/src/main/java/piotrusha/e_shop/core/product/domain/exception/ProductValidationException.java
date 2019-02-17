@@ -18,6 +18,10 @@ public class ProductValidationException extends RuntimeException {
         return new ProductValidationException(String.format("Category with name %s does not exists.", categoryName));
     }
 
+    public static ProductValidationException emptyProductId() {
+        return new ProductValidationException("Product id cannot be empty.");
+    }
+
     private ProductValidationException(String message) {
         super(message);
     }

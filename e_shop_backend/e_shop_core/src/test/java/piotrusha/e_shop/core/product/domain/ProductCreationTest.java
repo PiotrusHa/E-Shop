@@ -3,6 +3,7 @@ package piotrusha.e_shop.core.product.domain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static piotrusha.e_shop.core.product.domain.Assertions.assertProductDto;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,21 +35,20 @@ class ProductCreationTest {
         CreateProductDto createProductDto =
                 new CreateProductDto(productName, price, availablePiecesNumber, description, List.of(categoryName));
         productFacade.createProductCategory(new CreateProductCategoryDto(categoryName));
+        ProductDto expected = new ProductDto().setProductId(BigDecimal.ONE)
+                                              .setName(productName)
+                                              .setPrice(price)
+                                              .setAvailablePiecesNumber(availablePiecesNumber)
+                                              .setBookedPiecesNumber(0)
+                                              .setSoldPiecesNumber(0)
+                                              .setDescription(description)
+                                              .setCategories(List.of(categoryName));
 
         ProductDto createdProduct = productFacade.createProduct(createProductDto);
 
         Optional<ProductDto> productOpt = productFacade.findProductByProductId(createdProduct.getProductId());
         assertTrue(productOpt.isPresent());
-        ProductDto product = productOpt.get();
-        assertEquals(productName, product.getName());
-        assertEquals(price, product.getPrice());
-        assertEquals(availablePiecesNumber, product.getAvailablePiecesNumber());
-        assertEquals((Integer) 0, product.getBookedPiecesNumber());
-        assertEquals((Integer) 0, product.getSoldPiecesNumber());
-        assertEquals(description, product.getDescription());
-        assertTrue(product.getCategories()
-                          .size() == 1 && product.getCategories()
-                                                 .contains(categoryName));
+        assertProductDto(expected, productOpt.get());
     }
 
     @Test
