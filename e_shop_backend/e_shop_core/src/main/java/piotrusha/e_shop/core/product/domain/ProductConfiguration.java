@@ -18,8 +18,9 @@ class ProductConfiguration {
         ProductCreator productCreator = new ProductCreator(productRepository, productValidator, productIdGenerator, productConverter);
         ProductModifier productModifier = new ProductModifier(productRepository, productValidator);
         ProductFinder productFinder = new ProductFinder(productRepository, productConverter);
+        ProductBooker productBooker = new ProductBooker(productRepository, productValidator);
 
-        return new ProductFacade(categoryCreator, categoryFinder, productCreator, productModifier, productFinder);
+        return new ProductFacade(categoryCreator, categoryFinder, productCreator, productModifier, productBooker, productFinder);
     }
 
     ProductFacade productFacade() {

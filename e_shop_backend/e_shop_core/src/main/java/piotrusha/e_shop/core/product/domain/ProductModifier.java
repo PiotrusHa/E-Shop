@@ -25,7 +25,7 @@ class ProductModifier {
     }
 
     private void validate(ModifyProductDto dto) {
-        productValidator.validate(dto);
+        productValidator.validateDto(dto);
     }
 
     private Product get(BigDecimal productId) {
@@ -45,7 +45,7 @@ class ProductModifier {
         }
         if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign()
                                                               .isEmpty()) {
-            product.assingCategories(convertToCategories(dto.getProductCategoriesToAssign()));
+            product.assignCategories(convertToCategories(dto.getProductCategoriesToAssign()));
         }
         if (dto.getProductCategoriesToUnassign() != null && !dto.getProductCategoriesToUnassign()
                                                                 .isEmpty()) {

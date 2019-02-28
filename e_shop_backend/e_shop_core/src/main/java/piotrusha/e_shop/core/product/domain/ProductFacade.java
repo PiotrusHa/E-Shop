@@ -1,5 +1,6 @@
 package piotrusha.e_shop.core.product.domain;
 
+import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
@@ -17,14 +18,16 @@ public class ProductFacade {
 
     private final ProductCreator productCreator;
     private final ProductModifier productModifier;
+    private final ProductBooker productBooker;
     private final ProductFinder productFinder;
 
     ProductFacade(CategoryCreator categoryCreator, CategoryFinder categoryFinder, ProductCreator productCreator,
-                  ProductModifier productModifier, ProductFinder productFinder) {
+                  ProductModifier productModifier, ProductBooker productBooker, ProductFinder productFinder) {
         this.categoryCreator = categoryCreator;
         this.categoryFinder = categoryFinder;
         this.productCreator = productCreator;
         this.productModifier = productModifier;
+        this.productBooker = productBooker;
         this.productFinder = productFinder;
     }
 
@@ -38,6 +41,10 @@ public class ProductFacade {
 
     public void modifyProduct(ModifyProductDto modifyProductDto) {
         productModifier.modifyProduct(modifyProductDto);
+    }
+
+    public void bookProducts(List<BookProductDto> bookProductDtos) {
+        productBooker.bookProducts(bookProductDtos);
     }
 
     public List<ProductCategoryDto> findAllProductCategories() {

@@ -56,12 +56,17 @@ class Product {
     )
     private Set<Category> categories;
 
-    void assingCategories(List<Category> categories) {
+    void assignCategories(List<Category> categories) {
         this.categories.addAll(categories);
     }
 
     void unassignCategories(List<Category> categories) {
         this.categories.removeAll(categories);
+    }
+
+    void bookProduct(int piecesNumber) {
+        availablePiecesNumber -= piecesNumber;
+        bookedPiecesNumber += piecesNumber;
     }
 
 }

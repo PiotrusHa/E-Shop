@@ -1,12 +1,9 @@
 package piotrusha.e_shop.core.product.domain;
 
-import com.google.common.base.Strings;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,7 +30,7 @@ class ProductCreator {
     }
 
     private void validate(CreateProductDto dto) {
-        productValidator.validate(dto);
+        productValidator.validateDto(dto);
     }
 
     private Product create(CreateProductDto dto) {

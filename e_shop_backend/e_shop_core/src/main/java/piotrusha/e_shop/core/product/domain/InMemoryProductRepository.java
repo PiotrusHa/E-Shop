@@ -43,4 +43,10 @@ class InMemoryProductRepository implements ProductRepository {
     public void save(Product product) {
         map.put(product.getProductId(), product);
     }
+
+    @Override
+    public void saveAll(List<Product> products) {
+        products.forEach(this::save);
+    }
+
 }

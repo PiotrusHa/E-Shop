@@ -1,6 +1,7 @@
 package piotrusha.e_shop.core.product.domain;
 
 import com.google.common.base.Strings;
+import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
@@ -16,7 +17,7 @@ class ProductValidator {
         this.categoryRepository = categoryRepository;
     }
 
-    void validate(CreateProductDto dto) {
+    void validateDto(CreateProductDto dto) {
         validateProductName(dto.getProductName());
         validateProductPrice(dto.getPrice());
         validateAvailablePiecesNumber(dto.getAvailablePiecesNumber());
@@ -49,12 +50,13 @@ class ProductValidator {
         }
     }
 
-    void validate(ModifyProductDto dto) {
+    void validateDto(ModifyProductDto dto) {
         validateProductId(dto.getProductId());
         if (dto.getProductAvailablePiecesNumber() != null) {
             validateAvailablePiecesNumber(dto.getProductAvailablePiecesNumber());
         }
-        if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign().isEmpty()) {
+        if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign()
+                                                              .isEmpty()) {
             validateCategories(dto.getProductCategoriesToAssign());
         }
     }
@@ -62,6 +64,23 @@ class ProductValidator {
     private void validateProductId(BigDecimal productId) {
         if (productId == null) {
             throw ProductValidationException.emptyProductId();
+        }
+    }
+
+    void validateDto(BookProductDto dto) {
+        validateProductId(dto.getProductId());
+        validateBookPiecesNumber(dto.getPiecesNumber());
+    }
+
+    private void validateBookPiecesNumber(Integer piecesNumber) {
+        if (piecesNumber == null || piecesNumber <= 0) {
+            throw ProductValidationException.wrongPiecesNumber();
+        }
+    }
+
+    void validatePiecesNumber(Product product, int piecesNumber) {
+        if (product.getAvailablePiecesNumber() < piecesNumber) {
+            throw ProductValidationException.notEnoughPieces(product.getAvailablePiecesNumber(), piecesNumber, product.getName());
         }
     }
 

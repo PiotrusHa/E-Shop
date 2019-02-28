@@ -22,4 +22,6 @@ interface ProductRepository extends Repository<Product, BigDecimal> {
 
     void save(Product product);
 
+    void saveAll(List<Product> products);
+
 }

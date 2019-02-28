@@ -22,6 +22,15 @@ public class ProductValidationException extends RuntimeException {
         return new ProductValidationException("Product id cannot be empty.");
     }
 
+    public static ProductValidationException wrongPiecesNumber() {
+        return new ProductValidationException("Product book pieces number has to be greater than zero.");
+    }
+
+    public static ProductValidationException notEnoughPieces(Integer availablePieces, Integer currentPieces, String productName) {
+        return new ProductValidationException(String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.",
+                                                            currentPieces, productName, availablePieces));
+    }
+
     private ProductValidationException(String message) {
         super(message);
     }
