@@ -21,29 +21,37 @@ public class ProductFacade {
     private final ProductBooker productBooker;
     private final ProductFinder productFinder;
 
+    private final DtoValidator dtoValidator;
+
     ProductFacade(CategoryCreator categoryCreator, CategoryFinder categoryFinder, ProductCreator productCreator,
-                  ProductModifier productModifier, ProductBooker productBooker, ProductFinder productFinder) {
+                  ProductModifier productModifier, ProductBooker productBooker, ProductFinder productFinder,
+                  DtoValidator dtoValidator) {
         this.categoryCreator = categoryCreator;
         this.categoryFinder = categoryFinder;
         this.productCreator = productCreator;
         this.productModifier = productModifier;
         this.productBooker = productBooker;
         this.productFinder = productFinder;
+        this.dtoValidator = dtoValidator;
     }
 
     public void createProductCategory(CreateProductCategoryDto createProductCategoryDto) {
+        dtoValidator.validateDto(createProductCategoryDto);
         categoryCreator.createCategory(createProductCategoryDto);
     }
 
     public ProductDto createProduct(CreateProductDto createProductDto) {
+        dtoValidator.validateDto(createProductDto);
         return productCreator.createProduct(createProductDto);
     }
 
     public void modifyProduct(ModifyProductDto modifyProductDto) {
+        dtoValidator.validateDto(modifyProductDto);
         productModifier.modifyProduct(modifyProductDto);
     }
 
     public void bookProducts(List<BookProductDto> bookProductDtos) {
+        bookProductDtos.forEach(dtoValidator::validateDto);
         productBooker.bookProducts(bookProductDtos);
     }
 

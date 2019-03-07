@@ -2,19 +2,31 @@ package piotrusha.e_shop.core.product.domain;
 
 import com.google.common.base.Strings;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
+import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
+import piotrusha.e_shop.core.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
+import piotrusha.e_shop.core.product.domain.exception.CategoryValidationException;
 import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-class ProductValidator {
+class DtoValidator {
 
     private final CategoryRepository categoryRepository;
 
-    ProductValidator(CategoryRepository categoryRepository) {
+    DtoValidator(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
+    }
+
+    void validateDto(CreateProductCategoryDto dto) {
+        if (Strings.isNullOrEmpty(dto.getCategoryName())) {
+            throw CategoryValidationException.emptyCategoryName();
+        }
+        if (categoryRepository.existsByName(dto.getCategoryName())) {
+            throw CategoryValidationException.categoryNameAlreadyExists(dto.getCategoryName());
+        }
     }
 
     void validateDto(CreateProductDto dto) {
@@ -22,6 +34,27 @@ class ProductValidator {
         validateProductPrice(dto.getPrice());
         validateAvailablePiecesNumber(dto.getAvailablePiecesNumber());
         validateCategories(dto.getCategories());
+    }
+
+    void validateDto(ModifyProductDto dto) {
+        validateProductId(dto.getProductId());
+        if (dto.getProductAvailablePiecesNumber() != null) {
+            validateAvailablePiecesNumber(dto.getProductAvailablePiecesNumber());
+        }
+        if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign()
+                                                              .isEmpty()) {
+            validateCategories(dto.getProductCategoriesToAssign());
+        }
+    }
+
+    void validateDto(BookProductDto dto) {
+        validateProductId(dto.getProductId());
+        validateBookPiecesNumber(dto.getPiecesNumber());
+    }
+
+    void validateDto(CancelProductBookingDto dto) {
+        validateProductId(dto.getProductId());
+        validateBookPiecesNumber(dto.getPiecesNumber());
     }
 
     private void validateProductName(String productName) {
@@ -50,37 +83,15 @@ class ProductValidator {
         }
     }
 
-    void validateDto(ModifyProductDto dto) {
-        validateProductId(dto.getProductId());
-        if (dto.getProductAvailablePiecesNumber() != null) {
-            validateAvailablePiecesNumber(dto.getProductAvailablePiecesNumber());
-        }
-        if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign()
-                                                              .isEmpty()) {
-            validateCategories(dto.getProductCategoriesToAssign());
-        }
-    }
-
     private void validateProductId(BigDecimal productId) {
         if (productId == null) {
             throw ProductValidationException.emptyProductId();
         }
     }
 
-    void validateDto(BookProductDto dto) {
-        validateProductId(dto.getProductId());
-        validateBookPiecesNumber(dto.getPiecesNumber());
-    }
-
     private void validateBookPiecesNumber(Integer piecesNumber) {
         if (piecesNumber == null || piecesNumber <= 0) {
             throw ProductValidationException.wrongPiecesNumber();
-        }
-    }
-
-    void validatePiecesNumber(Product product, int piecesNumber) {
-        if (product.getAvailablePiecesNumber() < piecesNumber) {
-            throw ProductValidationException.notEnoughPieces(product.getAvailablePiecesNumber(), piecesNumber, product.getName());
         }
     }
 

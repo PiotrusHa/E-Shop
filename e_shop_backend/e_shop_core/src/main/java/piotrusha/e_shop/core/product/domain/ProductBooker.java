@@ -3,6 +3,7 @@ package piotrusha.e_shop.core.product.domain;
 import lombok.AllArgsConstructor;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
+import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,23 +12,16 @@ import java.util.stream.Collectors;
 class ProductBooker {
 
     private final ProductRepository productRepository;
-    private final ProductValidator productValidator;
 
-    ProductBooker(ProductRepository productRepository, ProductValidator productValidator) {
+    ProductBooker(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.productValidator = productValidator;
     }
 
     void bookProducts(List<BookProductDto> bookProductDtos) {
-        validateDto(bookProductDtos);
         List<ProductToBook> productsToBook = get(bookProductDtos);
         validatePiecesNumber(productsToBook);
         book(productsToBook);
         save(productsToBook);
-    }
-
-    private void validateDto(List<BookProductDto> bookProductDtos) {
-        bookProductDtos.forEach(productValidator::validateDto);
     }
 
     private List<ProductToBook> get(List<BookProductDto> dtos) {
@@ -42,7 +36,13 @@ class ProductBooker {
     }
 
     private void validatePiecesNumber(List<ProductToBook> productsToBook) {
-        productsToBook.forEach(productToBook -> productValidator.validatePiecesNumber(productToBook.product, productToBook.piecesNumber));
+        for (ProductToBook productToBook : productsToBook) {
+            boolean canBook = productToBook.product.canBook(productToBook.piecesNumber);
+            if (!canBook) {
+                throw ProductValidationException.notEnoughPieces(productToBook.product.getAvailablePiecesNumber(),
+                                                                 productToBook.piecesNumber, productToBook.product.getName());
+            }
+        }
     }
 
     private void book(List<ProductToBook> productsToBook) {

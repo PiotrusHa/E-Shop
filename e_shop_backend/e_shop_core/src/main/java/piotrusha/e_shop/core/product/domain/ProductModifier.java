@@ -9,23 +9,16 @@ import java.util.stream.Collectors;
 
 class ProductModifier {
 
-    private final ProductValidator productValidator;
     private final ProductRepository productRepository;
 
-    ProductModifier(ProductRepository productRepository, ProductValidator productValidator) {
-        this.productValidator = productValidator;
+    ProductModifier(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
 
     void modifyProduct(ModifyProductDto dto) {
-        validate(dto);
         Product product = get(dto.getProductId());
         modify(product, dto);
         save(product);
-    }
-
-    private void validate(ModifyProductDto dto) {
-        productValidator.validateDto(dto);
     }
 
     private Product get(BigDecimal productId) {

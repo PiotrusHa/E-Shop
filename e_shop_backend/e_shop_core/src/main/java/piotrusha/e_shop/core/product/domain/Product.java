@@ -64,6 +64,10 @@ class Product {
         this.categories.removeAll(categories);
     }
 
+    boolean canBook(int piecesNumber) {
+        return availablePiecesNumber >= piecesNumber;
+    }
+
     void bookProduct(int piecesNumber) {
         availablePiecesNumber -= piecesNumber;
         bookedPiecesNumber += piecesNumber;

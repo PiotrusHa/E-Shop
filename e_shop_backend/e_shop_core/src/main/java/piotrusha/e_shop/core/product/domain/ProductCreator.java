@@ -10,27 +10,20 @@ import java.util.stream.Collectors;
 class ProductCreator {
 
     private final ProductRepository productRepository;
-    private final ProductValidator productValidator;
     private final ProductIdGenerator productIdGenerator;
     private final ProductConverter productConverter;
 
-    ProductCreator(ProductRepository productRepository, ProductValidator productValidator, ProductIdGenerator productIdGenerator,
+    ProductCreator(ProductRepository productRepository, ProductIdGenerator productIdGenerator,
                    ProductConverter productConverter) {
         this.productRepository = productRepository;
-        this.productValidator = productValidator;
         this.productIdGenerator = productIdGenerator;
         this.productConverter = productConverter;
     }
 
     ProductDto createProduct(CreateProductDto dto) {
-        validate(dto);
         Product product = create(dto);
         save(product);
         return productConverter.toDto(product);
-    }
-
-    private void validate(CreateProductDto dto) {
-        productValidator.validateDto(dto);
     }
 
     private Product create(CreateProductDto dto) {
