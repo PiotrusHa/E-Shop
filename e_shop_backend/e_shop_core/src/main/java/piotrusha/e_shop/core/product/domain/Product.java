@@ -68,9 +68,18 @@ class Product {
         return availablePiecesNumber >= piecesNumber;
     }
 
+    boolean canCancel(int piecesNumber) {
+        return bookedPiecesNumber >= piecesNumber;
+    }
+
     void bookProduct(int piecesNumber) {
         availablePiecesNumber -= piecesNumber;
         bookedPiecesNumber += piecesNumber;
+    }
+
+    void cancelBooking(int piecesNumber) {
+        bookedPiecesNumber -= piecesNumber;
+        availablePiecesNumber += piecesNumber;
     }
 
 }

@@ -1,6 +1,7 @@
 package piotrusha.e_shop.core.product.domain;
 
-import lombok.AllArgsConstructor;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
 import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
@@ -18,15 +19,15 @@ class ProductBooker {
     }
 
     void bookProducts(List<BookProductDto> bookProductDtos) {
-        List<ProductToBook> productsToBook = get(bookProductDtos);
+        List<Tuple2<Product, Integer>> productsToBook = get(bookProductDtos);
         validatePiecesNumber(productsToBook);
         book(productsToBook);
         save(productsToBook);
     }
 
-    private List<ProductToBook> get(List<BookProductDto> dtos) {
+    private List<Tuple2<Product, Integer>> get(List<BookProductDto> dtos) {
         return dtos.stream()
-                   .map(dto -> new ProductToBook(get(dto.getProductId()), dto.getPiecesNumber()))
+                   .map(dto -> Tuple.of(get(dto.getProductId()), dto.getPiecesNumber()))
                    .collect(Collectors.toList());
     }
 
@@ -35,32 +36,25 @@ class ProductBooker {
                                 .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
-    private void validatePiecesNumber(List<ProductToBook> productsToBook) {
-        for (ProductToBook productToBook : productsToBook) {
-            boolean canBook = productToBook.product.canBook(productToBook.piecesNumber);
+    private void validatePiecesNumber(List<Tuple2<Product, Integer>> productsToBook) {
+        for (Tuple2<Product, Integer> productToBook : productsToBook) {
+            boolean canBook = productToBook._1.canBook(productToBook._2);
             if (!canBook) {
-                throw ProductValidationException.notEnoughPieces(productToBook.product.getAvailablePiecesNumber(),
-                                                                 productToBook.piecesNumber, productToBook.product.getName());
+                throw ProductValidationException.notEnoughPiecesToBook(productToBook._1.getAvailablePiecesNumber(),
+                                                                       productToBook._2, productToBook._1.getName());
             }
         }
     }
 
-    private void book(List<ProductToBook> productsToBook) {
-        productsToBook.forEach(productToBook -> productToBook.product.bookProduct(productToBook.piecesNumber));
+    private void book(List<Tuple2<Product, Integer>> productsToBook) {
+        productsToBook.forEach(productToBook -> productToBook._1.bookProduct(productToBook._2));
     }
 
-    private void save(List<ProductToBook> productsToBook) {
+    private void save(List<Tuple2<Product, Integer>> productsToBook) {
         List<Product> products = productsToBook.stream()
-                                               .map(productToBook -> productToBook.product)
+                                               .map(productToBook -> productToBook._1)
                                                .collect(Collectors.toList());
         productRepository.saveAll(products);
-    }
-
-    @AllArgsConstructor
-    private class ProductToBook {
-
-        Product product;
-        int piecesNumber;
     }
 
 }

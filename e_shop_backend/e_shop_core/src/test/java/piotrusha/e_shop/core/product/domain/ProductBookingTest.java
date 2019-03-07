@@ -69,7 +69,7 @@ class ProductBookingTest {
     @Test
     void bookWithoutPiecesNumber() {
         BookProductDto dto = new BookProductDto(product.getProductId(), null);
-        String expectedMessage = "Product book pieces number has to be greater than zero.";
+        String expectedMessage = "Product pieces number has to be greater than zero.";
 
         ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.bookProducts(List.of(dto)));
         assertEquals(expectedMessage, e.getMessage());
@@ -79,7 +79,7 @@ class ProductBookingTest {
     @Test
     void bookNegativePiecesNumber() {
         BookProductDto dto = new BookProductDto(product.getProductId(), -2);
-        String expectedMessage = "Product book pieces number has to be greater than zero.";
+        String expectedMessage = "Product pieces number has to be greater than zero.";
 
         ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.bookProducts(List.of(dto)));
         assertEquals(expectedMessage, e.getMessage());
@@ -89,7 +89,7 @@ class ProductBookingTest {
     @Test
     void bookZeroPiecesNumber() {
         BookProductDto dto = new BookProductDto(product.getProductId(), 0);
-        String expectedMessage = "Product book pieces number has to be greater than zero.";
+        String expectedMessage = "Product pieces number has to be greater than zero.";
 
         ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.bookProducts(List.of(dto)));
         assertEquals(expectedMessage, e.getMessage());
