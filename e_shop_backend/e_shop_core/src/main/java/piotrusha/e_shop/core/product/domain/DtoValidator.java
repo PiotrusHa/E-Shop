@@ -6,6 +6,7 @@ import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
+import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
 import piotrusha.e_shop.core.product.domain.exception.CategoryValidationException;
 import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
@@ -53,6 +54,11 @@ class DtoValidator {
     }
 
     void validateDto(CancelProductBookingDto dto) {
+        validateProductId(dto.getProductId());
+        validateBookPiecesNumber(dto.getPiecesNumber());
+    }
+
+    void validateDto(SellProductDto dto) {
         validateProductId(dto.getProductId());
         validateBookPiecesNumber(dto.getPiecesNumber());
     }

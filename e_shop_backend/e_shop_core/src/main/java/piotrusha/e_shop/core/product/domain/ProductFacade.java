@@ -7,6 +7,7 @@ import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductCategoryDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductDto;
+import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,12 +23,13 @@ public class ProductFacade {
     private final ProductBooker productBooker;
     private final ProductBookingCanceler productBookingCanceler;
     private final ProductFinder productFinder;
+    private final ProductSeller productSeller;
 
     private final DtoValidator dtoValidator;
 
     ProductFacade(CategoryCreator categoryCreator, CategoryFinder categoryFinder, ProductCreator productCreator,
                   ProductModifier productModifier, ProductBooker productBooker, ProductBookingCanceler productBookingCanceler,
-                  ProductFinder productFinder, DtoValidator dtoValidator) {
+                  ProductFinder productFinder, ProductSeller productSeller, DtoValidator dtoValidator) {
         this.categoryCreator = categoryCreator;
         this.categoryFinder = categoryFinder;
         this.productCreator = productCreator;
@@ -35,6 +37,7 @@ public class ProductFacade {
         this.productBooker = productBooker;
         this.productBookingCanceler = productBookingCanceler;
         this.productFinder = productFinder;
+        this.productSeller = productSeller;
         this.dtoValidator = dtoValidator;
     }
 
@@ -61,6 +64,11 @@ public class ProductFacade {
     public void cancelBooking(List<CancelProductBookingDto> cancelProductBookingDtos) {
         cancelProductBookingDtos.forEach(dtoValidator::validateDto);
         productBookingCanceler.cancelBooking(cancelProductBookingDtos);
+    }
+
+    public void sellProducts(List<SellProductDto> sellProductDtos) {
+        sellProductDtos.forEach(dtoValidator::validateDto);
+        productSeller.sellProducts(sellProductDtos);
     }
 
     public List<ProductCategoryDto> findAllProductCategories() {

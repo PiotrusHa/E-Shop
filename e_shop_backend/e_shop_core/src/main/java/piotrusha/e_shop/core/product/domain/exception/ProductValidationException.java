@@ -26,13 +26,21 @@ public class ProductValidationException extends RuntimeException {
         return new ProductValidationException("Product pieces number has to be greater than zero.");
     }
 
-    public static ProductValidationException notEnoughPiecesToBook(Integer availablePieces, Integer currentPieces, String productName) {
-        return new ProductValidationException(String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.",
-                                                            currentPieces, productName, availablePieces));
+    public static ProductValidationException notEnoughPiecesToBook(Integer availablePieces, Integer piecesToBook, String productName) {
+        return new ProductValidationException(
+                String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.", piecesToBook, productName,
+                              availablePieces));
     }
 
-    public static ProductValidationException notEnoughPiecesToCancel(Integer currentPieces, String productName) {
-        return new ProductValidationException(String.format("Cannot cancel booking %s pieces of product %s.", currentPieces, productName));
+    public static ProductValidationException notEnoughPiecesToCancel(Integer piecesToCancel, String productName) {
+        return new ProductValidationException(String.format("Cannot cancel booking %s pieces of product %s.", piecesToCancel, productName));
+    }
+
+    public static ProductValidationException notEnoughPiecesToSell(Integer piecesToSell, String productName,
+                                                                   Integer currentlyBookedPieces) {
+        return new ProductValidationException(
+                String.format("Cannot sell %s pieces of product %s. Currently booked pieces number is %s.", piecesToSell, productName,
+                              currentlyBookedPieces));
     }
 
     private ProductValidationException(String message) {
