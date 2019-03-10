@@ -7,7 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +21,7 @@ public class BillDto {
     private Date paymentDate;
     private Date paymentExpirationDate;
     private BigDecimal clientId;
-    private Set<BillRecordDto> billRecords;
+    private String billState;
+    private List<BillRecordDto> billRecords;
 
 }

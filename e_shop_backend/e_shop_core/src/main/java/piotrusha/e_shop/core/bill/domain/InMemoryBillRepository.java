@@ -22,6 +22,14 @@ class InMemoryBillRepository implements BillRepository {
     }
 
     @Override
+    public Optional<BigDecimal> findLastBillId() {
+        return map.values()
+                  .stream()
+                  .map(Bill::getBillId)
+                  .max(BigDecimal::compareTo);
+    }
+
+    @Override
     public void save(Bill bill) {
         map.put(bill.getBillId(), bill);
     }

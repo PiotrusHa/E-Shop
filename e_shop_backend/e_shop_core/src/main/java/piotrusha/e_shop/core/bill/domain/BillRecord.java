@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import piotrusha.e_shop.core.bill.domain.dto.BillRecordDto;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -19,5 +20,14 @@ class BillRecord {
 
     private BigDecimal productId;
     private Integer piecesNumber;
+    private BigDecimal piecePrice;
+
+    BigDecimal getPriceSum() {
+        return piecePrice.multiply(BigDecimal.valueOf(piecesNumber));
+    }
+
+    BillRecordDto toDto() {
+        return new BillRecordDto(productId, piecesNumber, piecePrice, getPriceSum());
+    }
 
 }

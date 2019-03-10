@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import piotrusha.e_shop.core.bill.domain.dto.BillDto;
+import piotrusha.e_shop.core.bill.domain.dto.BillRecordDto;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -15,7 +17,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "bills")
@@ -33,9 +37,24 @@ class Bill {
     private Date paymentDate;
     private Date paymentExpirationDate;
     private BigDecimal clientId;
+    private BillState billState;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bill_id")
     private Set<BillRecord> billRecords;
+
+    BillDto toDto() {
+        List<BillRecordDto> recordDtos = billRecords.stream()
+                                                    .map(BillRecord::toDto)
+                                                    .collect(Collectors.toList());
+        return new BillDto().setBillId(billId)
+                            .setPriceSum(priceSum)
+                            .setPurchaseDate(purchaseDate)
+                            .setPaymentDate(paymentDate)
+                            .setPaymentExpirationDate(paymentExpirationDate)
+                            .setClientId(clientId)
+                            .setBillState(billState.toString())
+                            .setBillRecords(recordDtos);
+    }
 
 }
