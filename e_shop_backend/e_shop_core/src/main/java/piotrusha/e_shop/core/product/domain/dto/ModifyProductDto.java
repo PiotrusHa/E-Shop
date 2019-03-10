@@ -10,13 +10,16 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class ModifyProductDto {
+public class ModifyProductDto extends AbstractProductActionDto {
 
-    private BigDecimal productId;
     private BigDecimal productPrice;
     private String productDescription;
     private Integer productAvailablePiecesNumber;
     private List<String> productCategoriesToAssign;
     private List<String> productCategoriesToUnassign;
+
+    public ModifyProductDto(BigDecimal productId) {
+        super(productId);
+    }
 
 }

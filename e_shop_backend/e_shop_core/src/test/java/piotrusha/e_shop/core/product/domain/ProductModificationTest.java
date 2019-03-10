@@ -42,8 +42,7 @@ class ProductModificationTest {
     @Test
     void modifyPrice() {
         BigDecimal newPrice = BigDecimal.valueOf(0.99);
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductPrice(newPrice);
+        ModifyProductDto modifyProductDto = new ModifyProductDto(productToModify.getProductId()).setProductPrice(newPrice);
         ProductDto expected = productToModify.setPrice(newPrice);
 
         productFacade.modifyProduct(modifyProductDto);
@@ -56,8 +55,8 @@ class ProductModificationTest {
     @Test
     void modifyAvailablePiecesNumber() {
         Integer newAvailablePiecesNumber = 1912;
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductAvailablePiecesNumber(newAvailablePiecesNumber);
+        ModifyProductDto modifyProductDto =
+                new ModifyProductDto(productToModify.getProductId()).setProductAvailablePiecesNumber(newAvailablePiecesNumber);
         ProductDto expected = productToModify.setAvailablePiecesNumber(newAvailablePiecesNumber);
 
         productFacade.modifyProduct(modifyProductDto);
@@ -70,8 +69,8 @@ class ProductModificationTest {
     @Test
     void modifyAvailablePiecesNumberNegativePiecesNumber() {
         Integer newAvailablePiecesNumber = -100;
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductAvailablePiecesNumber(newAvailablePiecesNumber);
+        ModifyProductDto modifyProductDto =
+                new ModifyProductDto(productToModify.getProductId()).setProductAvailablePiecesNumber(newAvailablePiecesNumber);
         String expectedMessage = "Product available pieces number has to be greater than zero.";
 
         ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.modifyProduct(modifyProductDto));
@@ -81,8 +80,7 @@ class ProductModificationTest {
     @Test
     void modifyDescription() {
         String newDescription = "new description";
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductDescription(newDescription);
+        ModifyProductDto modifyProductDto = new ModifyProductDto(productToModify.getProductId()).setProductDescription(newDescription);
         ProductDto expected = productToModify.setDescription(newDescription);
 
         productFacade.modifyProduct(modifyProductDto);
@@ -95,7 +93,7 @@ class ProductModificationTest {
     @Test
     void modifyNonexistentProduct() {
         BigDecimal nonexistentProductId = BigDecimal.valueOf(100);
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(nonexistentProductId);
+        ModifyProductDto modifyProductDto = new ModifyProductDto(nonexistentProductId);
         String expectedMessage = "Product with productId " + nonexistentProductId + " not found";
 
         ProductNotFoundException e = assertThrows(ProductNotFoundException.class, () -> productFacade.modifyProduct(modifyProductDto));
@@ -104,7 +102,7 @@ class ProductModificationTest {
 
     @Test
     void modifyNullProductId() {
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(null);
+        ModifyProductDto modifyProductDto = new ModifyProductDto(null);
         String expectedMessage = "Product id cannot be empty.";
 
         ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.modifyProduct(modifyProductDto));
@@ -113,9 +111,8 @@ class ProductModificationTest {
 
     @Test
     void modifyAssignCategory() {
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductCategoriesToAssign(
-                                                                          List.of(CATEGORY_TO_ASSIGN1, CATEGORY_TO_ASSIGN2));
+        ModifyProductDto modifyProductDto = new ModifyProductDto(productToModify.getProductId()).setProductCategoriesToAssign(
+                List.of(CATEGORY_TO_ASSIGN1, CATEGORY_TO_ASSIGN2));
         ProductDto expected = productToModify.setCategories(List.of(CATEGORY_TO_ASSIGN1, CATEGORY_TO_ASSIGN2, ASSIGNED_CATEGORY));
 
         productFacade.modifyProduct(modifyProductDto);
@@ -128,8 +125,8 @@ class ProductModificationTest {
     @Test
     void modifyAssignNonexistentCategory() {
         String categoryName = "nonexistent category";
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductCategoriesToAssign(List.of(categoryName));
+        ModifyProductDto modifyProductDto =
+                new ModifyProductDto(productToModify.getProductId()).setProductCategoriesToAssign(List.of(categoryName));
         String expectedMessage = "Category with name " + categoryName + " does not exists.";
 
         ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.modifyProduct(modifyProductDto));
@@ -138,8 +135,8 @@ class ProductModificationTest {
 
     @Test
     void modifyAssignAlreadyAssignedCategory() {
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductCategoriesToAssign(List.of(ASSIGNED_CATEGORY));
+        ModifyProductDto modifyProductDto =
+                new ModifyProductDto(productToModify.getProductId()).setProductCategoriesToAssign(List.of(ASSIGNED_CATEGORY));
         ProductDto expected = productToModify.setCategories(List.of(ASSIGNED_CATEGORY));
 
         productFacade.modifyProduct(modifyProductDto);
@@ -151,8 +148,8 @@ class ProductModificationTest {
 
     @Test
     void modifyUnassignCategory() {
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductCategoriesToUnassign(List.of(ASSIGNED_CATEGORY));
+        ModifyProductDto modifyProductDto =
+                new ModifyProductDto(productToModify.getProductId()).setProductCategoriesToUnassign(List.of(ASSIGNED_CATEGORY));
         ProductDto expected = productToModify.setCategories(List.of());
 
         productFacade.modifyProduct(modifyProductDto);
@@ -164,8 +161,8 @@ class ProductModificationTest {
 
     @Test
     void modifyUnassignNonexistentCategory() {
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductCategoriesToUnassign(List.of("nonexistent category"));
+        ModifyProductDto modifyProductDto =
+                new ModifyProductDto(productToModify.getProductId()).setProductCategoriesToUnassign(List.of("nonexistent category"));
         ProductDto expected = productToModify.setCategories(List.of(ASSIGNED_CATEGORY));
 
         productFacade.modifyProduct(modifyProductDto);
@@ -177,8 +174,8 @@ class ProductModificationTest {
 
     @Test
     void modifyUnassignNotAssignedCategory() {
-        ModifyProductDto modifyProductDto = new ModifyProductDto().setProductId(productToModify.getProductId())
-                                                                  .setProductCategoriesToUnassign(List.of(CATEGORY_TO_ASSIGN2));
+        ModifyProductDto modifyProductDto =
+                new ModifyProductDto(productToModify.getProductId()).setProductCategoriesToUnassign(List.of(CATEGORY_TO_ASSIGN2));
         ProductDto expected = productToModify.setCategories(List.of(ASSIGNED_CATEGORY));
 
         productFacade.modifyProduct(modifyProductDto);

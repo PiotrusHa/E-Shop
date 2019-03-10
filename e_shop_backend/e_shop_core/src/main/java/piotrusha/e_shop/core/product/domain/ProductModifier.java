@@ -1,29 +1,16 @@
 package piotrusha.e_shop.core.product.domain;
 
+import io.vavr.Tuple2;
 import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 class ProductModifier {
 
-    private final ProductRepository productRepository;
-
-    ProductModifier(ProductRepository productRepository) {
-        this.productRepository = productRepository;
-    }
-
-    void modifyProduct(ModifyProductDto dto) {
-        Product product = get(dto.getProductId());
-        modify(product, dto);
-        save(product);
-    }
-
-    private Product get(BigDecimal productId) {
-        return productRepository.findByProductId(productId)
-                                .orElseThrow(() -> new ProductNotFoundException(productId));
+    Product modifyProduct(Tuple2<ModifyProductDto, Product> t) {
+        modify(t._2, t._1);
+        return t._2;
     }
 
     private void modify(Product product, ModifyProductDto dto) {
@@ -50,10 +37,6 @@ class ProductModifier {
         return categories.stream()
                          .map(Category::new)
                          .collect(Collectors.toList());
-    }
-
-    private void save(Product product) {
-        productRepository.save(product);
     }
 
 }

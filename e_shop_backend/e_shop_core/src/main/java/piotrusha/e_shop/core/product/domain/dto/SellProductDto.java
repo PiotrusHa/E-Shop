@@ -1,15 +1,17 @@
 package piotrusha.e_shop.core.product.domain.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
-@AllArgsConstructor
-public class SellProductDto {
+public class SellProductDto extends AbstractProductActionDto {
 
-    private BigDecimal productId;
     private Integer piecesNumber;
+
+    public SellProductDto(BigDecimal productId, Integer piecesNumber) {
+        super(productId);
+        this.piecesNumber = piecesNumber;
+    }
 
 }

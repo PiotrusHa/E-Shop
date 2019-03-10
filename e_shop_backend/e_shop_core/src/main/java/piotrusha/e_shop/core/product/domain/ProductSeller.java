@@ -1,59 +1,42 @@
 package piotrusha.e_shop.core.product.domain;
 
-import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
 import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 class ProductSeller {
 
-    private final ProductRepository productRepository;
-
-    ProductSeller(ProductRepository productRepository) {
-        this.productRepository = productRepository;
+    List<Product> sellProducts(List<Tuple2<SellProductDto, Product>> productsToSell) {
+        validateCanSell(productsToSell);
+        return sell(productsToSell);
     }
 
-    void sellProducts(List<SellProductDto> dtos) {
-        List<Tuple2<Product, Integer>> productsToCancel = get(dtos);
-        canSell(productsToCancel);
-        sell(productsToCancel);
-        save(productsToCancel);
-    }
-
-    private List<Tuple2<Product, Integer>> get(List<SellProductDto> dtos) {
-        return dtos.stream()
-                   .map(dto -> Tuple.of(getProduct(dto.getProductId()), dto.getPiecesNumber()))
-                   .collect(Collectors.toList());
-    }
-
-    private Product getProduct(BigDecimal productId) {
-        return productRepository.findByProductId(productId)
-                                .orElseThrow(() -> new ProductNotFoundException(productId));
-    }
-
-    private void canSell(List<Tuple2<Product, Integer>> productsToCancel) {
-        for (Tuple2<Product, Integer> product : productsToCancel) {
-            boolean canSell = product._1.canSell(product._2);
-            if (!canSell) {
-                throw ProductValidationException.notEnoughPiecesToSell(product._2, product._1.getName(), product._1.getBookedPiecesNumber());
-            }
+    private void validateCanSell(List<Tuple2<SellProductDto, Product>> productsToSell) {
+        for (Tuple2<SellProductDto, Product> productToSell : productsToSell) {
+            validateCanSell(productToSell._2, productToSell._1.getPiecesNumber());
         }
     }
 
-    private void sell(List<Tuple2<Product, Integer>> productsToCancel) {
-        productsToCancel.forEach(productToCancel -> productToCancel._1.sellProduct(productToCancel._2));
+    private void validateCanSell(Product productToSell, Integer piecesNumber) {
+        boolean canSell = productToSell.canSell(piecesNumber);
+        if (!canSell) {
+            throw ProductValidationException.notEnoughPiecesToSell(piecesNumber, productToSell.getName(),
+                                                                   productToSell.getBookedPiecesNumber());
+        }
     }
 
-    private void save(List<Tuple2<Product, Integer>> productsToCancel) {
-        List<Product> products = productsToCancel.stream()
-                                                 .map(Tuple2::_1)
-                                                 .collect(Collectors.toList());
-        productRepository.saveAll(products);
+    private List<Product> sell(List<Tuple2<SellProductDto, Product>> productsToSell) {
+        return productsToSell.stream()
+                             .map(productToSell -> sell(productToSell._2, productToSell._1.getPiecesNumber()))
+                             .collect(Collectors.toList());
+    }
+
+    private Product sell(Product productToSell, Integer piecesNumber) {
+        productToSell.sellProduct(piecesNumber);
+        return productToSell;
     }
 
 }

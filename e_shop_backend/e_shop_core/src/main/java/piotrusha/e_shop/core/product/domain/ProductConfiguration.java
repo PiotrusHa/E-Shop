@@ -16,14 +16,14 @@ class ProductConfiguration {
         ProductConverter productConverter = new ProductConverter();
         DtoValidator dtoValidator = new DtoValidator(categoryRepository);
         ProductCreator productCreator = new ProductCreator(productRepository, productIdGenerator, productConverter);
-        ProductModifier productModifier = new ProductModifier(productRepository);
+        ProductModifier productModifier = new ProductModifier();
         ProductFinder productFinder = new ProductFinder(productRepository, productConverter);
-        ProductBooker productBooker = new ProductBooker(productRepository);
-        ProductBookingCanceler productBookingCanceler = new ProductBookingCanceler(productRepository);
-        ProductSeller productSeller = new ProductSeller(productRepository);
+        ProductBooker productBooker = new ProductBooker();
+        ProductBookingCanceler productBookingCanceler = new ProductBookingCanceler();
+        ProductSeller productSeller = new ProductSeller();
 
         return new ProductFacade(categoryCreator, categoryFinder, productCreator, productModifier, productBooker, productBookingCanceler,
-                                 productFinder, productSeller, dtoValidator);
+                                 productFinder, productSeller, productRepository, dtoValidator);
     }
 
     ProductFacade productFacade() {
