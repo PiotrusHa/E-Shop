@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static piotrusha.e_shop.core.bill.domain.SampleDtos.createCreateBillDto;
 import static piotrusha.e_shop.core.bill.domain.SampleDtos.createCreateBillRecordDto;
-import static piotrusha.e_shop.core.bill.domain.SampleDtos.createProductDtoForBillRecord1;
+import static piotrusha.e_shop.core.bill.domain.SampleDtos.createProductDtoForBillRecord;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,8 +56,8 @@ class BillCreationTest {
         Integer product2Pieces = 6;
         CreateBillRecordDto recordDto1 = new CreateBillRecordDto(product1Id, product1Pieces);
         CreateBillRecordDto recordDto2 = new CreateBillRecordDto(product2Id, product2Pieces);
-        ProductDto product1 = createProductDtoForBillRecord1(recordDto1, product1Price);
-        ProductDto product2 = createProductDtoForBillRecord1(recordDto2, product2Price);
+        ProductDto product1 = createProductDtoForBillRecord(recordDto1, product1Price);
+        ProductDto product2 = createProductDtoForBillRecord(recordDto2, product2Price);
         when(productFacade.findProductByProductId(product1Id))
                 .thenReturn(Optional.of(product1));
         when(productFacade.findProductByProductId(product2Id))

@@ -34,4 +34,10 @@ class InMemoryBillRepository implements BillRepository {
         map.put(bill.getBillId(), bill);
     }
 
+
+    @Override
+    public void saveAll(List<Bill> bills) {
+        bills.forEach(this::save);
+    }
+
 }

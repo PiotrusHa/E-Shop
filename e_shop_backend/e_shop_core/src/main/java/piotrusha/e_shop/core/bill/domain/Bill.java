@@ -43,6 +43,14 @@ class Bill {
     @JoinColumn(name = "bill_id")
     private Set<BillRecord> billRecords;
 
+    boolean canCancel() {
+        return billState == BillState.WAITING_FOR_PAYMENT;
+    }
+
+    public void markBillAsCancelled() {
+        billState = BillState.CANCELLED;
+    }
+
     BillDto toDto() {
         List<BillRecordDto> recordDtos = billRecords.stream()
                                                     .map(BillRecord::toDto)

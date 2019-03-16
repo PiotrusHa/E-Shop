@@ -18,4 +18,6 @@ interface BillRepository extends Repository<Bill, BigDecimal> {
 
     void save(Bill bill);
 
+    void saveAll(List<Bill> bills);
+
 }

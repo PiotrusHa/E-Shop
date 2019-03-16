@@ -1,5 +1,6 @@
 package piotrusha.e_shop.core.bill.domain;
 
+import piotrusha.e_shop.core.bill.domain.dto.BillActionDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto.CreateBillRecordDto;
 import piotrusha.e_shop.core.bill.domain.exception.BillValidationException;
@@ -12,6 +13,16 @@ class DtoValidator {
     void validateDto(CreateBillDto dto) {
         validateClientId(dto.getClientId());
         validateRecords(dto.getRecords());
+    }
+
+    public void validateDto(BillActionDto billActionDto) {
+        validateBillId(billActionDto.getBillId());
+    }
+
+    private void validateBillId(BigDecimal billId) {
+        if (billId == null) {
+            throw BillValidationException.emptyBillId();
+        }
     }
 
     private void validateClientId(BigDecimal clientId) {

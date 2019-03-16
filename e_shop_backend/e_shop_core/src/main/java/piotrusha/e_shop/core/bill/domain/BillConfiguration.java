@@ -11,9 +11,10 @@ class BillConfiguration {
     BillFacade billFacade(ProductFacade productFacade, BillRepository billRepository) {
         BillIdGenerator billIdGenerator = new BillIdGenerator(billRepository);
         BillCreator billCreator = new BillCreator(productFacade, billRepository, billIdGenerator);
+        BillCanceller billCanceller = new BillCanceller(productFacade);
 
         DtoValidator dtoValidator = new DtoValidator();
-        return new BillFacade(billCreator, dtoValidator);
+        return new BillFacade(billCreator, billCanceller, billRepository, dtoValidator);
     }
 
     BillFacade billFacade(ProductFacade productFacade) {

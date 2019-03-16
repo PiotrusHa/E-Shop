@@ -18,6 +18,14 @@ public class BillValidationException extends RuntimeException {
         return new BillValidationException("Product id cannot be empty.");
     }
 
+    public static BillValidationException emptyBillId() {
+        return new BillValidationException("Bill id cannot be empty.");
+    }
+
+    public static BillValidationException cannotCancel(String billState) {
+        return new BillValidationException("Cannot cancel bill with state " + billState);
+    }
+
     private BillValidationException(String message) {
         super(message);
     }

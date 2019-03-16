@@ -23,9 +23,13 @@ class SampleDtos {
         return new CreateBillRecordDto(productId, 100);
     }
 
-    static ProductDto createProductDtoForBillRecord1(CreateBillRecordDto billRecordDto, BigDecimal price) {
+    static ProductDto createProductDtoForBillRecord(CreateBillRecordDto billRecordDto, BigDecimal price) {
         return new ProductDto().setProductId(billRecordDto.getProductId())
                                .setPrice(price);
+    }
+
+    static ProductDto createProductDtoForBillRecord(CreateBillRecordDto billRecordDto) {
+        return createProductDtoForBillRecord(billRecordDto, BigDecimal.TEN);
     }
 
 }
