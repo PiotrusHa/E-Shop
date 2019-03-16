@@ -12,14 +12,16 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
 
     private final BillCreator billCreator;
     private final BillCanceller billCanceller;
+    private final BillPayer billPayer;
 
     private final BillRepository billRepository;
 
     private final DtoValidator dtoValidator;
 
-    public BillFacade(BillCreator billCreator, BillCanceller billCanceller, BillRepository billRepository, DtoValidator dtoValidator) {
+    public BillFacade(BillCreator billCreator, BillCanceller billCanceller, BillPayer billPayer, BillRepository billRepository, DtoValidator dtoValidator) {
         this.billCreator = billCreator;
         this.billCanceller = billCanceller;
+        this.billPayer = billPayer;
         this.billRepository = billRepository;
         this.dtoValidator = dtoValidator;
     }
@@ -33,6 +35,11 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
     public void cancelBill(BillActionDto billActionDto) {
         dtoValidator.validateDto(billActionDto);
         performAction(billCanceller::cancelBill, billActionDto);
+    }
+
+    public void payBill(BillActionDto billActionDto) {
+        dtoValidator.validateDto(billActionDto);
+        performAction(billPayer::payBill, billActionDto);
     }
 
     @Override

@@ -26,6 +26,10 @@ public class BillValidationException extends RuntimeException {
         return new BillValidationException("Cannot cancel bill with state " + billState);
     }
 
+    public static BillValidationException cannotPay(String billState) {
+        return new BillValidationException("Cannot pay bill with state " + billState);
+    }
+
     private BillValidationException(String message) {
         super(message);
     }

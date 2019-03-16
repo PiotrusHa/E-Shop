@@ -47,8 +47,16 @@ class Bill {
         return billState == BillState.WAITING_FOR_PAYMENT;
     }
 
+    boolean canPay() {
+        return billState == BillState.WAITING_FOR_PAYMENT;
+    }
+
     public void markBillAsCancelled() {
         billState = BillState.CANCELLED;
+    }
+
+    public void markBillAsPaid() {
+        billState = BillState.PAID;
     }
 
     BillDto toDto() {
