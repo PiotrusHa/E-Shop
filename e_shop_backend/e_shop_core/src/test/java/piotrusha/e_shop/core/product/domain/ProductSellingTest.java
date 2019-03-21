@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static piotrusha.e_shop.core.product.domain.Assertions.assertProductDto;
 
+import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
@@ -50,8 +51,8 @@ class ProductSellingTest {
 
         productFacade.sellProducts(List.of(dto));
 
-        Optional<ProductDto> productOpt = productFacade.findProductByProductId(product.getProductId());
-        assertTrue(productOpt.isPresent());
+        Option<ProductDto> productOpt = productFacade.findProductByProductId(product.getProductId());
+        assertTrue(productOpt.isDefined());
         ProductDto productDto = productOpt.get();
         assertEquals(product.getBookedPiecesNumber() - piecesNumberToSell, (int) productDto.getBookedPiecesNumber());
         assertEquals(product.getSoldPiecesNumber() + piecesNumberToSell, (int) productDto.getSoldPiecesNumber());
@@ -135,8 +136,8 @@ class ProductSellingTest {
     }
 
     private void assertProductDidNotChange(ProductDto productDto) {
-        Optional<ProductDto> productOpt = productFacade.findProductByProductId(productDto.getProductId());
-        assertTrue(productOpt.isPresent());
+        Option<ProductDto> productOpt = productFacade.findProductByProductId(productDto.getProductId());
+        assertTrue(productOpt.isDefined());
         assertProductDto(productDto, productOpt.get());
     }
 

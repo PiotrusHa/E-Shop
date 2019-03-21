@@ -1,6 +1,9 @@
 package piotrusha.e_shop.core.product.domain;
 
+import io.vavr.control.Either;
+import io.vavr.control.Option;
 import piotrusha.e_shop.core.base.AbstractFacade;
+import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.product.domain.dto.AbstractProductActionDto;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
@@ -14,7 +17,6 @@ import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 public class ProductFacade extends AbstractFacade<Product, AbstractProductActionDto> {
 
@@ -63,9 +65,10 @@ public class ProductFacade extends AbstractFacade<Product, AbstractProductAction
         performAction(productModifier::modifyProduct, modifyProductDto);
     }
 
-    public void bookProducts(List<BookProductDto> bookProductDtos) {
-        bookProductDtos.forEach(dtoValidator::validateDto);
-        performAction(productBooker::bookProducts, bookProductDtos);
+    public Either<AppError, List<Product>> bookProducts(List<BookProductDto> bookProductDtos) {
+        return dtoValidator.validateDto(bookProductDtos)
+                           .flatMap(productBooker::bookProducts)
+                           .peek(this::saveAll);
     }
 
     public void cancelBooking(List<CancelProductBookingDto> cancelProductBookingDtos) {
@@ -82,14 +85,14 @@ public class ProductFacade extends AbstractFacade<Product, AbstractProductAction
         return categoryFinder.findAll();
     }
 
-    public Optional<ProductDto> findProductByProductId(BigDecimal productId) {
+    public Option<ProductDto> findProductByProductId(BigDecimal productId) {
         return productFinder.findByProductId(productId);
     }
 
     @Override
     protected Product findEntity(AbstractProductActionDto dto) {
         return productRepository.findByProductId(dto.getProductId())
-                                .orElseThrow(() -> new ProductNotFoundException(dto.getProductId()));
+                                .getOrElseThrow(() -> new ProductNotFoundException(dto.getProductId()));
     }
 
     @Override

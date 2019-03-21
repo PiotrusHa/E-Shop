@@ -1,9 +1,9 @@
 package piotrusha.e_shop.core.product.domain;
 
+import io.vavr.control.Option;
 import piotrusha.e_shop.core.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 class ProductFinder {
 
@@ -15,7 +15,7 @@ class ProductFinder {
         this.productConverter = productConverter;
     }
 
-    Optional<ProductDto> findByProductId(BigDecimal productId) {
+    Option<ProductDto> findByProductId(BigDecimal productId) {
         return productRepository.findByProductId(productId)
                                 .map(productConverter::toDto);
     }

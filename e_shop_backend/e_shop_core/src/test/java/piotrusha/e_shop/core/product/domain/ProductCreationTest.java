@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static piotrusha.e_shop.core.product.domain.Assertions.assertProductDto;
 
+import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductCategoryDto;
@@ -14,7 +15,6 @@ import piotrusha.e_shop.core.product.domain.exception.ProductValidationException
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 class ProductCreationTest {
 
@@ -46,8 +46,8 @@ class ProductCreationTest {
 
         ProductDto createdProduct = productFacade.createProduct(createProductDto);
 
-        Optional<ProductDto> productOpt = productFacade.findProductByProductId(createdProduct.getProductId());
-        assertTrue(productOpt.isPresent());
+        Option<ProductDto> productOpt = productFacade.findProductByProductId(createdProduct.getProductId());
+        assertTrue(productOpt.isDefined());
         assertProductDto(expected, productOpt.get());
     }
 

@@ -60,7 +60,7 @@ class BillCreator {
     private BillRecord createBillRecord(CreateBillRecordDto dto) {
         Tuple2<ProductDto, Integer> productAndPiecesNumber = Tuple.of(dto.getProductId(), dto.getPiecesNumber())
                                                                   .map1(productFacade::findProductByProductId)
-                                                                  .map1(productOpt -> productOpt.orElseThrow(
+                                                                  .map1(productOpt -> productOpt.getOrElseThrow(
                                                                           () -> new ProductNotFoundException(dto.getProductId())));
 
         return new BillRecord(productAndPiecesNumber._1.getProductId(), productAndPiecesNumber._2, productAndPiecesNumber._1.getPrice());

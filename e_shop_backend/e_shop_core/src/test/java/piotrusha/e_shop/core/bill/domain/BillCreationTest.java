@@ -8,6 +8,7 @@ import static piotrusha.e_shop.core.bill.domain.SampleDtos.createCreateBillDto;
 import static piotrusha.e_shop.core.bill.domain.SampleDtos.createCreateBillRecordDto;
 import static piotrusha.e_shop.core.bill.domain.SampleDtos.createProductDtoForBillRecord;
 
+import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.core.bill.domain.dto.BillDto;
@@ -20,7 +21,6 @@ import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 class BillCreationTest {
 
@@ -37,7 +37,7 @@ class BillCreationTest {
     void createWithNonexistentProductId() {
         BigDecimal nonexistentProductId = BigDecimal.TEN;
         when(productFacade.findProductByProductId(nonexistentProductId))
-                .thenReturn(Optional.empty());
+                .thenReturn(Option.none());
         CreateBillDto dto = createCreateBillDto(List.of(createCreateBillRecordDto(nonexistentProductId)));
         String expectedMessage = String.format("Product with productId %s not found", nonexistentProductId);
 
@@ -59,9 +59,9 @@ class BillCreationTest {
         ProductDto product1 = createProductDtoForBillRecord(recordDto1, product1Price);
         ProductDto product2 = createProductDtoForBillRecord(recordDto2, product2Price);
         when(productFacade.findProductByProductId(product1Id))
-                .thenReturn(Optional.of(product1));
+                .thenReturn(Option.some(product1));
         when(productFacade.findProductByProductId(product2Id))
-                .thenReturn(Optional.of(product2));
+                .thenReturn(Option.some(product2));
         CreateBillDto createBillDto = createCreateBillDto(List.of(recordDto1, recordDto2));
         BigDecimal expectedPriceSum = BigDecimal.valueOf(153);
 

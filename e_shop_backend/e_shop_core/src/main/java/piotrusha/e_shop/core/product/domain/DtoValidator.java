@@ -1,6 +1,11 @@
 package piotrusha.e_shop.core.product.domain;
 
 import com.google.common.base.Strings;
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
+import io.vavr.control.Either;
+import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.base.ListValidator;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductCategoryDto;
@@ -16,9 +21,11 @@ import java.util.List;
 class DtoValidator {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
-    DtoValidator(CategoryRepository categoryRepository) {
+    DtoValidator(CategoryRepository categoryRepository, ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
     }
 
     void validateDto(CreateProductCategoryDto dto) {
@@ -48,9 +55,29 @@ class DtoValidator {
         }
     }
 
-    void validateDto(BookProductDto dto) {
-        validateProductId(dto.getProductId());
-        validateBookPiecesNumber(dto.getPiecesNumber());
+    Either<AppError, List<Tuple2<BookProductDto, Product>>> validateDto(List<BookProductDto> dtos) {
+        return ListValidator.validateAndTransform(dtos, this::validateBookDto);
+    }
+
+    private Either<AppError, Tuple2<BookProductDto, Product>> validateBookDto(BookProductDto dto) {
+        return validateBookPiecesNumber2(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId2(dto.getProductId()))
+                                                               .map(product -> Tuple.of(dto, product));
+    }
+
+    private Either<AppError, Integer> validateBookPiecesNumber2(Integer piecesNumber) {
+        if (piecesNumber == null || piecesNumber <= 0) {
+            return Either.left(AppError.validation("Product pieces number has to be greater than zero."));
+        }
+        return Either.right(piecesNumber);
+    }
+
+    private Either<AppError, Product> validateProductId2(BigDecimal productId) {
+        if (productId == null) {
+            return Either.left(AppError.validation("Product id cannot be empty."));
+        }
+
+        return productRepository.findByProductId(productId)
+                                .toEither(() -> AppError.notFound(String.format("Product with productId %s not found", productId)));
     }
 
     void validateDto(CancelProductBookingDto dto) {

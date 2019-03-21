@@ -14,7 +14,7 @@ class ProductConfiguration {
 
         ProductIdGenerator productIdGenerator = new ProductIdGenerator(productRepository);
         ProductConverter productConverter = new ProductConverter();
-        DtoValidator dtoValidator = new DtoValidator(categoryRepository);
+        DtoValidator dtoValidator = new DtoValidator(categoryRepository, productRepository);
         ProductCreator productCreator = new ProductCreator(productRepository, productIdGenerator, productConverter);
         ProductModifier productModifier = new ProductModifier();
         ProductFinder productFinder = new ProductFinder(productRepository, productConverter);
