@@ -1,19 +1,19 @@
 package piotrusha.e_shop.core.product.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static piotrusha.e_shop.core.product.domain.Assertions.assertProductDto;
 
+import io.vavr.control.Either;
 import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.base.AppError.ErrorType;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
-import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -58,62 +58,17 @@ class ProductBookingCancelTest {
     }
 
     @Test
-    void cancelWithoutProductId() {
-        CancelProductBookingDto dto = new CancelProductBookingDto(null, 1);
-        String expectedMessage = "Product id cannot be empty.";
-
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.cancelBooking(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void cancelNonexistentProduct() {
-        BigDecimal id = BigDecimal.TEN;
-        CancelProductBookingDto dto = new CancelProductBookingDto(id, 1);
-        String expectedMessage = "Product with productId " + id + " not found";
-
-        ProductNotFoundException e = assertThrows(ProductNotFoundException.class, () -> productFacade.cancelBooking(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void cancelWithoutPiecesNumber() {
-        CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), null);
-        String expectedMessage = "Product pieces number has to be greater than zero.";
-
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.cancelBooking(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-        assertProductDidNotChange(product);
-    }
-
-    @Test
-    void cancelNegativePiecesNumber() {
-        CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), -2);
-        String expectedMessage = "Product pieces number has to be greater than zero.";
-
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.cancelBooking(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-        assertProductDidNotChange(product);
-    }
-
-    @Test
-    void cancelZeroPiecesNumber() {
-        CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), 0);
-        String expectedMessage = "Product pieces number has to be greater than zero.";
-
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.cancelBooking(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-        assertProductDidNotChange(product);
-    }
-
-    @Test
     void cancelNotEnoughPiecesNumber() {
         Integer piecesNumber = product.getAvailablePiecesNumber() + 1;
         CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), piecesNumber);
         String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, product.getName());
+        ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.cancelBooking(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
+        Either<AppError, List<Product>> result = productFacade.cancelBooking(List.of(dto));
+
+        assertTrue(result.isLeft());
+        assertEquals(expectedMessage, result.getLeft().getErrorMessage());
+        assertEquals(expectedErrorType, result.getLeft().getErrorType());
         assertProductDidNotChange(product);
     }
 
@@ -123,10 +78,13 @@ class ProductBookingCancelTest {
         CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), 1);
         CancelProductBookingDto dto2 = new CancelProductBookingDto(product2.getProductId(), piecesNumber);
         String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, product2.getName());
+        ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        ProductValidationException e =
-                assertThrows(ProductValidationException.class, () -> productFacade.cancelBooking(List.of(dto, dto2)));
-        assertEquals(expectedMessage, e.getMessage());
+        Either<AppError, List<Product>> result = productFacade.cancelBooking(List.of(dto, dto2));
+
+        assertTrue(result.isLeft());
+        assertEquals(expectedMessage, result.getLeft().getErrorMessage());
+        assertEquals(expectedErrorType, result.getLeft().getErrorType());
         assertProductDidNotChange(product);
         assertProductDidNotChange(product2);
     }

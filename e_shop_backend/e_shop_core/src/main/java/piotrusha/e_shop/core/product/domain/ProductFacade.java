@@ -66,19 +66,21 @@ public class ProductFacade extends AbstractFacade<Product, AbstractProductAction
     }
 
     public Either<AppError, List<Product>> bookProducts(List<BookProductDto> bookProductDtos) {
-        return dtoValidator.validateDto(bookProductDtos)
+        return dtoValidator.validateBookDto(bookProductDtos)
                            .flatMap(productBooker::bookProducts)
                            .peek(this::saveAll);
     }
 
-    public void cancelBooking(List<CancelProductBookingDto> cancelProductBookingDtos) {
-        cancelProductBookingDtos.forEach(dtoValidator::validateDto);
-        performAction(productBookingCanceler::cancelBooking, cancelProductBookingDtos);
+    public Either<AppError, List<Product>> cancelBooking(List<CancelProductBookingDto> cancelProductBookingDtos) {
+        return dtoValidator.validateCancelDto(cancelProductBookingDtos)
+                           .flatMap(productBookingCanceler::cancelBooking)
+                           .peek(this::saveAll);
     }
 
-    public void sellProducts(List<SellProductDto> sellProductDtos) {
-        sellProductDtos.forEach(dtoValidator::validateDto);
-        performAction(productSeller::sellProducts, sellProductDtos);
+    public Either<AppError, List<Product>> sellProducts(List<SellProductDto> sellProductDtos) {
+        return dtoValidator.validateSellDto(sellProductDtos)
+                           .flatMap(productSeller::sellProducts)
+                           .peek(this::saveAll);
     }
 
     public List<ProductCategoryDto> findAllProductCategories() {

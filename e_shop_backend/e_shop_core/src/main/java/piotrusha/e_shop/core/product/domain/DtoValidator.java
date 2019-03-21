@@ -55,7 +55,7 @@ class DtoValidator {
         }
     }
 
-    Either<AppError, List<Tuple2<BookProductDto, Product>>> validateDto(List<BookProductDto> dtos) {
+    Either<AppError, List<Tuple2<BookProductDto, Product>>> validateBookDto(List<BookProductDto> dtos) {
         return ListValidator.validateAndTransform(dtos, this::validateBookDto);
     }
 
@@ -80,14 +80,24 @@ class DtoValidator {
                                 .toEither(() -> AppError.notFound(String.format("Product with productId %s not found", productId)));
     }
 
-    void validateDto(CancelProductBookingDto dto) {
-        validateProductId(dto.getProductId());
-        validateBookPiecesNumber(dto.getPiecesNumber());
+    Either<AppError, List<Tuple2<CancelProductBookingDto, Product>>> validateCancelDto(List<CancelProductBookingDto> dtos) {
+        return ListValidator.validateAndTransform(dtos, this::validateCancelDto);
+
     }
 
-    void validateDto(SellProductDto dto) {
-        validateProductId(dto.getProductId());
-        validateBookPiecesNumber(dto.getPiecesNumber());
+    private Either<AppError, Tuple2<CancelProductBookingDto, Product>> validateCancelDto(CancelProductBookingDto dto) {
+        return validateBookPiecesNumber2(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId2(dto.getProductId()))
+                                                               .map(product -> Tuple.of(dto, product));
+    }
+
+    Either<AppError, List<Tuple2<SellProductDto, Product>>> validateSellDto(List<SellProductDto> dtos) {
+        return ListValidator.validateAndTransform(dtos, this::validateSellDto);
+
+    }
+
+    private Either<AppError, Tuple2<SellProductDto, Product>> validateSellDto(SellProductDto dto) {
+        return validateBookPiecesNumber2(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId2(dto.getProductId()))
+                                                               .map(product -> Tuple.of(dto, product));
     }
 
     private void validateProductName(String productName) {
@@ -119,12 +129,6 @@ class DtoValidator {
     private void validateProductId(BigDecimal productId) {
         if (productId == null) {
             throw ProductValidationException.emptyProductId();
-        }
-    }
-
-    private void validateBookPiecesNumber(Integer piecesNumber) {
-        if (piecesNumber == null || piecesNumber <= 0) {
-            throw ProductValidationException.wrongPiecesNumber();
         }
     }
 

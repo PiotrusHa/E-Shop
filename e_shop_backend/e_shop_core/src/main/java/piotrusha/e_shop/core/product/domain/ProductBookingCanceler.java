@@ -1,30 +1,35 @@
 package piotrusha.e_shop.core.product.domain;
 
 import io.vavr.Tuple2;
+import io.vavr.control.Either;
+import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.base.ListValidator;
 import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 class ProductBookingCanceler {
 
-    List<Product> cancelBooking(List<Tuple2<CancelProductBookingDto, Product>> productsToCancel) {
-        validateCanCancel(productsToCancel);
-        return cancel(productsToCancel);
+    Either<AppError, List<Product>> cancelBooking(List<Tuple2<CancelProductBookingDto, Product>> productsToCancel) {
+        return validateCanCancel(productsToCancel)
+                .map(this::cancel);
     }
 
-    private void validateCanCancel(List<Tuple2<CancelProductBookingDto, Product>> productsToCancel) {
-        for (Tuple2<CancelProductBookingDto, Product> productToCancel : productsToCancel) {
-            validateCanCancel(productToCancel._2, productToCancel._1.getPiecesNumber());
-        }
+    private Either<AppError, List<Tuple2<CancelProductBookingDto, Product>>> validateCanCancel(List<Tuple2<CancelProductBookingDto, Product>> productsToCancel) {
+        return ListValidator.checkError(productsToCancel, this::validateCanCancel);
     }
 
-    private void validateCanCancel(Product productToCancel, Integer piecesNumber) {
-        boolean canCancel = productToCancel.canCancel(piecesNumber);
+    private Either<AppError, Tuple2<CancelProductBookingDto, Product>> validateCanCancel(Tuple2<CancelProductBookingDto, Product> productToCancel) {
+        Product product = productToCancel._2;
+        Integer piecesNumber = productToCancel._1.getPiecesNumber();
+
+        boolean canCancel = product.canCancel(piecesNumber);
         if (!canCancel) {
-            throw ProductValidationException.notEnoughPiecesToCancel(piecesNumber, productToCancel.getName());
+            return Either.left(AppError.validation(String.format("Cannot cancel booking %s pieces of product %s.",
+                                                                 piecesNumber, product.getName())));
         }
+        return Either.right(productToCancel);
     }
 
     private List<Product> cancel(List<Tuple2<CancelProductBookingDto, Product>> productsToCancel) {
