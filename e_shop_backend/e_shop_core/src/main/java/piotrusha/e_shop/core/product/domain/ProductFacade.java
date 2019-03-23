@@ -86,6 +86,10 @@ public class ProductFacade extends AbstractFacade<Product, AbstractProductAction
         return productFinder.findByProductId(productId);
     }
 
+    public List<ProductDto> findProductsByCategoryName(String categoryName) {
+        return productFinder.findProductsByCategoryName(categoryName);
+    }
+
     @Override
     protected Product findEntity(AbstractProductActionDto dto) {
         return productRepository.findByProductId(dto.getProductId())
