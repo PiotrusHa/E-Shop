@@ -13,6 +13,10 @@ interface BillRepository extends Repository<Bill, BigDecimal> {
 
     Option<Bill> findByBillId(BigDecimal id);
 
+    List<Bill> findBillByClientId(BigDecimal clientId);
+
+    List<Bill> findBillByClientIdAndBillState(BigDecimal clientId, BillState billState);
+
     @Query("SELECT max(b.id) FROM Bill b")
     Option<BigDecimal> findLastBillId();
 

@@ -6,6 +6,10 @@ import piotrusha.e_shop.core.bill.domain.dto.BillActionDto;
 import piotrusha.e_shop.core.bill.domain.dto.BillDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class BillFacade {
 
     private final BillCreator billCreator;
@@ -44,6 +48,26 @@ public class BillFacade {
                            .flatMap(billPayer::payBill)
                            .peek(billRepository::save)
                            .map(Bill::toDto);
+    }
+
+    public Either<AppError, BillDto>  findBillByBillId(BigDecimal billId) {
+        return billRepository.findByBillId(billId)
+                             .toEither(() -> AppError.notFound(String.format("Bill with billId %s not found.", billId)))
+                             .map(Bill::toDto);
+    }
+
+    public List<BillDto> findBillsByClientId(BigDecimal clientId) {
+        return billRepository.findBillByClientId(clientId)
+                             .stream()
+                             .map(Bill::toDto)
+                             .collect(Collectors.toList());
+    }
+
+    public List<BillDto> findBillsByClientIdAndBillState(BigDecimal clientId, String billState) {
+        return billRepository.findBillByClientIdAndBillState(clientId, BillState.valueOf(billState))
+                             .stream()
+                             .map(Bill::toDto)
+                             .collect(Collectors.toList());
     }
 
 }

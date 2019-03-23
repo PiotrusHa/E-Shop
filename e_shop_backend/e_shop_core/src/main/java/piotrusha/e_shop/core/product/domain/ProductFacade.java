@@ -100,6 +100,10 @@ public class ProductFacade {
         return productFinder.findByProductId(productId);
     }
 
+    public List<ProductDto> findProductsByCategoryName(String categoryName) {
+        return productFinder.findProductsByCategoryName(categoryName);
+    }
+
     private List<ProductDto> toDto(List<Product> products) {
         return products.stream()
                        .map(Product::toDto)
