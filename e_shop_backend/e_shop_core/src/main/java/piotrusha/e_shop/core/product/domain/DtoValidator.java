@@ -12,7 +12,6 @@ import piotrusha.e_shop.core.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
-import piotrusha.e_shop.core.product.domain.exception.CategoryValidationException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,13 +26,19 @@ class DtoValidator {
         this.productRepository = productRepository;
     }
 
-    void validateCreateCategoryDto(CreateProductCategoryDto dto) {
-        if (Strings.isNullOrEmpty(dto.getCategoryName())) {
-            throw CategoryValidationException.emptyCategoryName();
+    Either<AppError, CreateProductCategoryDto> validateCreateCategoryDto(CreateProductCategoryDto dto) {
+        return validateCategoryName(dto.getCategoryName())
+                .map(x -> dto);
+    }
+
+    private Either<AppError, String> validateCategoryName(String categoryName) {
+        if (Strings.isNullOrEmpty(categoryName)) {
+            return Either.left(AppError.validation("Category name cannot be empty."));
         }
-        if (categoryRepository.existsByName(dto.getCategoryName())) {
-            throw CategoryValidationException.categoryNameAlreadyExists(dto.getCategoryName());
+        if (categoryRepository.existsByName(categoryName)) {
+            return Either.left(AppError.validation("Category with name " + categoryName + " already exists."));
         }
+        return Either.right(categoryName);
     }
 
     Either<AppError, CreateProductDto> validateCreateProductDto(CreateProductDto dto) {

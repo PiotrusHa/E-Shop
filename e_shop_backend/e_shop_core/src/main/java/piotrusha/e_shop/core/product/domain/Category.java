@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import piotrusha.e_shop.core.product.domain.dto.ProductCategoryDto;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,5 +28,9 @@ class Category {
     @Id
     @Column(name = "name", length = 30, nullable = false, unique = true)
     private String name;
+
+    ProductCategoryDto toDto() {
+        return new ProductCategoryDto(name);
+    }
 
 }

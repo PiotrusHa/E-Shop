@@ -29,12 +29,14 @@ public class ProductFacade {
     private final ProductSeller productSeller;
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     private final DtoValidator dtoValidator;
 
     ProductFacade(CategoryCreator categoryCreator, CategoryFinder categoryFinder, ProductCreator productCreator,
                   ProductModifier productModifier, ProductBooker productBooker, ProductBookingCanceler productBookingCanceler,
-                  ProductFinder productFinder, ProductSeller productSeller, ProductRepository productRepository, DtoValidator dtoValidator) {
+                  ProductFinder productFinder, ProductSeller productSeller, ProductRepository productRepository,
+                  CategoryRepository categoryRepository, DtoValidator dtoValidator) {
         this.categoryCreator = categoryCreator;
         this.categoryFinder = categoryFinder;
         this.productCreator = productCreator;
@@ -44,12 +46,15 @@ public class ProductFacade {
         this.productFinder = productFinder;
         this.productSeller = productSeller;
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
         this.dtoValidator = dtoValidator;
     }
 
-    public void createProductCategory(CreateProductCategoryDto createProductCategoryDto) {
-        dtoValidator.validateCreateCategoryDto(createProductCategoryDto);
-        categoryCreator.createCategory(createProductCategoryDto);
+    public Either<AppError, ProductCategoryDto> createProductCategory(CreateProductCategoryDto createProductCategoryDto) {
+        return dtoValidator.validateCreateCategoryDto(createProductCategoryDto)
+                           .map(categoryCreator::createCategory)
+                           .peek(categoryRepository::save)
+                           .map(Category::toDto);
     }
 
     public Either<AppError, ProductDto> createProduct(CreateProductDto createProductDto) {

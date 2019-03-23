@@ -9,7 +9,7 @@ class ProductConfiguration {
     @Bean
     ProductFacade productFacade(CategoryRepository categoryRepository, ProductRepository productRepository) {
         CategoryConverter categoryConverter = new CategoryConverter();
-        CategoryCreator categoryCreator = new CategoryCreator(categoryRepository);
+        CategoryCreator categoryCreator = new CategoryCreator();
         CategoryFinder categoryFinder = new CategoryFinder(categoryRepository, categoryConverter);
 
         ProductIdGenerator productIdGenerator = new ProductIdGenerator(productRepository);
@@ -22,7 +22,7 @@ class ProductConfiguration {
         ProductSeller productSeller = new ProductSeller();
 
         return new ProductFacade(categoryCreator, categoryFinder, productCreator, productModifier, productBooker, productBookingCanceler,
-                                 productFinder, productSeller, productRepository, dtoValidator);
+                                 productFinder, productSeller, productRepository, categoryRepository, dtoValidator);
     }
 
     ProductFacade productFacade() {
