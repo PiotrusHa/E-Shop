@@ -1,8 +1,7 @@
 package piotrusha.e_shop.core.bill.domain;
 
-import io.vavr.Tuple2;
-import piotrusha.e_shop.core.bill.domain.dto.BillActionDto;
-import piotrusha.e_shop.core.bill.domain.exception.BillValidationException;
+import io.vavr.control.Either;
+import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.product.domain.ProductFacade;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
 
@@ -17,22 +16,23 @@ class BillPayer {
         this.productFacade = productFacade;
     }
 
-    Bill payBill(Tuple2<BillActionDto, Bill> billTuple) {
-        Bill bill = billTuple._2;
-        validateCanPay(bill);
-        markProductsAsSold(bill);
-        return markBillAsPaid(bill);
+    Either<AppError, Bill> payBill(Bill bill) {
+        return validateCanPay(bill)
+                .flatMap(this::markProductsAsSold)
+                .map(this::markBillAsPaid);
     }
 
-    private void validateCanPay(Bill bill) {
+    private Either<AppError, Bill> validateCanPay(Bill bill) {
         if (!bill.canPay()) {
-            throw BillValidationException.cannotPay(bill.getBillState().toString());
+            return Either.left(AppError.validation("Cannot pay bill with state " + bill.getBillState()));
         }
+        return Either.right(bill);
     }
 
-    private void markProductsAsSold(Bill bill) {
+    private Either<AppError, Bill> markProductsAsSold(Bill bill) {
         List<SellProductDto> sellProductDtos = createSellProductDtos(bill);
-        productFacade.sellProducts(sellProductDtos);
+        return productFacade.sellProducts(sellProductDtos)
+                            .map(x -> bill);
     }
 
     private List<SellProductDto> createSellProductDtos(Bill bill) {

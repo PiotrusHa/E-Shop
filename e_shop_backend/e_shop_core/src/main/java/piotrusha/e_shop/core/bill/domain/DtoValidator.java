@@ -1,7 +1,5 @@
 package piotrusha.e_shop.core.bill.domain;
 
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
 import io.vavr.control.Either;
 import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.base.ListValidator;
@@ -26,9 +24,8 @@ class DtoValidator {
                 .map(x -> dto);
     }
 
-    Either<AppError, Tuple2<BillActionDto, Bill>> validateDto(BillActionDto dto) {
-        return validateBillId(dto.getBillId())
-                .map(bill -> Tuple.of(dto, bill));
+    Either<AppError, Bill> validateDto(BillActionDto dto) {
+        return validateBillId(dto.getBillId());
     }
 
     private Either<AppError, Bill> validateBillId(BigDecimal billId) {
@@ -36,7 +33,7 @@ class DtoValidator {
             return Either.left(AppError.validation("Bill id cannot be empty."));
         }
         return billRepository.findByBillId(billId)
-                             .toEither(() -> AppError.notFound("Bill with billId %s not found."));
+                             .toEither(() -> AppError.notFound(String.format("Bill with billId %s not found.", billId)));
     }
 
     private Either<AppError, BigDecimal> validateClientId(BigDecimal clientId) {

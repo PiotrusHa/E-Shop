@@ -1,16 +1,12 @@
 package piotrusha.e_shop.core.bill.domain;
 
 import io.vavr.control.Either;
-import piotrusha.e_shop.core.base.AbstractFacade;
 import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.bill.domain.dto.BillActionDto;
 import piotrusha.e_shop.core.bill.domain.dto.BillDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto;
-import piotrusha.e_shop.core.bill.domain.exception.BillNotFoundException;
 
-import java.util.List;
-
-public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
+public class BillFacade {
 
     private final BillCreator billCreator;
     private final BillCanceller billCanceller;
@@ -36,30 +32,18 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
                            .map(Bill::toDto);
     }
 
-    public void cancelBill(BillActionDto billActionDto) {
-        dtoValidator.validateDto(billActionDto);
-        performAction(billCanceller::cancelBill, billActionDto);
+    public Either<AppError, BillDto> cancelBill(BillActionDto billActionDto) {
+        return dtoValidator.validateDto(billActionDto)
+                           .flatMap(billCanceller::cancelBill)
+                           .peek(billRepository::save)
+                           .map(Bill::toDto);
     }
 
-    public void payBill(BillActionDto billActionDto) {
-        dtoValidator.validateDto(billActionDto);
-        performAction(billPayer::payBill, billActionDto);
-    }
-
-    @Override
-    protected Bill findEntity(BillActionDto billActionDto) {
-        return billRepository.findByBillId(billActionDto.getBillId())
-                             .getOrElseThrow(() -> new BillNotFoundException(billActionDto.getBillId()));
-    }
-
-    @Override
-    protected void save(Bill bill) {
-        billRepository.save(bill);
-    }
-
-    @Override
-    protected void saveAll(List<Bill> bills) {
-        billRepository.saveAll(bills);
+    public Either<AppError, BillDto> payBill(BillActionDto billActionDto) {
+        return dtoValidator.validateDto(billActionDto)
+                           .flatMap(billPayer::payBill)
+                           .peek(billRepository::save)
+                           .map(Bill::toDto);
     }
 
 }
