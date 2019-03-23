@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 class InMemoryBillRepository implements BillRepository {
 
@@ -19,6 +20,24 @@ class InMemoryBillRepository implements BillRepository {
     @Override
     public Optional<Bill> findByBillId(BigDecimal id) {
         return Optional.ofNullable(map.get(id));
+    }
+
+    @Override
+    public List<Bill> findBillByClientId(BigDecimal clientId) {
+        return map.values()
+                  .stream()
+                  .filter(bill -> bill.getClientId()
+                                      .equals(clientId))
+                  .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Bill> findBillByClientIdAndBillState(BigDecimal clientId, BillState billState) {
+        return map.values()
+                  .stream()
+                  .filter(bill -> bill.getClientId().equals(clientId)
+                                  && bill.getBillState().equals(billState))
+                  .collect(Collectors.toList());
     }
 
     @Override

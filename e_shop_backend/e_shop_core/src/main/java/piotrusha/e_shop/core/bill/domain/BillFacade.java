@@ -6,7 +6,9 @@ import piotrusha.e_shop.core.bill.domain.dto.BillDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto;
 import piotrusha.e_shop.core.bill.domain.exception.BillNotFoundException;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
 
@@ -18,7 +20,8 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
 
     private final DtoValidator dtoValidator;
 
-    public BillFacade(BillCreator billCreator, BillCanceller billCanceller, BillPayer billPayer, BillRepository billRepository, DtoValidator dtoValidator) {
+    public BillFacade(BillCreator billCreator, BillCanceller billCanceller, BillPayer billPayer, BillRepository billRepository,
+                      DtoValidator dtoValidator) {
         this.billCreator = billCreator;
         this.billCanceller = billCanceller;
         this.billPayer = billPayer;
@@ -40,6 +43,26 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
     public void payBill(BillActionDto billActionDto) {
         dtoValidator.validateDto(billActionDto);
         performAction(billPayer::payBill, billActionDto);
+    }
+
+    public BillDto findBillByBillId(BigDecimal billId) {
+        return billRepository.findByBillId(billId)
+                             .orElseThrow(() -> new BillNotFoundException(billId))
+                             .toDto();
+    }
+
+    public List<BillDto> findBillsByClientId(BigDecimal clientId) {
+        return billRepository.findBillByClientId(clientId)
+                             .stream()
+                             .map(Bill::toDto)
+                             .collect(Collectors.toList());
+    }
+
+    public List<BillDto> findBillsByClientIdAndBillState(BigDecimal clientId, String billState) {
+        return billRepository.findBillByClientIdAndBillState(clientId, BillState.valueOf(billState))
+                             .stream()
+                             .map(Bill::toDto)
+                             .collect(Collectors.toList());
     }
 
     @Override
