@@ -29,8 +29,8 @@ class ProductBookingTest {
     @BeforeEach
     void init() {
         productFacade = new ProductConfiguration().productFacade();
-        product = productFacade.createProduct(CREATE_PRODUCT_DTO);
-        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2);
+        product = productFacade.createProduct(CREATE_PRODUCT_DTO).get();
+        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2).get();
     }
 
     @Test
@@ -55,7 +55,7 @@ class ProductBookingTest {
                                                     piecesNumber, product.getName(), product.getAvailablePiecesNumber());
         ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        Either<AppError, List<Product>> result = productFacade.bookProducts(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(dto));
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
@@ -72,7 +72,7 @@ class ProductBookingTest {
                                                     piecesNumber, product2.getName(), product2.getAvailablePiecesNumber());
         ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        Either<AppError, List<Product>> result = productFacade.bookProducts(List.of(dto, dto2));
+        Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(dto, dto2));
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());

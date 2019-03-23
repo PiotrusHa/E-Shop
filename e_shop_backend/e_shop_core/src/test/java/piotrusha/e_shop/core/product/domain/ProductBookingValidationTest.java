@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.base.AppError.ErrorType;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
+import piotrusha.e_shop.core.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -33,7 +34,7 @@ class ProductBookingValidationTest {
     @ParameterizedTest
     @MethodSource("bookValidationProvider")
     void bookValidationTest(BookProductDto dto, String expectedErrorMessage, ErrorType expectedErrorType) {
-        Either<AppError, List<Product>> result = productFacade.bookProducts(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(dto));
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());

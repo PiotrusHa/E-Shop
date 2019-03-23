@@ -13,11 +13,10 @@ class ProductConfiguration {
         CategoryFinder categoryFinder = new CategoryFinder(categoryRepository, categoryConverter);
 
         ProductIdGenerator productIdGenerator = new ProductIdGenerator(productRepository);
-        ProductConverter productConverter = new ProductConverter();
         DtoValidator dtoValidator = new DtoValidator(categoryRepository, productRepository);
-        ProductCreator productCreator = new ProductCreator(productRepository, productIdGenerator, productConverter);
+        ProductCreator productCreator = new ProductCreator(productIdGenerator);
         ProductModifier productModifier = new ProductModifier();
-        ProductFinder productFinder = new ProductFinder(productRepository, productConverter);
+        ProductFinder productFinder = new ProductFinder(productRepository);
         ProductBooker productBooker = new ProductBooker();
         ProductBookingCanceler productBookingCanceler = new ProductBookingCanceler();
         ProductSeller productSeller = new ProductSeller();

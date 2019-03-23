@@ -13,7 +13,6 @@ import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
 import piotrusha.e_shop.core.product.domain.exception.CategoryValidationException;
-import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,7 +27,7 @@ class DtoValidator {
         this.productRepository = productRepository;
     }
 
-    void validateDto(CreateProductCategoryDto dto) {
+    void validateCreateCategoryDto(CreateProductCategoryDto dto) {
         if (Strings.isNullOrEmpty(dto.getCategoryName())) {
             throw CategoryValidationException.emptyCategoryName();
         }
@@ -37,22 +36,25 @@ class DtoValidator {
         }
     }
 
-    void validateDto(CreateProductDto dto) {
-        validateProductName(dto.getProductName());
-        validateProductPrice(dto.getPrice());
-        validateAvailablePiecesNumber(dto.getAvailablePiecesNumber());
-        validateCategories(dto.getCategories());
+    Either<AppError, CreateProductDto> validateCreateProductDto(CreateProductDto dto) {
+        return validateProductName(dto.getProductName())
+                .flatMap(x -> validateProductPrice(dto.getPrice()))
+                .flatMap(x -> validatePiecesNumber(dto.getAvailablePiecesNumber()))
+                .flatMap(x -> validateCategories(dto.getCategories()))
+                .map(x -> dto);
     }
 
-    void validateDto(ModifyProductDto dto) {
-        validateProductId(dto.getProductId());
+    Either<AppError, Tuple2<ModifyProductDto, Product>> validateModifyProductDto(ModifyProductDto dto) {
+        Either<AppError, ?> result = Either.right(null);
         if (dto.getProductAvailablePiecesNumber() != null) {
-            validateAvailablePiecesNumber(dto.getProductAvailablePiecesNumber());
+            result = result.flatMap(x -> validatePiecesNumber(dto.getProductAvailablePiecesNumber()));
         }
         if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign()
                                                               .isEmpty()) {
-            validateCategories(dto.getProductCategoriesToAssign());
+            result = result.flatMap(x -> validateCategories(dto.getProductCategoriesToAssign()));
         }
+        return result.flatMap(x -> validateProductId(dto.getProductId()))
+                     .map(product -> Tuple.of(dto, product));
     }
 
     Either<AppError, List<Tuple2<BookProductDto, Product>>> validateBookDto(List<BookProductDto> dtos) {
@@ -60,24 +62,8 @@ class DtoValidator {
     }
 
     private Either<AppError, Tuple2<BookProductDto, Product>> validateBookDto(BookProductDto dto) {
-        return validateBookPiecesNumber2(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId2(dto.getProductId()))
-                                                               .map(product -> Tuple.of(dto, product));
-    }
-
-    private Either<AppError, Integer> validateBookPiecesNumber2(Integer piecesNumber) {
-        if (piecesNumber == null || piecesNumber <= 0) {
-            return Either.left(AppError.validation("Product pieces number has to be greater than zero."));
-        }
-        return Either.right(piecesNumber);
-    }
-
-    private Either<AppError, Product> validateProductId2(BigDecimal productId) {
-        if (productId == null) {
-            return Either.left(AppError.validation("Product id cannot be empty."));
-        }
-
-        return productRepository.findByProductId(productId)
-                                .toEither(() -> AppError.notFound(String.format("Product with productId %s not found", productId)));
+        return validatePiecesNumber(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId(dto.getProductId()))
+                                                          .map(product -> Tuple.of(dto, product));
     }
 
     Either<AppError, List<Tuple2<CancelProductBookingDto, Product>>> validateCancelDto(List<CancelProductBookingDto> dtos) {
@@ -86,8 +72,8 @@ class DtoValidator {
     }
 
     private Either<AppError, Tuple2<CancelProductBookingDto, Product>> validateCancelDto(CancelProductBookingDto dto) {
-        return validateBookPiecesNumber2(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId2(dto.getProductId()))
-                                                               .map(product -> Tuple.of(dto, product));
+        return validatePiecesNumber(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId(dto.getProductId()))
+                                                          .map(product -> Tuple.of(dto, product));
     }
 
     Either<AppError, List<Tuple2<SellProductDto, Product>>> validateSellDto(List<SellProductDto> dtos) {
@@ -96,40 +82,47 @@ class DtoValidator {
     }
 
     private Either<AppError, Tuple2<SellProductDto, Product>> validateSellDto(SellProductDto dto) {
-        return validateBookPiecesNumber2(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId2(dto.getProductId()))
-                                                               .map(product -> Tuple.of(dto, product));
+        return validatePiecesNumber(dto.getPiecesNumber()).flatMap(piecesNumber -> validateProductId(dto.getProductId()))
+                                                          .map(product -> Tuple.of(dto, product));
     }
 
-    private void validateProductName(String productName) {
+    private Either<AppError, Product> validateProductId(BigDecimal productId) {
+        if (productId == null) {
+            return Either.left(AppError.validation("Product id cannot be empty."));
+        }
+
+        return productRepository.findByProductId(productId)
+                                .toEither(() -> AppError.notFound(String.format("Product with productId %s not found", productId)));
+    }
+
+    private Either<AppError, Integer> validatePiecesNumber(Integer piecesNumber) {
+        if (piecesNumber == null || piecesNumber <= 0) {
+            return Either.left(AppError.validation("Product pieces number has to be greater than zero."));
+        }
+        return Either.right(piecesNumber);
+    }
+
+    private Either<AppError, String> validateProductName(String productName) {
         if (Strings.isNullOrEmpty(productName)) {
-            throw ProductValidationException.emptyName();
+            return Either.left(AppError.validation("Product name cannot be empty."));
         }
+        return Either.right(productName);
     }
 
-    private void validateProductPrice(BigDecimal productPrice) {
+    private Either<AppError, BigDecimal> validateProductPrice(BigDecimal productPrice) {
         if (productPrice == null) {
-            throw ProductValidationException.emptyPrice();
+            return Either.left(AppError.validation("Product price cannot be empty."));
         }
+        return Either.right(productPrice);
     }
 
-    private void validateAvailablePiecesNumber(Integer availablePiecesNumber) {
-        if (availablePiecesNumber == null || availablePiecesNumber < 0) {
-            throw ProductValidationException.wrongAvailablePiecesNumber();
-        }
-    }
-
-    private void validateCategories(List<String> categories) {
+    private Either<AppError, List<String>> validateCategories(List<String> categories) {
         for (String categoryName : categories) {
             if (!categoryRepository.existsByName(categoryName)) {
-                throw ProductValidationException.categoryDoesNotExists(categoryName);
+                return Either.left(AppError.notFound(String.format("Category with name %s does not exists.", categoryName)));
             }
         }
-    }
-
-    private void validateProductId(BigDecimal productId) {
-        if (productId == null) {
-            throw ProductValidationException.emptyProductId();
-        }
+        return Either.right(categories);
     }
 
 }

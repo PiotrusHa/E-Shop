@@ -15,6 +15,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
+import piotrusha.e_shop.core.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -32,7 +33,7 @@ class ProductBookingCancelValidationTest {
     @ParameterizedTest
     @MethodSource("cancelBookingValidationProvider")
     void cancelBookingValidationTest(CancelProductBookingDto dto, String expectedErrorMessage, AppError.ErrorType expectedErrorType) {
-        Either<AppError, List<Product>> result = productFacade.cancelBooking(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(dto));
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());

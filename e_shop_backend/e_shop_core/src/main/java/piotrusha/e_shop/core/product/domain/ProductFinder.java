@@ -8,16 +8,14 @@ import java.math.BigDecimal;
 class ProductFinder {
 
     private final ProductRepository productRepository;
-    private final ProductConverter productConverter;
 
-    ProductFinder(ProductRepository productRepository, ProductConverter productConverter) {
+    ProductFinder(ProductRepository productRepository) {
         this.productRepository = productRepository;
-        this.productConverter = productConverter;
     }
 
     Option<ProductDto> findByProductId(BigDecimal productId) {
         return productRepository.findByProductId(productId)
-                                .map(productConverter::toDto);
+                                .map(Product::toDto);
     }
 
 }

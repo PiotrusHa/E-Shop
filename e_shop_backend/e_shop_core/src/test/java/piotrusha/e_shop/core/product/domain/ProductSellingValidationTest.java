@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.product.domain.dto.ProductDto;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
 
 import java.math.BigDecimal;
@@ -32,7 +33,7 @@ class ProductSellingValidationTest {
     @ParameterizedTest
     @MethodSource("sellValidationProvider")
     void sellValidationTest(SellProductDto dto, String expectedErrorMessage, AppError.ErrorType expectedErrorType) {
-        Either<AppError, List<Product>> result = productFacade.sellProducts(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.sellProducts(List.of(dto));
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());

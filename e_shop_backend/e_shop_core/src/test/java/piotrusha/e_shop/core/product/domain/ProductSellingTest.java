@@ -30,8 +30,8 @@ class ProductSellingTest {
     @BeforeEach
     void init() {
         productFacade = new ProductConfiguration().productFacade();
-        product = productFacade.createProduct(CREATE_PRODUCT_DTO);
-        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2);
+        product = productFacade.createProduct(CREATE_PRODUCT_DTO).get();
+        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2).get();
 
         BookProductDto bookProductDto = new BookProductDto(product.getProductId(), 2);
         BookProductDto bookProduct2Dto = new BookProductDto(product2.getProductId(), 5);
@@ -66,7 +66,7 @@ class ProductSellingTest {
                               product.getBookedPiecesNumber());
         ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        Either<AppError, List<Product>> result = productFacade.sellProducts(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.sellProducts(List.of(dto));
 
         assertTrue(result.isLeft());
         assertEquals(expectedMessage, result.getLeft().getErrorMessage());
@@ -84,7 +84,7 @@ class ProductSellingTest {
                               product2.getName(), product2.getBookedPiecesNumber());
         ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        Either<AppError, List<Product>> result = productFacade.sellProducts(List.of(dto, dto2));
+        Either<AppError, List<ProductDto>> result = productFacade.sellProducts(List.of(dto, dto2));
 
         assertTrue(result.isLeft());
         assertEquals(expectedMessage, result.getLeft().getErrorMessage());

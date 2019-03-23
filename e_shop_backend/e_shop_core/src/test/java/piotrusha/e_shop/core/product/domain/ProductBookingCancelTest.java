@@ -30,8 +30,8 @@ class ProductBookingCancelTest {
     @BeforeEach
     void init() {
         productFacade = new ProductConfiguration().productFacade();
-        product = productFacade.createProduct(CREATE_PRODUCT_DTO);
-        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2);
+        product = productFacade.createProduct(CREATE_PRODUCT_DTO).get();
+        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2).get();
 
         BookProductDto bookProductDto = new BookProductDto(product.getProductId(), 1);
         BookProductDto bookProduct2Dto = new BookProductDto(product2.getProductId(), 5);
@@ -64,7 +64,7 @@ class ProductBookingCancelTest {
         String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, product.getName());
         ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        Either<AppError, List<Product>> result = productFacade.cancelBooking(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(dto));
 
         assertTrue(result.isLeft());
         assertEquals(expectedMessage, result.getLeft().getErrorMessage());
@@ -80,7 +80,7 @@ class ProductBookingCancelTest {
         String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, product2.getName());
         ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        Either<AppError, List<Product>> result = productFacade.cancelBooking(List.of(dto, dto2));
+        Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(dto, dto2));
 
         assertTrue(result.isLeft());
         assertEquals(expectedMessage, result.getLeft().getErrorMessage());

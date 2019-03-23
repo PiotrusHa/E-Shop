@@ -2,11 +2,54 @@ package piotrusha.e_shop.core.product.domain;
 
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
+import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
+import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 class SampleDtosToValidate {
+
+    static CreateProductDto createProductDtoWithoutName() {
+        return new CreateProductDto("", BigDecimal.ONE, 1, "", List.of());
+    }
+
+    static CreateProductDto createProductDtoWithoutPrice() {
+        return new CreateProductDto("Tatra", null, 1, "", List.of());
+    }
+
+    static CreateProductDto createProductDtoWithoutAvailablePiecesNumber() {
+        return new CreateProductDto("Tatra", BigDecimal.TEN, null, "", List.of());
+    }
+
+    static CreateProductDto createProductDtoWithNegativeAvailablePiecesNumber() {
+        return new CreateProductDto("Tatra", BigDecimal.TEN, -10, "", List.of());
+    }
+
+    static CreateProductDto createProductDtoWithZeroAvailablePiecesNumber() {
+        return new CreateProductDto("Tatra", BigDecimal.TEN, 0, "", List.of());
+    }
+
+    static CreateProductDto createProductDtoWithNonexistentCategory(String categoryName) {
+        return new CreateProductDto("Tatra", BigDecimal.TEN, 5, "", List.of(categoryName));
+    }
+
+    static ModifyProductDto modifyProductDtoWithNegativeAvailablePiecesNumber() {
+        return new ModifyProductDto(BigDecimal.ONE).setProductAvailablePiecesNumber(-100);
+    }
+
+    static ModifyProductDto modifyProductDtoWithZeroAvailablePiecesNumber() {
+        return new ModifyProductDto(BigDecimal.ONE).setProductAvailablePiecesNumber(0);
+    }
+
+    static ModifyProductDto modifyProductDtoWithProductId(BigDecimal nonexistentProductId) {
+        return new ModifyProductDto(nonexistentProductId);
+    }
+
+    static ModifyProductDto modifyProductDtoWithNonexistentCategory(String categoryName) {
+        return new ModifyProductDto(BigDecimal.ONE).setProductCategoriesToAssign(List.of(categoryName));
+    }
 
     static BookProductDto bookProductDtoWithoutProductId() {
         return new BookProductDto(null, 1);

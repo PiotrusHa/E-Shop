@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import piotrusha.e_shop.core.product.domain.dto.ProductDto;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,6 +19,7 @@ import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "products")
@@ -89,6 +91,22 @@ class Product {
     void sellProduct(int piecesNumber) {
         bookedPiecesNumber -= piecesNumber;
         soldPiecesNumber += piecesNumber;
+    }
+
+    ProductDto toDto() {
+        List<String> categories = this.getCategories()
+                                         .stream()
+                                         .map(Category::getName)
+                                         .collect(Collectors.toList());
+
+        return new ProductDto().setProductId(this.getProductId())
+                               .setName(this.getName())
+                               .setPrice(this.getPrice())
+                               .setAvailablePiecesNumber(this.getAvailablePiecesNumber())
+                               .setBookedPiecesNumber(this.getBookedPiecesNumber())
+                               .setSoldPiecesNumber(this.getSoldPiecesNumber())
+                               .setDescription(this.getDescription())
+                               .setCategories(categories);
     }
 
 }
