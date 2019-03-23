@@ -1,6 +1,8 @@
 package piotrusha.e_shop.core.bill.domain;
 
+import io.vavr.control.Either;
 import piotrusha.e_shop.core.base.AbstractFacade;
+import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.bill.domain.dto.BillActionDto;
 import piotrusha.e_shop.core.bill.domain.dto.BillDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto;
@@ -18,7 +20,8 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
 
     private final DtoValidator dtoValidator;
 
-    public BillFacade(BillCreator billCreator, BillCanceller billCanceller, BillPayer billPayer, BillRepository billRepository, DtoValidator dtoValidator) {
+    public BillFacade(BillCreator billCreator, BillCanceller billCanceller, BillPayer billPayer, BillRepository billRepository,
+                      DtoValidator dtoValidator) {
         this.billCreator = billCreator;
         this.billCanceller = billCanceller;
         this.billPayer = billPayer;
@@ -26,10 +29,11 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
         this.dtoValidator = dtoValidator;
     }
 
-    public BillDto createBill(CreateBillDto createBillDto) {
-        dtoValidator.validateDto(createBillDto);
-        Bill bill = billCreator.createBill(createBillDto);
-        return bill.toDto();
+    public Either<AppError, BillDto> createBill(CreateBillDto createBillDto) {
+        return dtoValidator.validateDto(createBillDto)
+                           .flatMap(billCreator::createBill)
+                           .peek(billRepository::save)
+                           .map(Bill::toDto);
     }
 
     public void cancelBill(BillActionDto billActionDto) {
@@ -45,7 +49,7 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
     @Override
     protected Bill findEntity(BillActionDto billActionDto) {
         return billRepository.findByBillId(billActionDto.getBillId())
-                             .orElseThrow(() -> new BillNotFoundException(billActionDto.getBillId()));
+                             .getOrElseThrow(() -> new BillNotFoundException(billActionDto.getBillId()));
     }
 
     @Override

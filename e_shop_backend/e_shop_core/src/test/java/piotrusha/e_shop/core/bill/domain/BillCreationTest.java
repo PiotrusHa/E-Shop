@@ -1,25 +1,30 @@
 package piotrusha.e_shop.core.bill.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static piotrusha.e_shop.core.bill.domain.SampleDtos.createCreateBillDto;
+import static piotrusha.e_shop.core.bill.domain.SampleDtos.createBillDto;
 import static piotrusha.e_shop.core.bill.domain.SampleDtos.createCreateBillRecordDto;
 import static piotrusha.e_shop.core.bill.domain.SampleDtos.createProductDtoForBillRecord;
 
-import io.vavr.control.Option;
+import com.google.common.collect.Ordering;
+import io.vavr.control.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.bill.domain.dto.BillDto;
 import piotrusha.e_shop.core.bill.domain.dto.BillRecordDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto.CreateBillRecordDto;
 import piotrusha.e_shop.core.product.domain.ProductFacade;
+import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 
 class BillCreationTest {
@@ -34,20 +39,33 @@ class BillCreationTest {
     }
 
     @Test
-    void createWithNonexistentProductId() {
-        BigDecimal nonexistentProductId = BigDecimal.TEN;
-        when(productFacade.findProductByProductId(nonexistentProductId))
-                .thenReturn(Option.none());
-        CreateBillDto dto = createCreateBillDto(List.of(createCreateBillRecordDto(nonexistentProductId)));
-        String expectedMessage = String.format("Product with productId %s not found", nonexistentProductId);
+    void createWithErrorWhileBookingProduct() {
+        String errorMessage = "Error while booking product";
+        CreateBillDto createBillDto = createBillDto(List.of(createCreateBillRecordDto(BigDecimal.ONE)));
+        when(productFacade.bookProducts(any()))
+                .thenReturn(Either.left(AppError.validation(errorMessage)));
 
-        ProductNotFoundException e = assertThrows(ProductNotFoundException.class, () -> billFacade.createBill(dto));
+        Either<AppError, BillDto> result = billFacade.createBill(createBillDto);
 
-        assertEquals(expectedMessage, e.getMessage());
+        assertTrue(result.isLeft());
+        assertEquals(errorMessage, result.getLeft().getErrorMessage());
     }
 
     @Test
     void create() {
+        List<CreateBillRecordDto> createBillRecordDtos = prepareBillRecords();
+        CreateBillDto createBillDto = createBillDto(createBillRecordDtos);
+        BigDecimal expectedPriceSum = getPriceSumForPreparedRecords();
+
+        Either<AppError, BillDto> billDto = billFacade.createBill(createBillDto);
+
+        assertTrue(billDto.isRight());
+        assertEquals(expectedPriceSum, billDto.get().getPriceSum());
+        assertEquals(createBillDto.getClientId(), billDto.get().getClientId());
+        assertRecords(createBillRecordDtos, billDto.get().getBillRecords());
+    }
+
+    private List<CreateBillRecordDto> prepareBillRecords() {
         BigDecimal product1Id = BigDecimal.ONE;
         BigDecimal product2Id = BigDecimal.valueOf(2);
         BigDecimal product1Price = BigDecimal.valueOf(11);
@@ -58,25 +76,34 @@ class BillCreationTest {
         CreateBillRecordDto recordDto2 = new CreateBillRecordDto(product2Id, product2Pieces);
         ProductDto product1 = createProductDtoForBillRecord(recordDto1, product1Price);
         ProductDto product2 = createProductDtoForBillRecord(recordDto2, product2Price);
-        when(productFacade.findProductByProductId(product1Id))
-                .thenReturn(Option.some(product1));
-        when(productFacade.findProductByProductId(product2Id))
-                .thenReturn(Option.some(product2));
-        CreateBillDto createBillDto = createCreateBillDto(List.of(recordDto1, recordDto2));
-        BigDecimal expectedPriceSum = BigDecimal.valueOf(153);
 
-        BillDto billDto = billFacade.createBill(createBillDto);
+        BookProductDto bookProduct1Dto = new BookProductDto(product1Id, product1Pieces);
+        BookProductDto bookProduct2Dto = new BookProductDto(product2Id, product2Pieces);
+        when(productFacade.bookProducts(eq(List.of(bookProduct1Dto, bookProduct2Dto))))
+                .thenReturn(Either.right(List.of(product1, product2)));
 
-        assertEquals(expectedPriceSum, billDto.getPriceSum());
-        assertRecord(recordDto1, product1, billDto.getBillRecords().get(0));
+        return List.of(recordDto1, recordDto2);
     }
 
-    private void assertRecord(CreateBillRecordDto recordDto, ProductDto product, BillRecordDto billRecordDto) {
-        BigDecimal expectedPriceSum = product.getPrice().multiply(BigDecimal.valueOf(recordDto.getPiecesNumber()));
-        assertEquals(recordDto.getPiecesNumber(), billRecordDto.getPiecesNumber());
-        assertEquals(recordDto.getProductId(), billRecordDto.getProductId());
-        assertEquals(product.getPrice(), billRecordDto.getPiecePrice());
-        assertEquals(expectedPriceSum, billRecordDto.getPriceSum());
+    private BigDecimal getPriceSumForPreparedRecords() {
+        return BigDecimal.valueOf(153);
+    }
+
+    private void assertRecords(List<CreateBillRecordDto> createBillRecordDtos, List<BillRecordDto> billRecordDtos) {
+        assertEquals(createBillRecordDtos.size(), billRecordDtos.size());
+
+        List<CreateBillRecordDto> sortedCreateBRDtos = Ordering.from(Comparator.comparing(CreateBillRecordDto::getProductId))
+                                                               .sortedCopy(createBillRecordDtos);
+        List<BillRecordDto> sortedBRDtos = Ordering.from(Comparator.comparing(BillRecordDto::getProductId))
+                                                   .sortedCopy(billRecordDtos);
+        for (int i = 0; i < sortedCreateBRDtos.size(); i++) {
+            assertRecord(sortedCreateBRDtos.get(i), sortedBRDtos.get(i));
+        }
+    }
+
+    private void assertRecord(CreateBillRecordDto createBillRecordDto, BillRecordDto billRecordDto) {
+        assertEquals(createBillRecordDto.getPiecesNumber(), billRecordDto.getPiecesNumber());
+        assertEquals(createBillRecordDto.getProductId(), billRecordDto.getProductId());
     }
 
 }

@@ -12,7 +12,7 @@ class BillIdGenerator {
 
     BigDecimal generate() {
         BigDecimal maxProductId = billRepository.findLastBillId()
-                                                .orElse(BigDecimal.ZERO);
+                                                .getOrElse(BigDecimal.ZERO);
         return maxProductId.add(BigDecimal.ONE);
     }
 

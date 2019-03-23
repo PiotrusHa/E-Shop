@@ -1,10 +1,12 @@
 package piotrusha.e_shop.core.product.domain.dto;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.math.BigDecimal;
 
 @Getter
+@EqualsAndHashCode
 public class BookProductDto extends AbstractProductActionDto {
 
     private Integer piecesNumber;

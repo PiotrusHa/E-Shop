@@ -1,10 +1,11 @@
 package piotrusha.e_shop.core.bill.domain;
 
+import io.vavr.control.Option;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 class InMemoryBillRepository implements BillRepository {
@@ -17,16 +18,16 @@ class InMemoryBillRepository implements BillRepository {
     }
 
     @Override
-    public Optional<Bill> findByBillId(BigDecimal id) {
-        return Optional.ofNullable(map.get(id));
+    public Option<Bill> findByBillId(BigDecimal id) {
+        return Option.of(map.get(id));
     }
 
     @Override
-    public Optional<BigDecimal> findLastBillId() {
-        return map.values()
-                  .stream()
-                  .map(Bill::getBillId)
-                  .max(BigDecimal::compareTo);
+    public Option<BigDecimal> findLastBillId() {
+        return Option.ofOptional(map.values()
+                                    .stream()
+                                    .map(Bill::getBillId)
+                                    .max(BigDecimal::compareTo));
     }
 
     @Override
