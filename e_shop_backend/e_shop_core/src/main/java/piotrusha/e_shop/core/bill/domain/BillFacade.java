@@ -1,6 +1,7 @@
 package piotrusha.e_shop.core.bill.domain;
 
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.bill.domain.dto.BillActionDto;
 import piotrusha.e_shop.core.bill.domain.dto.BillDto;
@@ -63,11 +64,17 @@ public class BillFacade {
                              .collect(Collectors.toList());
     }
 
-    public List<BillDto> findBillsByClientIdAndBillState(BigDecimal clientId, String billState) {
-        return billRepository.findBillByClientIdAndBillState(clientId, BillState.valueOf(billState))
-                             .stream()
-                             .map(Bill::toDto)
-                             .collect(Collectors.toList());
+    public Either<AppError, List<BillDto>> findBillsByClientIdAndBillState(BigDecimal clientId, String billState) {
+        return Try.of(() -> BillState.valueOf(billState))
+                  .toEither(() -> AppError.validation("Wrong bill state: " + billState))
+                  .map(enumState -> findBillsByClientIdAndBillState(clientId, enumState));
+    }
+
+    private List<BillDto> findBillsByClientIdAndBillState(BigDecimal clientId, BillState billState) {
+        return billRepository.findBillByClientIdAndBillState(clientId, billState)
+                      .stream()
+                      .map(Bill::toDto)
+                      .collect(Collectors.toList());
     }
 
 }

@@ -48,8 +48,10 @@ class BillController {
     }
 
     @GetMapping("client/{clientId}/{state}")
-    List<BillDto> findBillsByClientIdAndState(@PathVariable BigDecimal clientId, @PathVariable String state) {
-        return billFacade.findBillsByClientIdAndBillState(clientId, state);
+    ResponseEntity<?> findBillsByClientIdAndState(@PathVariable BigDecimal clientId, @PathVariable String state) {
+        return billFacade.findBillsByClientIdAndBillState(clientId, state)
+                         .map(ResponseEntityCreator::ok)
+                         .getOrElseGet(responseErrorMapper::map);
     }
 
     @PostMapping("client/{clientId}/create")
