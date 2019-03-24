@@ -10,11 +10,11 @@ class BillConfiguration {
     @Bean
     BillFacade billFacade(ProductFacade productFacade, BillRepository billRepository) {
         BillIdGenerator billIdGenerator = new BillIdGenerator(billRepository);
-        BillCreator billCreator = new BillCreator(productFacade, billRepository, billIdGenerator);
+        BillCreator billCreator = new BillCreator(productFacade, billIdGenerator);
         BillCanceller billCanceller = new BillCanceller(productFacade);
         BillPayer billPayer = new BillPayer(productFacade);
 
-        DtoValidator dtoValidator = new DtoValidator();
+        DtoValidator dtoValidator = new DtoValidator(billRepository);
         return new BillFacade(billCreator, billCanceller, billPayer, billRepository, dtoValidator);
     }
 

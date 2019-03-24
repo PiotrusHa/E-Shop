@@ -1,31 +1,36 @@
 package piotrusha.e_shop.core.product.domain;
 
 import io.vavr.Tuple2;
+import io.vavr.control.Either;
+import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.base.ListValidator;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 class ProductBooker {
 
-    List<Product> bookProducts(List<Tuple2<BookProductDto, Product>> productsToBook) {
-        validateCanBook(productsToBook);
-        return book(productsToBook);
+    Either<AppError, List<Product>> bookProducts(List<Tuple2<BookProductDto, Product>> productsToBook) {
+        return validateCanBook(productsToBook)
+                .map(this::book);
     }
 
-    private void validateCanBook(List<Tuple2<BookProductDto, Product>> productsToBook) {
-        for (Tuple2<BookProductDto, Product> productToBook : productsToBook) {
-            validateCanBook(productToBook._2, productToBook._1.getPiecesNumber());
-        }
+    private Either<AppError, List<Tuple2<BookProductDto, Product>>> validateCanBook(List<Tuple2<BookProductDto, Product>> productsToBook) {
+        return ListValidator.checkError(productsToBook, this::validateCanBook);
     }
 
-    private void validateCanBook(Product productToBook, Integer piecesNumber) {
-        boolean canBook = productToBook.canBook(piecesNumber);
+    private Either<AppError, Tuple2<BookProductDto, Product>> validateCanBook(Tuple2<BookProductDto, Product> productToBook) {
+        Product product = productToBook._2;
+        Integer piecesNumber = productToBook._1.getPiecesNumber();
+
+        boolean canBook = product.canBook(piecesNumber);
         if (!canBook) {
-            throw ProductValidationException.notEnoughPiecesToBook(productToBook.getAvailablePiecesNumber(), piecesNumber,
-                                                                   productToBook.getName());
+            return Either.left(AppError.validation(String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.",
+                                                                 piecesNumber, product.getName(),
+                                                                 product.getAvailablePiecesNumber())));
         }
+        return Either.right(productToBook);
     }
 
     private List<Product> book(List<Tuple2<BookProductDto, Product>> productsToBook) {

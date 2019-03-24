@@ -1,7 +1,8 @@
 package piotrusha.e_shop.core.product.domain;
 
-import piotrusha.e_shop.core.base.AbstractFacade;
-import piotrusha.e_shop.core.product.domain.dto.AbstractProductActionDto;
+import io.vavr.control.Either;
+import io.vavr.control.Option;
+import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductCategoryDto;
@@ -10,13 +11,12 @@ import piotrusha.e_shop.core.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductCategoryDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductDto;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class ProductFacade extends AbstractFacade<Product, AbstractProductActionDto> {
+public class ProductFacade {
 
     private final CategoryCreator categoryCreator;
     private final CategoryFinder categoryFinder;
@@ -29,13 +29,14 @@ public class ProductFacade extends AbstractFacade<Product, AbstractProductAction
     private final ProductSeller productSeller;
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     private final DtoValidator dtoValidator;
 
     ProductFacade(CategoryCreator categoryCreator, CategoryFinder categoryFinder, ProductCreator productCreator,
                   ProductModifier productModifier, ProductBooker productBooker, ProductBookingCanceler productBookingCanceler,
                   ProductFinder productFinder, ProductSeller productSeller, ProductRepository productRepository,
-                  DtoValidator dtoValidator) {
+                  CategoryRepository categoryRepository, DtoValidator dtoValidator) {
         this.categoryCreator = categoryCreator;
         this.categoryFinder = categoryFinder;
         this.productCreator = productCreator;
@@ -45,44 +46,57 @@ public class ProductFacade extends AbstractFacade<Product, AbstractProductAction
         this.productFinder = productFinder;
         this.productSeller = productSeller;
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
         this.dtoValidator = dtoValidator;
     }
 
-    public void createProductCategory(CreateProductCategoryDto createProductCategoryDto) {
-        dtoValidator.validateDto(createProductCategoryDto);
-        categoryCreator.createCategory(createProductCategoryDto);
+    public Either<AppError, ProductCategoryDto> createProductCategory(CreateProductCategoryDto createProductCategoryDto) {
+        return dtoValidator.validateCreateCategoryDto(createProductCategoryDto)
+                           .map(categoryCreator::createCategory)
+                           .peek(categoryRepository::save)
+                           .map(Category::toDto);
     }
 
-    public ProductDto createProduct(CreateProductDto createProductDto) {
-        dtoValidator.validateDto(createProductDto);
-        return productCreator.createProduct(createProductDto);
+    public Either<AppError, ProductDto> createProduct(CreateProductDto createProductDto) {
+        return dtoValidator.validateCreateProductDto(createProductDto)
+                           .map(productCreator::createProduct)
+                           .peek(productRepository::save)
+                           .map(Product::toDto);
     }
 
-    public void modifyProduct(ModifyProductDto modifyProductDto) {
-        dtoValidator.validateDto(modifyProductDto);
-        performAction(productModifier::modifyProduct, modifyProductDto);
+    public Either<AppError, ProductDto> modifyProduct(ModifyProductDto modifyProductDto) {
+        return dtoValidator.validateModifyProductDto(modifyProductDto)
+                           .map(productModifier::modifyProduct)
+                           .peek(productRepository::save)
+                           .map(Product::toDto);
     }
 
-    public void bookProducts(List<BookProductDto> bookProductDtos) {
-        bookProductDtos.forEach(dtoValidator::validateDto);
-        performAction(productBooker::bookProducts, bookProductDtos);
+    public Either<AppError, List<ProductDto>> bookProducts(List<BookProductDto> bookProductDtos) {
+        return dtoValidator.validateBookDto(bookProductDtos)
+                           .flatMap(productBooker::bookProducts)
+                           .peek(productRepository::saveAll)
+                           .map(this::toDto);
     }
 
-    public void cancelBooking(List<CancelProductBookingDto> cancelProductBookingDtos) {
-        cancelProductBookingDtos.forEach(dtoValidator::validateDto);
-        performAction(productBookingCanceler::cancelBooking, cancelProductBookingDtos);
+    public Either<AppError, List<ProductDto>> cancelBooking(List<CancelProductBookingDto> cancelProductBookingDtos) {
+        return dtoValidator.validateCancelDto(cancelProductBookingDtos)
+                           .flatMap(productBookingCanceler::cancelBooking)
+                           .peek(productRepository::saveAll)
+                           .map(this::toDto);
     }
 
-    public void sellProducts(List<SellProductDto> sellProductDtos) {
-        sellProductDtos.forEach(dtoValidator::validateDto);
-        performAction(productSeller::sellProducts, sellProductDtos);
+    public Either<AppError, List<ProductDto>> sellProducts(List<SellProductDto> sellProductDtos) {
+        return dtoValidator.validateSellDto(sellProductDtos)
+                           .flatMap(productSeller::sellProducts)
+                           .peek(productRepository::saveAll)
+                           .map(this::toDto);
     }
 
     public List<ProductCategoryDto> findAllProductCategories() {
         return categoryFinder.findAll();
     }
 
-    public Optional<ProductDto> findProductByProductId(BigDecimal productId) {
+    public Option<ProductDto> findProductByProductId(BigDecimal productId) {
         return productFinder.findByProductId(productId);
     }
 
@@ -90,20 +104,10 @@ public class ProductFacade extends AbstractFacade<Product, AbstractProductAction
         return productFinder.findProductsByCategoryName(categoryName);
     }
 
-    @Override
-    protected Product findEntity(AbstractProductActionDto dto) {
-        return productRepository.findByProductId(dto.getProductId())
-                                .orElseThrow(() -> new ProductNotFoundException(dto.getProductId()));
-    }
-
-    @Override
-    protected void save(Product product) {
-        productRepository.save(product);
-    }
-
-    @Override
-    protected void saveAll(List<Product> products) {
-        productRepository.saveAll(products);
+    private List<ProductDto> toDto(List<Product> products) {
+        return products.stream()
+                       .map(Product::toDto)
+                       .collect(Collectors.toList());
     }
 
 }

@@ -1,5 +1,7 @@
 package piotrusha.e_shop.core.product.domain;
 
+import io.vavr.control.Option;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +20,8 @@ class InMemoryProductRepository implements ProductRepository {
     }
 
     @Override
-    public Optional<Product> findByProductId(BigDecimal id) {
-        return Optional.ofNullable(map.get(id));
+    public Option<Product> findByProductId(BigDecimal id) {
+        return Option.of(map.get(id));
     }
 
     @Override

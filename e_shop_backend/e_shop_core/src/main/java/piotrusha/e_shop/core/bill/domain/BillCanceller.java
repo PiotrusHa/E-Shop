@@ -1,8 +1,7 @@
 package piotrusha.e_shop.core.bill.domain;
 
-import io.vavr.Tuple2;
-import piotrusha.e_shop.core.bill.domain.dto.BillActionDto;
-import piotrusha.e_shop.core.bill.domain.exception.BillValidationException;
+import io.vavr.control.Either;
+import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.product.domain.ProductFacade;
 import piotrusha.e_shop.core.product.domain.dto.CancelProductBookingDto;
 
@@ -17,22 +16,24 @@ class BillCanceller {
         this.productFacade = productFacade;
     }
 
-    Bill cancelBill(Tuple2<BillActionDto, Bill> billTuple) {
-        Bill bill = billTuple._2;
-        validateCanCancel(bill);
-        cancelProductBooking(bill);
-        return markBillAsCancelled(bill);
+    Either<AppError, Bill> cancelBill(Bill bill) {
+        return validateCanCancel(bill)
+                .flatMap(this::cancelProductBooking)
+                .map(this::markBillAsCancelled);
+
     }
 
-    private void validateCanCancel(Bill bill) {
+    private Either<AppError, Bill> validateCanCancel(Bill bill) {
         if (!bill.canCancel()) {
-            throw BillValidationException.cannotCancel(bill.getBillState().toString());
+            return Either.left(AppError.validation("Cannot cancel bill with state " + bill.getBillState()));
         }
+        return Either.right(bill);
     }
 
-    private void cancelProductBooking(Bill bill) {
+    private Either<AppError, Bill> cancelProductBooking(Bill bill) {
         List<CancelProductBookingDto> cancelDtos = createCancelProductBookingDto(bill);
-        productFacade.cancelBooking(cancelDtos);
+        return productFacade.cancelBooking(cancelDtos)
+                            .map(x -> bill);
     }
 
     private List<CancelProductBookingDto> createCancelProductBookingDto(Bill bill) {

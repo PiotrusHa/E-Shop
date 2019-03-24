@@ -1,5 +1,6 @@
 package piotrusha.e_shop.core.product.domain;
 
+import io.vavr.control.Option;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,7 @@ interface ProductRepository extends Repository<Product, BigDecimal> {
 
     List<Product> findAll();
 
-    Optional<Product> findByProductId(BigDecimal productId);
+    Option<Product> findByProductId(BigDecimal productId);
 
     @Query("SELECT p FROM Product p JOIN p.categories c WHERE c.name = :categoryName")
     List<Product> findByCategoryName(@Param("categoryName") String categoryName);

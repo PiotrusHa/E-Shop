@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 
 class ProductModifier {
 
-    Product modifyProduct(Tuple2<ModifyProductDto, Product> t) {
-        modify(t._2, t._1);
-        return t._2;
+    Product modifyProduct(Tuple2<ModifyProductDto, Product> productToModify) {
+        modify(productToModify._2, productToModify._1);
+        return productToModify._2;
     }
 
     private void modify(Product product, ModifyProductDto dto) {

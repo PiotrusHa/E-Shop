@@ -1,16 +1,17 @@
 package piotrusha.e_shop.core.bill.domain;
 
-import piotrusha.e_shop.core.base.AbstractFacade;
+import io.vavr.control.Either;
+import io.vavr.control.Try;
+import piotrusha.e_shop.core.base.AppError;
 import piotrusha.e_shop.core.bill.domain.dto.BillActionDto;
 import piotrusha.e_shop.core.bill.domain.dto.BillDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto;
-import piotrusha.e_shop.core.bill.domain.exception.BillNotFoundException;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
+public class BillFacade {
 
     private final BillCreator billCreator;
     private final BillCanceller billCanceller;
@@ -29,26 +30,31 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
         this.dtoValidator = dtoValidator;
     }
 
-    public BillDto createBill(CreateBillDto createBillDto) {
-        dtoValidator.validateDto(createBillDto);
-        Bill bill = billCreator.createBill(createBillDto);
-        return bill.toDto();
+    public Either<AppError, BillDto> createBill(CreateBillDto createBillDto) {
+        return dtoValidator.validateDto(createBillDto)
+                           .flatMap(billCreator::createBill)
+                           .peek(billRepository::save)
+                           .map(Bill::toDto);
     }
 
-    public void cancelBill(BillActionDto billActionDto) {
-        dtoValidator.validateDto(billActionDto);
-        performAction(billCanceller::cancelBill, billActionDto);
+    public Either<AppError, BillDto> cancelBill(BillActionDto billActionDto) {
+        return dtoValidator.validateDto(billActionDto)
+                           .flatMap(billCanceller::cancelBill)
+                           .peek(billRepository::save)
+                           .map(Bill::toDto);
     }
 
-    public void payBill(BillActionDto billActionDto) {
-        dtoValidator.validateDto(billActionDto);
-        performAction(billPayer::payBill, billActionDto);
+    public Either<AppError, BillDto> payBill(BillActionDto billActionDto) {
+        return dtoValidator.validateDto(billActionDto)
+                           .flatMap(billPayer::payBill)
+                           .peek(billRepository::save)
+                           .map(Bill::toDto);
     }
 
-    public BillDto findBillByBillId(BigDecimal billId) {
+    public Either<AppError, BillDto>  findBillByBillId(BigDecimal billId) {
         return billRepository.findByBillId(billId)
-                             .orElseThrow(() -> new BillNotFoundException(billId))
-                             .toDto();
+                             .toEither(() -> AppError.notFound(String.format("Bill with billId %s not found.", billId)))
+                             .map(Bill::toDto);
     }
 
     public List<BillDto> findBillsByClientId(BigDecimal clientId) {
@@ -58,27 +64,17 @@ public class BillFacade extends AbstractFacade<Bill, BillActionDto> {
                              .collect(Collectors.toList());
     }
 
-    public List<BillDto> findBillsByClientIdAndBillState(BigDecimal clientId, String billState) {
-        return billRepository.findBillByClientIdAndBillState(clientId, BillState.valueOf(billState))
-                             .stream()
-                             .map(Bill::toDto)
-                             .collect(Collectors.toList());
+    public Either<AppError, List<BillDto>> findBillsByClientIdAndBillState(BigDecimal clientId, String billState) {
+        return Try.of(() -> BillState.valueOf(billState))
+                  .toEither(() -> AppError.validation("Wrong bill state: " + billState))
+                  .map(enumState -> findBillsByClientIdAndBillState(clientId, enumState));
     }
 
-    @Override
-    protected Bill findEntity(BillActionDto billActionDto) {
-        return billRepository.findByBillId(billActionDto.getBillId())
-                             .orElseThrow(() -> new BillNotFoundException(billActionDto.getBillId()));
-    }
-
-    @Override
-    protected void save(Bill bill) {
-        billRepository.save(bill);
-    }
-
-    @Override
-    protected void saveAll(List<Bill> bills) {
-        billRepository.saveAll(bills);
+    private List<BillDto> findBillsByClientIdAndBillState(BigDecimal clientId, BillState billState) {
+        return billRepository.findBillByClientIdAndBillState(clientId, billState)
+                      .stream()
+                      .map(Bill::toDto)
+                      .collect(Collectors.toList());
     }
 
 }

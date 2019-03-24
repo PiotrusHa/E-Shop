@@ -1,22 +1,22 @@
 package piotrusha.e_shop.core.product.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static piotrusha.e_shop.core.product.domain.Assertions.assertProductDto;
 
+import io.vavr.control.Either;
+import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.base.AppError.ErrorType;
 import piotrusha.e_shop.core.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductDto;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductNotFoundException;
-import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 class ProductSellingTest {
 
@@ -30,8 +30,8 @@ class ProductSellingTest {
     @BeforeEach
     void init() {
         productFacade = new ProductConfiguration().productFacade();
-        product = productFacade.createProduct(CREATE_PRODUCT_DTO);
-        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2);
+        product = productFacade.createProduct(CREATE_PRODUCT_DTO).get();
+        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2).get();
 
         BookProductDto bookProductDto = new BookProductDto(product.getProductId(), 2);
         BookProductDto bookProduct2Dto = new BookProductDto(product2.getProductId(), 5);
@@ -50,60 +50,11 @@ class ProductSellingTest {
 
         productFacade.sellProducts(List.of(dto));
 
-        Optional<ProductDto> productOpt = productFacade.findProductByProductId(product.getProductId());
-        assertTrue(productOpt.isPresent());
+        Option<ProductDto> productOpt = productFacade.findProductByProductId(product.getProductId());
+        assertTrue(productOpt.isDefined());
         ProductDto productDto = productOpt.get();
         assertEquals(product.getBookedPiecesNumber() - piecesNumberToSell, (int) productDto.getBookedPiecesNumber());
         assertEquals(product.getSoldPiecesNumber() + piecesNumberToSell, (int) productDto.getSoldPiecesNumber());
-    }
-
-    @Test
-    void sellWithoutProductId() {
-        SellProductDto dto = new SellProductDto(null, 1);
-        String expectedMessage = "Product id cannot be empty.";
-
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.sellProducts(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void sellNonexistentProduct() {
-        BigDecimal id = BigDecimal.TEN;
-        SellProductDto dto = new SellProductDto(id, 1);
-        String expectedMessage = "Product with productId " + id + " not found";
-
-        ProductNotFoundException e = assertThrows(ProductNotFoundException.class, () -> productFacade.sellProducts(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void sellWithoutPiecesNumber() {
-        SellProductDto dto = new SellProductDto(product.getProductId(), null);
-        String expectedMessage = "Product pieces number has to be greater than zero.";
-
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.sellProducts(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-        assertProductDidNotChange(product);
-    }
-
-    @Test
-    void sellNegativePiecesNumber() {
-        SellProductDto dto = new SellProductDto(product.getProductId(), -2);
-        String expectedMessage = "Product pieces number has to be greater than zero.";
-
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.sellProducts(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-        assertProductDidNotChange(product);
-    }
-
-    @Test
-    void sellZeroPiecesNumber() {
-        SellProductDto dto = new SellProductDto(product.getProductId(), 0);
-        String expectedMessage = "Product pieces number has to be greater than zero.";
-
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.sellProducts(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
-        assertProductDidNotChange(product);
     }
 
     @Test
@@ -113,9 +64,13 @@ class ProductSellingTest {
         String expectedMessage =
                 String.format("Cannot sell %s pieces of product %s. Currently booked pieces number is %s.", piecesNumber, product.getName(),
                               product.getBookedPiecesNumber());
+        ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.sellProducts(List.of(dto)));
-        assertEquals(expectedMessage, e.getMessage());
+        Either<AppError, List<ProductDto>> result = productFacade.sellProducts(List.of(dto));
+
+        assertTrue(result.isLeft());
+        assertEquals(expectedMessage, result.getLeft().getErrorMessage());
+        assertEquals(expectedErrorType, result.getLeft().getErrorType());
         assertProductDidNotChange(product);
     }
 
@@ -127,16 +82,20 @@ class ProductSellingTest {
         String expectedMessage =
                 String.format("Cannot sell %s pieces of product %s. Currently booked pieces number is %s.", piecesNumber,
                               product2.getName(), product2.getBookedPiecesNumber());
+        ErrorType expectedErrorType = ErrorType.VALIDATION;
 
-        ProductValidationException e = assertThrows(ProductValidationException.class, () -> productFacade.sellProducts(List.of(dto, dto2)));
-        assertEquals(expectedMessage, e.getMessage());
+        Either<AppError, List<ProductDto>> result = productFacade.sellProducts(List.of(dto, dto2));
+
+        assertTrue(result.isLeft());
+        assertEquals(expectedMessage, result.getLeft().getErrorMessage());
+        assertEquals(expectedErrorType, result.getLeft().getErrorType());
         assertProductDidNotChange(product);
         assertProductDidNotChange(product2);
     }
 
     private void assertProductDidNotChange(ProductDto productDto) {
-        Optional<ProductDto> productOpt = productFacade.findProductByProductId(productDto.getProductId());
-        assertTrue(productOpt.isPresent());
+        Option<ProductDto> productOpt = productFacade.findProductByProductId(productDto.getProductId());
+        assertTrue(productOpt.isDefined());
         assertProductDto(productDto, productOpt.get());
     }
 

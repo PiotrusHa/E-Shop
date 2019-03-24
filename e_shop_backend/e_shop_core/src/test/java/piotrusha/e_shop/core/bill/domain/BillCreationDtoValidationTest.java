@@ -1,17 +1,25 @@
 package piotrusha.e_shop.core.bill.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static piotrusha.e_shop.core.bill.domain.SampleDtos.createCreateBillDto;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static piotrusha.e_shop.core.bill.domain.SampleDtos.createBillDtoWithEmptyClientId;
+import static piotrusha.e_shop.core.bill.domain.SampleDtos.createBillDtoWithEmptyPiecesNumber;
+import static piotrusha.e_shop.core.bill.domain.SampleDtos.createBillDtoWithEmptyRecordProductId;
+import static piotrusha.e_shop.core.bill.domain.SampleDtos.createBillDtoWithEmptyRecords;
+import static piotrusha.e_shop.core.bill.domain.SampleDtos.createBillDtoWithNegativePiecesNumber;
+import static piotrusha.e_shop.core.bill.domain.SampleDtos.createBillDtoWithZeroPiecesNumber;
 
+import io.vavr.control.Either;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.base.AppError.ErrorType;
+import piotrusha.e_shop.core.bill.domain.dto.BillDto;
 import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto;
-import piotrusha.e_shop.core.bill.domain.dto.CreateBillDto.CreateBillRecordDto;
-import piotrusha.e_shop.core.bill.domain.exception.BillValidationException;
 
-import java.math.BigDecimal;
-import java.util.List;
+import java.util.stream.Stream;
 
 class BillCreationDtoValidationTest {
 
@@ -22,74 +30,35 @@ class BillCreationDtoValidationTest {
         billFacade = new BillConfiguration().billFacade(null);
     }
 
-    @Test
-    void createBillWithEmptyClientId() {
-        CreateBillDto dto = createCreateBillDto().setClientId(null);
-        String expectedMessage = "Client id cannot be empty.";
+    @ParameterizedTest
+    @MethodSource("createBillValidationProvider")
+    void createBillValidationTest(CreateBillDto dto, String expectedErrorMessage, ErrorType expectedErrorType) {
+        Either<AppError, BillDto> result = billFacade.createBill(dto);
 
-        BillValidationException e = assertThrows(BillValidationException.class, () -> billFacade.createBill(dto));
-
-        assertEquals(expectedMessage, e.getMessage());
+        assertTrue(result.isLeft());
+        assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
+        assertEquals(expectedErrorType, result.getLeft().getErrorType());
     }
 
-    @Test
-    void createBillWithNullRecords() {
-        CreateBillDto dto = createCreateBillDto().setRecords(null);
-        String expectedMessage = "Bill records cannot be empty.";
+    private static Stream<Arguments> createBillValidationProvider() {
+        Arguments emptyClientId = Arguments.of(createBillDtoWithEmptyClientId(), "Client id cannot be empty.", ErrorType.VALIDATION);
+        Arguments emptyRecords = Arguments.of(createBillDtoWithEmptyRecords(), "Bill records cannot be empty.", ErrorType.VALIDATION);
+        Arguments emptyRecordProductId = Arguments.of(createBillDtoWithEmptyRecordProductId(), "Product id cannot be empty.",
+                                                      ErrorType.VALIDATION);
+        Arguments emptyPiecesNumber = Arguments.of(createBillDtoWithEmptyPiecesNumber(), "Pieces number has to be greater than zero.",
+                                                   ErrorType.VALIDATION);
+        Arguments zeroPiecesNumber = Arguments.of(createBillDtoWithZeroPiecesNumber(), "Pieces number has to be greater than zero.",
+                                                  ErrorType.VALIDATION);
+        Arguments negativePiecesNumber = Arguments.of(createBillDtoWithNegativePiecesNumber(), "Pieces number has to be greater than zero.",
+                                                      ErrorType.VALIDATION);
 
-        BillValidationException e = assertThrows(BillValidationException.class, () -> billFacade.createBill(dto));
-
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void createBillWithEmptyRecordList() {
-        CreateBillDto dto = createCreateBillDto().setRecords(List.of());
-        String expectedMessage = "Bill records cannot be empty.";
-
-        BillValidationException e = assertThrows(BillValidationException.class, () -> billFacade.createBill(dto));
-
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void createBillWithEmptyRecordProductId() {
-        CreateBillDto dto = createCreateBillDto().setRecords(List.of(new CreateBillRecordDto(null, 2)));
-        String expectedMessage = "Product id cannot be empty.";
-
-        BillValidationException e = assertThrows(BillValidationException.class, () -> billFacade.createBill(dto));
-
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void createBillWithEmptyRecordPiecesNumber() {
-        CreateBillDto dto = createCreateBillDto().setRecords(List.of(new CreateBillRecordDto(BigDecimal.ONE, null)));
-        String expectedMessage = "Pieces number has to be greater than zero.";
-
-        BillValidationException e = assertThrows(BillValidationException.class, () -> billFacade.createBill(dto));
-
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void createBillWithZeroRecordPiecesNumber() {
-        CreateBillDto dto = createCreateBillDto().setRecords(List.of(new CreateBillRecordDto(BigDecimal.ONE, 0)));
-        String expectedMessage = "Pieces number has to be greater than zero.";
-
-        BillValidationException e = assertThrows(BillValidationException.class, () -> billFacade.createBill(dto));
-
-        assertEquals(expectedMessage, e.getMessage());
-    }
-
-    @Test
-    void createBillWithNegativeRecordPiecesNumber() {
-        CreateBillDto dto = createCreateBillDto().setRecords(List.of(new CreateBillRecordDto(BigDecimal.ONE, -2)));
-        String expectedMessage = "Pieces number has to be greater than zero.";
-
-        BillValidationException e = assertThrows(BillValidationException.class, () -> billFacade.createBill(dto));
-
-        assertEquals(expectedMessage, e.getMessage());
+        return Stream.of(emptyClientId,
+                         emptyRecords,
+                         emptyRecordProductId,
+                         emptyPiecesNumber,
+                         zeroPiecesNumber,
+                         negativePiecesNumber
+        );
     }
 
 }

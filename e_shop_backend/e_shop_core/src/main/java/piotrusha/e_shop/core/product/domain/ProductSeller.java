@@ -1,31 +1,34 @@
 package piotrusha.e_shop.core.product.domain;
 
 import io.vavr.Tuple2;
+import io.vavr.control.Either;
+import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.base.ListValidator;
 import piotrusha.e_shop.core.product.domain.dto.SellProductDto;
-import piotrusha.e_shop.core.product.domain.exception.ProductValidationException;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 class ProductSeller {
 
-    List<Product> sellProducts(List<Tuple2<SellProductDto, Product>> productsToSell) {
-        validateCanSell(productsToSell);
-        return sell(productsToSell);
+    Either<AppError, List<Product>> sellProducts(List<Tuple2<SellProductDto, Product>> productsToSell) {
+        return validateCanSell(productsToSell).map(this::sell);
     }
 
-    private void validateCanSell(List<Tuple2<SellProductDto, Product>> productsToSell) {
-        for (Tuple2<SellProductDto, Product> productToSell : productsToSell) {
-            validateCanSell(productToSell._2, productToSell._1.getPiecesNumber());
-        }
+    private Either<AppError, List<Tuple2<SellProductDto, Product>>> validateCanSell(List<Tuple2<SellProductDto, Product>> productsToSell) {
+        return ListValidator.checkError(productsToSell, this::validateCanSell);
     }
 
-    private void validateCanSell(Product productToSell, Integer piecesNumber) {
-        boolean canSell = productToSell.canSell(piecesNumber);
+    private Either<AppError, Tuple2<SellProductDto, Product>> validateCanSell(Tuple2<SellProductDto, Product> productsToSell) {
+        Product product = productsToSell._2;
+        Integer piecesNumber = productsToSell._1.getPiecesNumber();
+
+        boolean canSell = product.canSell(piecesNumber);
         if (!canSell) {
-            throw ProductValidationException.notEnoughPiecesToSell(piecesNumber, productToSell.getName(),
-                                                                   productToSell.getBookedPiecesNumber());
+            return Either.left(AppError.validation(String.format("Cannot sell %s pieces of product %s. Currently booked pieces number is %s.",
+                                                                 piecesNumber, product.getName(), product.getBookedPiecesNumber())));
         }
+        return Either.right(productsToSell);
     }
 
     private List<Product> sell(List<Tuple2<SellProductDto, Product>> productsToSell) {

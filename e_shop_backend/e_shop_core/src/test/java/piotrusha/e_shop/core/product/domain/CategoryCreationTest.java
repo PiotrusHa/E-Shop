@@ -1,14 +1,20 @@
 package piotrusha.e_shop.core.product.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.vavr.control.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import piotrusha.e_shop.core.base.AppError;
+import piotrusha.e_shop.core.base.AppError.ErrorType;
 import piotrusha.e_shop.core.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.core.product.domain.dto.ProductCategoryDto;
-import piotrusha.e_shop.core.product.domain.exception.CategoryValidationException;
+
+import java.util.stream.Stream;
 
 class CategoryCreationTest {
 
@@ -32,24 +38,36 @@ class CategoryCreationTest {
     }
 
     @Test
-    void createCategoryWithEmptyName() {
-        String categoryName = "";
-        String expectedExceptionMessage = "Category name cannot be empty.";
-        CreateProductCategoryDto dto = new CreateProductCategoryDto(categoryName);
-
-        CategoryValidationException e = assertThrows(CategoryValidationException.class, () -> productFacade.createProductCategory(dto));
-        assertEquals(expectedExceptionMessage, e.getMessage());
-    }
-
-    @Test
     void createCategoryWithExistentName() {
         String categoryName = "Beer";
-        String expectedExceptionMessage = "Category with name " + categoryName + " already exists.";
+        String expectedErrorMessage =  "Category with name " + categoryName + " already exists.";
         CreateProductCategoryDto dto = new CreateProductCategoryDto(categoryName);
         productFacade.createProductCategory(dto);
 
-        CategoryValidationException e = assertThrows(CategoryValidationException.class, () -> productFacade.createProductCategory(dto));
-        assertEquals(expectedExceptionMessage, e.getMessage());
+        Either<AppError, ProductCategoryDto> result = productFacade.createProductCategory(dto);
+
+        assertTrue(result.isLeft());
+        assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
+        assertEquals(ErrorType.VALIDATION, result.getLeft().getErrorType());
+    }
+
+    @ParameterizedTest
+    @MethodSource("createCategoryValidationProvider")
+    void createCategoryValidationTest(CreateProductCategoryDto dto, String expectedErrorMessage) {
+        Either<AppError, ProductCategoryDto> result = productFacade.createProductCategory(dto);
+
+        assertTrue(result.isLeft());
+        assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
+        assertEquals(ErrorType.VALIDATION, result.getLeft().getErrorType());
+    }
+
+    private static Stream<Arguments> createCategoryValidationProvider() {
+        Arguments emptyName = Arguments.of(new CreateProductCategoryDto(""), "Category name cannot be empty.");
+        Arguments nullName = Arguments.of(new CreateProductCategoryDto(null), "Category name cannot be empty.");
+
+        return Stream.of(emptyName,
+                         nullName
+        );
     }
 
 }
