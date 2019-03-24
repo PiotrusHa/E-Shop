@@ -1,7 +1,6 @@
 package piotrusha.e_shop.bill.persistence.jpa;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -14,8 +13,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "bill_records")
-@Getter(AccessLevel.PACKAGE)
-@Setter(AccessLevel.PACKAGE)
+@Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Accessors(chain = true)
 class BillRecordEntity {

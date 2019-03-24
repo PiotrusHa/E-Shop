@@ -1,10 +1,9 @@
 package piotrusha.e_shop.bill.domain;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import piotrusha.e_shop.bill.domain.dto.BillDto;
 import piotrusha.e_shop.bill.domain.dto.BillRecordDto;
 
@@ -15,10 +14,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Accessors(chain = true)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Bill {
 
     private BigDecimal billId;

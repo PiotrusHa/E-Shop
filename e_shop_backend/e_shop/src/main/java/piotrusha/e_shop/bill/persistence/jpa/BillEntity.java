@@ -1,7 +1,6 @@
 package piotrusha.e_shop.bill.persistence.jpa;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -23,8 +22,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "bills")
-@Getter(AccessLevel.PACKAGE)
-@Setter(AccessLevel.PACKAGE)
+@Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Accessors(chain = true)
 class BillEntity {
@@ -46,14 +44,16 @@ class BillEntity {
         Set<BillRecord> billRecordEntities = billRecords.stream()
                                                         .map(BillRecordEntity::toDomainBillRecord)
                                                         .collect(Collectors.toSet());
-        return new Bill().setBillId(billId)
-                         .setPriceSum(priceSum)
-                         .setPurchaseDate(purchaseDate)
-                         .setPaymentDate(paymentDate)
-                         .setPaymentExpirationDate(paymentExpirationDate)
-                         .setClientId(clientId)
-                         .setBillState(billState)
-                         .setBillRecords(billRecordEntities);
+        return Bill.builder()
+                   .billId(billId)
+                   .priceSum(priceSum)
+                   .purchaseDate(purchaseDate)
+                   .paymentDate(paymentDate)
+                   .paymentExpirationDate(paymentExpirationDate)
+                   .clientId(clientId)
+                   .billState(billState)
+                   .billRecords(billRecordEntities)
+                   .build();
     }
 
     static BillEntity fromDomainBill(Bill bill, boolean includeBillRecords) {

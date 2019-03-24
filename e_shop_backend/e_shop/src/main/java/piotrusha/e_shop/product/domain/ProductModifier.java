@@ -15,13 +15,13 @@ class ProductModifier {
 
     private void modify(Product product, ModifyProductDto dto) {
         if (dto.getProductPrice() != null) {
-            product.setPrice(dto.getProductPrice());
+            product.modifyPrice(dto.getProductPrice());
         }
         if (dto.getProductAvailablePiecesNumber() != null) {
-            product.setAvailablePiecesNumber(dto.getProductAvailablePiecesNumber());
+            product.modifyAvailablePiecesNumber(dto.getProductAvailablePiecesNumber());
         }
         if (dto.getProductDescription() != null) {
-            product.setDescription(dto.getProductDescription());
+            product.modifyDescription(dto.getProductDescription());
         }
         if (dto.getProductCategoriesToAssign() != null && !dto.getProductCategoriesToAssign()
                                                               .isEmpty()) {

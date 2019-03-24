@@ -1,7 +1,6 @@
 package piotrusha.e_shop.product.persistence.jpa;
 
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -23,8 +22,7 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "products")
-@Getter(AccessLevel.PACKAGE)
-@Setter(AccessLevel.PACKAGE)
+@Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Accessors(chain = true)
 class ProductEntity {
@@ -60,14 +58,16 @@ class ProductEntity {
         Set<Category> domainCategories = categories.stream()
                                                    .map(CategoryEntity::toDomainCategory)
                                                    .collect(Collectors.toSet());
-        return new Product().setProductId(productId)
-                            .setName(name)
-                            .setPrice(price)
-                            .setAvailablePiecesNumber(availablePiecesNumber)
-                            .setBookedPiecesNumber(bookedPiecesNumber)
-                            .setSoldPiecesNumber(soldPiecesNumber)
-                            .setDescription(description)
-                            .setCategories(domainCategories);
+        return Product.builder()
+                      .productId(productId)
+                      .name(name)
+                      .price(price)
+                      .availablePiecesNumber(availablePiecesNumber)
+                      .bookedPiecesNumber(bookedPiecesNumber)
+                      .soldPiecesNumber(soldPiecesNumber)
+                      .description(description)
+                      .categories(domainCategories)
+                      .build();
     }
 
     static ProductEntity fromDomainProduct(Product product) {

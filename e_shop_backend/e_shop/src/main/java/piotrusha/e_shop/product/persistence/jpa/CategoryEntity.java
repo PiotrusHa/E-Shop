@@ -2,7 +2,6 @@ package piotrusha.e_shop.product.persistence.jpa;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import piotrusha.e_shop.product.domain.Category;
@@ -14,9 +13,8 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "categories")
-@Getter(AccessLevel.PACKAGE)
-@Setter(AccessLevel.PACKAGE)
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+@Setter(AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 class CategoryEntity {
 
