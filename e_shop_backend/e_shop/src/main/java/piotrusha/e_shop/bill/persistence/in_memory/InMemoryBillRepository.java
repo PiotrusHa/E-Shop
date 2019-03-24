@@ -1,22 +1,19 @@
-package piotrusha.e_shop.bill.domain;
+package piotrusha.e_shop.bill.persistence.in_memory;
 
 import io.vavr.control.Option;
+import piotrusha.e_shop.bill.domain.Bill;
+import piotrusha.e_shop.bill.domain.BillRepository;
+import piotrusha.e_shop.bill.domain.BillState;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-class InMemoryBillRepository implements BillRepository {
+public class InMemoryBillRepository implements BillRepository {
 
     private Map<BigDecimal, Bill> map = new ConcurrentHashMap<>();
-
-    @Override
-    public List<Bill> findAll() {
-        return new ArrayList<>(map.values());
-    }
 
     @Override
     public Option<Bill> findByBillId(BigDecimal id) {
@@ -50,14 +47,13 @@ class InMemoryBillRepository implements BillRepository {
     }
 
     @Override
-    public void save(Bill bill) {
+    public void create(Bill bill) {
         map.put(bill.getBillId(), bill);
     }
 
-
     @Override
-    public void saveAll(List<Bill> bills) {
-        bills.forEach(this::save);
+    public void update(Bill bill) {
+        create(bill);
     }
 
 }

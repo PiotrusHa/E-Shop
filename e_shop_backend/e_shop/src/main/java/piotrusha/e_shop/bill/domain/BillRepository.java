@@ -1,15 +1,11 @@
 package piotrusha.e_shop.bill.domain;
 
 import io.vavr.control.Option;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-interface BillRepository extends Repository<Bill, BigDecimal> {
-
-    List<Bill> findAll();
+public interface BillRepository {
 
     Option<Bill> findByBillId(BigDecimal id);
 
@@ -17,11 +13,10 @@ interface BillRepository extends Repository<Bill, BigDecimal> {
 
     List<Bill> findBillByClientIdAndBillState(BigDecimal clientId, BillState billState);
 
-    @Query("SELECT max(b.id) FROM Bill b")
     Option<BigDecimal> findLastBillId();
 
-    void save(Bill bill);
+    void create(Bill bill);
 
-    void saveAll(List<Bill> bills);
+    void update(Bill bill);
 
 }

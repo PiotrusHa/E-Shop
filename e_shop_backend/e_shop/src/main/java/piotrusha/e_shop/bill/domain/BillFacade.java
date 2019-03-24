@@ -33,21 +33,21 @@ public class BillFacade {
     public Either<AppError, BillDto> createBill(CreateBillDto createBillDto) {
         return dtoValidator.validateDto(createBillDto)
                            .flatMap(billCreator::createBill)
-                           .peek(billRepository::save)
+                           .peek(billRepository::create)
                            .map(Bill::toDto);
     }
 
     public Either<AppError, BillDto> cancelBill(BillActionDto billActionDto) {
         return dtoValidator.validateDto(billActionDto)
                            .flatMap(billCanceller::cancelBill)
-                           .peek(billRepository::save)
+                           .peek(billRepository::update)
                            .map(Bill::toDto);
     }
 
     public Either<AppError, BillDto> payBill(BillActionDto billActionDto) {
         return dtoValidator.validateDto(billActionDto)
                            .flatMap(billPayer::payBill)
-                           .peek(billRepository::save)
+                           .peek(billRepository::update)
                            .map(Bill::toDto);
     }
 

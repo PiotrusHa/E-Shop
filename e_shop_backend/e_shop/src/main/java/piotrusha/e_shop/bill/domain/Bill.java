@@ -8,29 +8,19 @@ import lombok.experimental.Accessors;
 import piotrusha.e_shop.bill.domain.dto.BillDto;
 import piotrusha.e_shop.bill.domain.dto.BillRecordDto;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "bills")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-class Bill {
+public class Bill {
 
-    @Id
     private BigDecimal billId;
     private BigDecimal priceSum;
     private Date purchaseDate;
@@ -38,9 +28,6 @@ class Bill {
     private Date paymentExpirationDate;
     private BigDecimal clientId;
     private BillState billState;
-
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "bill_id")
     private Set<BillRecord> billRecords;
 
     boolean canCancel() {
