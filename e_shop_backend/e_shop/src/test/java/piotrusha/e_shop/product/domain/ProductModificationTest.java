@@ -15,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.AppError.ErrorType;
 import piotrusha.e_shop.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.product.domain.dto.ModifyProductDto;
@@ -152,7 +153,7 @@ class ProductModificationTest {
 
     @ParameterizedTest
     @MethodSource("modifyProductValidationProvider")
-    void modifyProductValidationTest(ModifyProductDto dto, String expectedMessage, AppError.ErrorType expectedErrorType) {
+    void modifyProductValidationTest(ModifyProductDto dto, String expectedMessage, ErrorType expectedErrorType) {
         Either<AppError, ProductDto> result = productFacade.modifyProduct(dto);
 
         assertTrue(result.isLeft());
@@ -162,17 +163,22 @@ class ProductModificationTest {
 
     private static Stream<Arguments> modifyProductValidationProvider() {
         Arguments negativeAvailablePiecesNumber = Arguments.of(modifyProductDtoWithNegativeAvailablePiecesNumber(),
-                                                               "Product pieces number has to be greater than zero.", AppError.ErrorType.VALIDATION);
+                                                               "Product pieces number has to be greater than zero.",
+                                                               ErrorType.NUMBER_SHOULD_BE_POSITIVE);
         Arguments zeroAvailablePiecesNumber = Arguments.of(modifyProductDtoWithZeroAvailablePiecesNumber(),
-                                                           "Product pieces number has to be greater than zero.", AppError.ErrorType.VALIDATION);
+                                                           "Product pieces number has to be greater than zero.",
+                                                           ErrorType.NUMBER_SHOULD_BE_POSITIVE);
         Arguments nullProductId = Arguments.of(modifyProductDtoWithProductId(null),
-                                               "Product id cannot be empty.", AppError.ErrorType.VALIDATION);
+                                               "Product id cannot be empty.",
+                                               ErrorType.EMPTY_DTO_FIELD);
         BigDecimal nonexistentProductId = BigDecimal.valueOf(1000);
         Arguments nonexistentProduct = Arguments.of(modifyProductDtoWithProductId(nonexistentProductId),
-                                                    "Product with productId " + nonexistentProductId + " not found", AppError.ErrorType.NOT_FOUND);
+                                                    "Product with productId " + nonexistentProductId + " not found.",
+                                                    ErrorType.PRODUCT_NOT_FOUND);
         String nonexistentCategoryName = "example";
         Arguments nonexistentCategory = Arguments.of(modifyProductDtoWithNonexistentCategory(nonexistentCategoryName),
-                                                     "Category with name " + nonexistentCategoryName + " does not exists.", AppError.ErrorType.NOT_FOUND);
+                                                     "Category with name " + nonexistentCategoryName + " does not exists.",
+                                                     ErrorType.CATEGORY_DOES_NOT_EXISTS);
 
         return Stream.of(negativeAvailablePiecesNumber,
                          zeroAvailablePiecesNumber,

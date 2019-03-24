@@ -33,10 +33,10 @@ class DtoValidator {
 
     private Either<AppError, String> validateCategoryName(String categoryName) {
         if (Strings.isNullOrEmpty(categoryName)) {
-            return Either.left(AppError.validation("Category name cannot be empty."));
+            return Either.left(AppError.emptyDtoField("Category name"));
         }
         if (categoryRepository.existsByName(categoryName)) {
-            return Either.left(AppError.validation("Category with name " + categoryName + " already exists."));
+            return Either.left(AppError.categoryAlreadyExists(categoryName));
         }
         return Either.right(categoryName);
     }
@@ -93,30 +93,30 @@ class DtoValidator {
 
     private Either<AppError, Product> validateProductId(BigDecimal productId) {
         if (productId == null) {
-            return Either.left(AppError.validation("Product id cannot be empty."));
+            return Either.left(AppError.emptyDtoField("Product id"));
         }
 
         return productRepository.findByProductId(productId)
-                                .toEither(() -> AppError.notFound(String.format("Product with productId %s not found", productId)));
+                                .toEither(() -> AppError.productNotFound(productId));
     }
 
     private Either<AppError, Integer> validatePiecesNumber(Integer piecesNumber) {
         if (piecesNumber == null || piecesNumber <= 0) {
-            return Either.left(AppError.validation("Product pieces number has to be greater than zero."));
+            return Either.left(AppError.numberShouldBePositive("Product pieces number"));
         }
         return Either.right(piecesNumber);
     }
 
     private Either<AppError, String> validateProductName(String productName) {
         if (Strings.isNullOrEmpty(productName)) {
-            return Either.left(AppError.validation("Product name cannot be empty."));
+            return Either.left(AppError.emptyDtoField("Product name"));
         }
         return Either.right(productName);
     }
 
     private Either<AppError, BigDecimal> validateProductPrice(BigDecimal productPrice) {
         if (productPrice == null) {
-            return Either.left(AppError.validation("Product price cannot be empty."));
+            return Either.left(AppError.emptyDtoField("Product price"));
         }
         return Either.right(productPrice);
     }
@@ -124,7 +124,7 @@ class DtoValidator {
     private Either<AppError, List<String>> validateCategories(List<String> categories) {
         for (String categoryName : categories) {
             if (!categoryRepository.existsByName(categoryName)) {
-                return Either.left(AppError.notFound(String.format("Category with name %s does not exists.", categoryName)));
+                return Either.left(AppError.categoryDoesNotExists(categoryName));
             }
         }
         return Either.right(categories);

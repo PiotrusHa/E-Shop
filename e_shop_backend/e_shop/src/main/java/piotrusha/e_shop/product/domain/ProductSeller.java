@@ -25,8 +25,7 @@ class ProductSeller {
 
         boolean canSell = product.canSell(piecesNumber);
         if (!canSell) {
-            return Either.left(AppError.validation(String.format("Cannot sell %s pieces of product %s. Currently booked pieces number is %s.",
-                                                                 piecesNumber, product.getName(), product.getBookedPiecesNumber())));
+            return Either.left(AppError.cannotSellProduct(product.getName(), piecesNumber, product.getBookedPiecesNumber()));
         }
         return Either.right(productsToSell);
     }

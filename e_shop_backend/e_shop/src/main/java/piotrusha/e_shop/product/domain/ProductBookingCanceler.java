@@ -26,8 +26,7 @@ class ProductBookingCanceler {
 
         boolean canCancel = product.canCancel(piecesNumber);
         if (!canCancel) {
-            return Either.left(AppError.validation(String.format("Cannot cancel booking %s pieces of product %s.",
-                                                                 piecesNumber, product.getName())));
+            return Either.left(AppError.cannotCancelProductBooking(product.getName(), piecesNumber));
         }
         return Either.right(productToCancel);
     }

@@ -9,6 +9,7 @@ import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.AppError.ErrorType;
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.CancelProductBookingDto;
 import piotrusha.e_shop.product.domain.dto.CreateProductDto;
@@ -61,7 +62,7 @@ class ProductBookingCancelTest {
         Integer piecesNumber = product.getAvailablePiecesNumber() + 1;
         CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), piecesNumber);
         String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, product.getName());
-        AppError.ErrorType expectedErrorType = AppError.ErrorType.VALIDATION;
+        ErrorType expectedErrorType = ErrorType.CANNOT_CANCEL_PRODUCT_BOOKING;
 
         Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(dto));
 
@@ -77,7 +78,7 @@ class ProductBookingCancelTest {
         CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), 1);
         CancelProductBookingDto dto2 = new CancelProductBookingDto(product2.getProductId(), piecesNumber);
         String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, product2.getName());
-        AppError.ErrorType expectedErrorType = AppError.ErrorType.VALIDATION;
+        ErrorType expectedErrorType = ErrorType.CANNOT_CANCEL_PRODUCT_BOOKING;
 
         Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(dto, dto2));
 

@@ -26,9 +26,7 @@ class ProductBooker {
 
         boolean canBook = product.canBook(piecesNumber);
         if (!canBook) {
-            return Either.left(AppError.validation(String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.",
-                                                                 piecesNumber, product.getName(),
-                                                                 product.getAvailablePiecesNumber())));
+            return Either.left(AppError.cannotBookProduct(product.getName(), piecesNumber, product.getAvailablePiecesNumber()));
         }
         return Either.right(productToBook);
     }

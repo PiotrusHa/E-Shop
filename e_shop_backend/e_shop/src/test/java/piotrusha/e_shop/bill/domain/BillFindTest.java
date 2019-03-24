@@ -7,6 +7,7 @@ import io.vavr.control.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.AppError.ErrorType;
 import piotrusha.e_shop.bill.domain.dto.BillDto;
 
 import java.math.BigDecimal;
@@ -34,7 +35,7 @@ class BillFindTest {
     void findBillWithBillWithWrongState() {
         String state = "wrong state";
         String expectedErrorMessage = "Wrong bill state: " + state;
-        AppError.ErrorType expectedErrorType = AppError.ErrorType.VALIDATION;
+        ErrorType expectedErrorType = ErrorType.WRONG_BILL_STATE;
 
         Either<AppError, List<BillDto>> result = billFacade.findBillsByClientIdAndBillState(BigDecimal.ONE, state);
 

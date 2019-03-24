@@ -25,7 +25,7 @@ class BillCanceller {
 
     private Either<AppError, Bill> validateCanCancel(Bill bill) {
         if (!bill.canCancel()) {
-            return Either.left(AppError.validation("Cannot cancel bill with state " + bill.getBillState()));
+            return Either.left(AppError.cannotCancelBill(bill.getBillState().toString()));
         }
         return Either.right(bill);
     }

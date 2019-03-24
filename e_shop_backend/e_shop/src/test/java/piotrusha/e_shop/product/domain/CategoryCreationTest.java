@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.AppError.ErrorType;
 import piotrusha.e_shop.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.product.domain.dto.ProductCategoryDto;
 
@@ -48,7 +49,7 @@ class CategoryCreationTest {
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
-        Assertions.assertEquals(AppError.ErrorType.VALIDATION, result.getLeft().getErrorType());
+        Assertions.assertEquals(ErrorType.CATEGORY_ALREADY_EXISTS, result.getLeft().getErrorType());
     }
 
     @ParameterizedTest
@@ -58,7 +59,7 @@ class CategoryCreationTest {
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
-        Assertions.assertEquals(AppError.ErrorType.VALIDATION, result.getLeft().getErrorType());
+        Assertions.assertEquals(ErrorType.EMPTY_DTO_FIELD, result.getLeft().getErrorType());
     }
 
     private static Stream<Arguments> createCategoryValidationProvider() {

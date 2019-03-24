@@ -29,15 +29,15 @@ class DtoValidator {
 
     private Either<AppError, Bill> validateBillId(BigDecimal billId) {
         if (billId == null) {
-            return Either.left(AppError.validation("Bill id cannot be empty."));
+            return Either.left(AppError.emptyDtoField("Bill id"));
         }
         return billRepository.findByBillId(billId)
-                             .toEither(() -> AppError.notFound(String.format("Bill with billId %s not found.", billId)));
+                             .toEither(() -> AppError.billNotFound(billId));
     }
 
     private Either<AppError, BigDecimal> validateClientId(BigDecimal clientId) {
         if (clientId == null) {
-            return Either.left(AppError.validation("Client id cannot be empty."));
+            return Either.left(AppError.emptyDtoField("Client id"));
         }
         // TODO validate client existence (ClientFacade)
         return Either.right(clientId);
@@ -45,7 +45,7 @@ class DtoValidator {
 
     private Either<AppError, List<CreateBillDto.CreateBillRecordDto>> validateRecords(List<CreateBillDto.CreateBillRecordDto> dtos) {
         if (dtos == null || dtos.isEmpty()) {
-            return Either.left(AppError.validation("Bill records cannot be empty."));
+            return Either.left(AppError.emptyDtoField("Bill records"));
         }
         return ListValidator.checkError(dtos, this::validateRecord)
                             .map(x -> dtos);
@@ -59,14 +59,14 @@ class DtoValidator {
 
     private Either<AppError, Integer> validatePiecesNumber(Integer piecesNumber) {
         if (piecesNumber == null || piecesNumber <= 0) {
-            return Either.left(AppError.validation("Pieces number has to be greater than zero."));
+            return Either.left(AppError.numberShouldBePositive("Pieces number"));
         }
         return Either.right(piecesNumber);
     }
 
     private Either<AppError, BigDecimal> validateProductId(BigDecimal productId) {
         if (productId == null) {
-            return Either.left(AppError.validation("Product id cannot be empty."));
+            return Either.left(AppError.emptyDtoField("Product id"));
         }
         return Either.right(productId);
     }

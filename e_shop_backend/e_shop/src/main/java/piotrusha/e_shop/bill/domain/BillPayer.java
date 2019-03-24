@@ -24,7 +24,7 @@ class BillPayer {
 
     private Either<AppError, Bill> validateCanPay(Bill bill) {
         if (!bill.canPay()) {
-            return Either.left(AppError.validation("Cannot pay bill with state " + bill.getBillState()));
+            return Either.left(AppError.cannotPayBill(bill.getBillState().toString()));
         }
         return Either.right(bill);
     }

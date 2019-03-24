@@ -11,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.AppError.ErrorType;
 import piotrusha.e_shop.bill.domain.dto.BillActionDto;
 import piotrusha.e_shop.bill.domain.dto.BillDto;
 
@@ -28,7 +29,7 @@ class BillCancellingValidationTest {
 
     @ParameterizedTest
     @MethodSource("cancelBillValidationProvider")
-    void cancelBillValidationTest(BillActionDto billActionDto, String expectedErrorMessage, AppError.ErrorType expectedErrorType) {
+    void cancelBillValidationTest(BillActionDto billActionDto, String expectedErrorMessage, ErrorType expectedErrorType) {
         Either<AppError, BillDto> result = billFacade.cancelBill(billActionDto);
 
         assertTrue(result.isLeft());
@@ -37,10 +38,13 @@ class BillCancellingValidationTest {
     }
 
     private static Stream<Arguments> cancelBillValidationProvider() {
-        Arguments emptyBillId = Arguments.of(billActionDtoWithEmptyBillId(), "Bill id cannot be empty.", AppError.ErrorType.VALIDATION);
+        Arguments emptyBillId = Arguments.of(billActionDtoWithEmptyBillId(),
+                                             "Bill id cannot be empty.",
+                                             ErrorType.EMPTY_DTO_FIELD);
         BigDecimal nonexistentId = BigDecimal.valueOf(1410);
         Arguments nonexistentBill = Arguments.of(billActionDtoWithBillId(nonexistentId),
-                                                 "Bill with billId " + nonexistentId + " not found.", AppError.ErrorType.NOT_FOUND);
+                                                 "Bill with billId " + nonexistentId + " not found.",
+                                                 ErrorType.BILL_NOT_FOUND);
 
         return Stream.of(emptyBillId,
                          nonexistentBill

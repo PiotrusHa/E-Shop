@@ -8,6 +8,7 @@ import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.AppError.ErrorType;
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
@@ -62,7 +63,7 @@ class ProductSellingTest {
         String expectedMessage =
                 String.format("Cannot sell %s pieces of product %s. Currently booked pieces number is %s.", piecesNumber, product.getName(),
                               product.getBookedPiecesNumber());
-        AppError.ErrorType expectedErrorType = AppError.ErrorType.VALIDATION;
+        ErrorType expectedErrorType = ErrorType.CANNOT_SELL_PRODUCT;
 
         Either<AppError, List<ProductDto>> result = productFacade.sellProducts(List.of(dto));
 
@@ -80,7 +81,7 @@ class ProductSellingTest {
         String expectedMessage =
                 String.format("Cannot sell %s pieces of product %s. Currently booked pieces number is %s.", piecesNumber,
                               product2.getName(), product2.getBookedPiecesNumber());
-        AppError.ErrorType expectedErrorType = AppError.ErrorType.VALIDATION;
+        ErrorType expectedErrorType = ErrorType.CANNOT_SELL_PRODUCT;
 
         Either<AppError, List<ProductDto>> result = productFacade.sellProducts(List.of(dto, dto2));
 

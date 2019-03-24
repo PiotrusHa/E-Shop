@@ -8,6 +8,7 @@ import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.AppError.ErrorType;
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
@@ -51,7 +52,7 @@ class ProductBookingTest {
         BookProductDto dto = new BookProductDto(product.getProductId(), piecesNumber);
         String expectedErrorMessage = String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.",
                                                     piecesNumber, product.getName(), product.getAvailablePiecesNumber());
-        AppError.ErrorType expectedErrorType = AppError.ErrorType.VALIDATION;
+        ErrorType expectedErrorType = ErrorType.CANNOT_BOOK_PRODUCT;
 
         Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(dto));
 
@@ -68,7 +69,7 @@ class ProductBookingTest {
         BookProductDto dto2 = new BookProductDto(product2.getProductId(), piecesNumber);
         String expectedErrorMessage = String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.",
                                                     piecesNumber, product2.getName(), product2.getAvailablePiecesNumber());
-        AppError.ErrorType expectedErrorType = AppError.ErrorType.VALIDATION;
+        ErrorType expectedErrorType = ErrorType.CANNOT_BOOK_PRODUCT;
 
         Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(dto, dto2));
 

@@ -53,7 +53,7 @@ public class BillFacade {
 
     public Either<AppError, BillDto>  findBillByBillId(BigDecimal billId) {
         return billRepository.findByBillId(billId)
-                             .toEither(() -> AppError.notFound(String.format("Bill with billId %s not found.", billId)))
+                             .toEither(() -> AppError.billNotFound(billId))
                              .map(Bill::toDto);
     }
 
@@ -66,7 +66,7 @@ public class BillFacade {
 
     public Either<AppError, List<BillDto>> findBillsByClientIdAndBillState(BigDecimal clientId, String billState) {
         return Try.of(() -> BillState.valueOf(billState))
-                  .toEither(() -> AppError.validation("Wrong bill state: " + billState))
+                  .toEither(() -> AppError.wrongBillState(billState))
                   .map(enumState -> findBillsByClientIdAndBillState(clientId, enumState));
     }
 

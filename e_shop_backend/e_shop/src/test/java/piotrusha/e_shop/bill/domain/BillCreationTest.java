@@ -39,10 +39,10 @@ class BillCreationTest {
 
     @Test
     void createWithErrorWhileBookingProduct() {
-        String errorMessage = "Error while booking product";
+        String errorMessage = "Field cannot be empty.";
         CreateBillDto createBillDto = createBillDto(List.of(createCreateBillRecordDto(BigDecimal.ONE)));
         when(productFacade.bookProducts(any()))
-                .thenReturn(Either.left(AppError.validation(errorMessage)));
+                .thenReturn(Either.left(AppError.emptyDtoField("Field")));
 
         Either<AppError, BillDto> result = billFacade.createBill(createBillDto);
 
