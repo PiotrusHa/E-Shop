@@ -5,12 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>piotrusha</groupId>
-    <artifactId>e_shop</artifactId>
+    <artifactId>e_shop_backend</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>e_shop_core</module>
-        <module>e_shop_web</module>
+        <module>e_shop</module>
         <module>e_shop_database</module>
     </modules>
 
