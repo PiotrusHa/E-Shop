@@ -1,10 +1,8 @@
 package piotrusha.e_shop.product.domain;
 
-import org.springframework.data.repository.Repository;
-
 import java.util.List;
 
-interface CategoryRepository extends Repository<Category, String> {
+public interface CategoryRepository {
 
     List<Category> findAll();
 

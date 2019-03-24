@@ -1,16 +1,18 @@
-package piotrusha.e_shop.product.domain;
+package piotrusha.e_shop.product.persistence.in_memory;
 
 import io.vavr.control.Option;
+import piotrusha.e_shop.product.domain.Category;
+import piotrusha.e_shop.product.domain.Product;
+import piotrusha.e_shop.product.domain.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-class InMemoryProductRepository implements ProductRepository {
+public class InMemoryProductRepository implements ProductRepository {
 
     private Map<BigDecimal, Product> map = new ConcurrentHashMap<>();
 
@@ -34,11 +36,11 @@ class InMemoryProductRepository implements ProductRepository {
     }
 
     @Override
-    public Optional<BigDecimal> findMaxProductId() {
-        return map.values()
-                  .stream()
-                  .map(Product::getProductId)
-                  .max(BigDecimal::compareTo);
+    public Option<BigDecimal> findMaxProductId() {
+        return Option.ofOptional(map.values()
+                                    .stream()
+                                    .map(Product::getProductId)
+                                    .max(BigDecimal::compareTo));
     }
 
     @Override

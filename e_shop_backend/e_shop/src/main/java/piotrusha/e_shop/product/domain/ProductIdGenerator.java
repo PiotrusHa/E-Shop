@@ -11,7 +11,7 @@ class ProductIdGenerator {
     }
 
     BigDecimal generate() {
-        BigDecimal maxProductId = productRepository.findMaxProductId().orElse(BigDecimal.ZERO);
+        BigDecimal maxProductId = productRepository.findMaxProductId().getOrElse(BigDecimal.ZERO);
         return maxProductId.add(BigDecimal.ONE);
     }
 

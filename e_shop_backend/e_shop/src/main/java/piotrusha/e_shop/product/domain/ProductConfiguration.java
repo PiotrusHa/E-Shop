@@ -2,6 +2,8 @@ package piotrusha.e_shop.product.domain;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import piotrusha.e_shop.product.persistence.in_memory.InMemoryCategoryRepository;
+import piotrusha.e_shop.product.persistence.in_memory.InMemoryProductRepository;
 
 @Configuration
 class ProductConfiguration {

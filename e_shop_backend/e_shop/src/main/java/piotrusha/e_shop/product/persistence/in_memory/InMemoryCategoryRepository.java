@@ -1,11 +1,14 @@
-package piotrusha.e_shop.product.domain;
+package piotrusha.e_shop.product.persistence.in_memory;
+
+import piotrusha.e_shop.product.domain.Category;
+import piotrusha.e_shop.product.domain.CategoryRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-class InMemoryCategoryRepository implements CategoryRepository {
+public class InMemoryCategoryRepository implements CategoryRepository {
 
     private Map<String, Category> map = new ConcurrentHashMap<>();
 

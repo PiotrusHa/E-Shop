@@ -21,14 +21,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Entity
-@Table(name = "products")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Accessors(chain = true)
-class Product {
+public class Product {
 
     @Id
     @Column(nullable = false, unique = true, columnDefinition = "DECIMAL(19,0)")
