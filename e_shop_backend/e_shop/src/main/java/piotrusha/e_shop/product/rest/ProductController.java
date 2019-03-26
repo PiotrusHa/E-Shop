@@ -5,10 +5,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import piotrusha.e_shop.base.rest.ResponseEntityCreator;
 import piotrusha.e_shop.base.rest.ResponseErrorMapper;
@@ -32,22 +33,22 @@ class ProductController {
         this.responseErrorMapper = responseErrorMapper;
     }
 
-    @GetMapping("{categoryName}")
-    List<ProductDto> getProductsByCategory(@PathVariable String categoryName) {
+    @GetMapping
+    List<ProductDto> getProductsByCategory(@RequestParam String categoryName) {
         return productFacade.findProductsByCategoryName(categoryName);
     }
 
-    @PostMapping("create")
+    @PostMapping
     ResponseEntity<?> createProduct(@RequestBody CreateProductDto createProductDto) {
         return productFacade.createProduct(createProductDto)
-                            .map(ResponseEntityCreator::ok)
+                            .map(ResponseEntityCreator::created)
                             .getOrElseGet(responseErrorMapper::map);
     }
 
-    @PostMapping("modify")
+    @PatchMapping
     ResponseEntity<?> modifyProduct(@RequestBody ModifyProductDto modifyProductDto) {
         return productFacade.modifyProduct(modifyProductDto)
-                            .map(ResponseEntityCreator::ok)
+                            .map(product -> ResponseEntityCreator.noContent())
                             .getOrElseGet(responseErrorMapper::map);
     }
 

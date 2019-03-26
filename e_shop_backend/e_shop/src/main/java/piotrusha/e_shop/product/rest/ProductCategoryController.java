@@ -30,15 +30,15 @@ class ProductCategoryController {
         this.responseErrorMapper = responseErrorMapper;
     }
 
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping
     List<ProductCategoryDto> getAllCategories() {
         return productFacade.findAllProductCategories();
     }
 
-    @PostMapping("create")
+    @PostMapping
     ResponseEntity<?> createCategory(@RequestBody CreateProductCategoryDto categoryDto) {
         return productFacade.createProductCategory(categoryDto)
-                            .map(category -> ResponseEntityCreator.ok())
+                            .map(ResponseEntityCreator::created)
                             .getOrElseGet(responseErrorMapper::map);
     }
 

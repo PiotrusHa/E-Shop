@@ -12,8 +12,12 @@ public class ResponseEntityCreator {
         return new ResponseEntity<>(payload, HttpStatus.OK);
     }
 
-    public static ResponseEntity<?> ok() {
-        return new ResponseEntity<>(HttpStatus.OK);
+    public static <P> ResponseEntity<P> created(P payload) {
+        return new ResponseEntity<>(payload, HttpStatus.CREATED);
+    }
+
+    public static ResponseEntity<?> noContent() {
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }
