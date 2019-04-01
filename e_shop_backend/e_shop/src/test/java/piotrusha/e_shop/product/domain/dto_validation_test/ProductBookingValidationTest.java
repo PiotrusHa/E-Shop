@@ -1,20 +1,20 @@
-package piotrusha.e_shop.product.domain;
+package piotrusha.e_shop.product.domain.dto_validation_test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.bookProductDtoWithNegativePiecesNumber;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.bookProductDtoWithProductId;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.bookProductDtoWithZeroPiecesNumber;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.bookProductDtoWithoutPiecesNumber;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.bookProductDtoWithoutProductId;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.bookProductDtoWithNegativePiecesNumber;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.bookProductDtoWithProductId;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.bookProductDtoWithZeroPiecesNumber;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.bookProductDtoWithoutPiecesNumber;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.bookProductDtoWithoutProductId;
 
 import io.vavr.control.Either;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.base.AppError;
 import piotrusha.e_shop.base.AppError.ErrorType;
+import piotrusha.e_shop.product.domain.ProductTest;
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
 
@@ -22,14 +22,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
-class ProductBookingValidationTest {
-
-    private ProductFacade productFacade;
-
-    @BeforeEach
-    void init() {
-        productFacade = new ProductConfiguration().productFacade();
-    }
+class ProductBookingValidationTest extends ProductTest {
 
     @ParameterizedTest
     @MethodSource("bookValidationProvider")

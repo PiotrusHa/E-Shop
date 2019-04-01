@@ -1,62 +1,55 @@
-package piotrusha.e_shop.product.domain;
+package piotrusha.e_shop.product.domain.dto_validation_test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.sellProductDtoWithNegativePiecesNumber;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.sellProductDtoWithProductId;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.sellProductDtoWithZeroPiecesNumber;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.sellProductDtoWithoutPiecesNumber;
-import static piotrusha.e_shop.product.domain.SampleDtosToValidate.sellProductDtoWithoutProductId;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.cancelProductBookingDtoWithNegativePiecesNumber;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.cancelProductBookingDtoWithProductId;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.cancelProductBookingDtoWithZeroPiecesNumber;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.cancelProductBookingDtoWithoutPiecesNumber;
+import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.cancelProductBookingDtoWithoutProductId;
 
 import io.vavr.control.Either;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.base.AppError;
 import piotrusha.e_shop.base.AppError.ErrorType;
+import piotrusha.e_shop.product.domain.ProductTest;
+import piotrusha.e_shop.product.domain.dto.CancelProductBookingDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
-import piotrusha.e_shop.product.domain.dto.SellProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
-class ProductSellingValidationTest {
-
-    private ProductFacade productFacade;
-
-    @BeforeEach
-    void init() {
-        productFacade = new ProductConfiguration().productFacade();
-    }
+class ProductBookingCancelValidationTest extends ProductTest {
 
     @ParameterizedTest
-    @MethodSource("sellValidationProvider")
-    void sellValidationTest(SellProductDto dto, String expectedErrorMessage, ErrorType expectedErrorType) {
-        Either<AppError, List<ProductDto>> result = productFacade.sellProducts(List.of(dto));
+    @MethodSource("cancelBookingValidationProvider")
+    void cancelBookingValidationTest(CancelProductBookingDto dto, String expectedErrorMessage, ErrorType expectedErrorType) {
+        Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(dto));
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
         assertEquals(expectedErrorType, result.getLeft().getErrorType());
     }
 
-    private static Stream<Arguments> sellValidationProvider() {
-        Arguments withoutProductId = Arguments.of(sellProductDtoWithoutProductId(),
+    private static Stream<Arguments> cancelBookingValidationProvider() {
+        Arguments withoutProductId = Arguments.of(cancelProductBookingDtoWithoutProductId(),
                                                   "Product id cannot be empty.",
                                                   ErrorType.EMPTY_DTO_FIELD);
         BigDecimal nonexistentId = BigDecimal.TEN;
-        Arguments nonexistentProduct = Arguments.of(sellProductDtoWithProductId(nonexistentId),
+        Arguments nonexistentProduct = Arguments.of(cancelProductBookingDtoWithProductId(nonexistentId),
                                                     "Product with productId " + nonexistentId + " not found.",
                                                     ErrorType.PRODUCT_NOT_FOUND);
 
-        Arguments withoutPiecesNumber = Arguments.of(sellProductDtoWithoutPiecesNumber(),
+        Arguments withoutPiecesNumber = Arguments.of(cancelProductBookingDtoWithoutPiecesNumber(),
                                                      "Product pieces number has to be greater than zero.",
                                                      ErrorType.NUMBER_SHOULD_BE_POSITIVE);
-        Arguments negativePiecesNumber = Arguments.of(sellProductDtoWithNegativePiecesNumber(),
+        Arguments negativePiecesNumber = Arguments.of(cancelProductBookingDtoWithNegativePiecesNumber(),
                                                       "Product pieces number has to be greater than zero.",
                                                       ErrorType.NUMBER_SHOULD_BE_POSITIVE);
-        Arguments zeroPiecesNumber = Arguments.of(sellProductDtoWithZeroPiecesNumber(),
+        Arguments zeroPiecesNumber = Arguments.of(cancelProductBookingDtoWithZeroPiecesNumber(),
                                                   "Product pieces number has to be greater than zero.",
                                                   ErrorType.NUMBER_SHOULD_BE_POSITIVE);
 

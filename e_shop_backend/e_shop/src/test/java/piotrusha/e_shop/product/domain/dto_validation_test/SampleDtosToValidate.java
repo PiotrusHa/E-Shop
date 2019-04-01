@@ -1,7 +1,8 @@
-package piotrusha.e_shop.product.domain;
+package piotrusha.e_shop.product.domain.dto_validation_test;
 
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.CancelProductBookingDto;
+import piotrusha.e_shop.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.product.domain.dto.SellProductDto;
@@ -10,6 +11,14 @@ import java.math.BigDecimal;
 import java.util.List;
 
 class SampleDtosToValidate {
+
+    static CreateProductCategoryDto createProductCategoryDtoWithEmptyName() {
+        return new CreateProductCategoryDto("");
+    }
+
+    static CreateProductCategoryDto createProductCategoryDtoWithNullName() {
+        return new CreateProductCategoryDto(null);
+    }
 
     static CreateProductDto createProductDtoWithoutName() {
         return new CreateProductDto("", BigDecimal.ONE, 1, "", List.of());
