@@ -9,6 +9,7 @@ import piotrusha.e_shop.bill.domain.BillRecord;
 import piotrusha.e_shop.bill.domain.BillState;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
@@ -28,12 +29,25 @@ import java.util.stream.Collectors;
 class BillEntity {
 
     @Id
+    @Column(nullable = false, unique = true, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal billId;
+
+    @Column(nullable = false, scale = 2)
     private BigDecimal priceSum;
+
+    @Column(nullable = false)
     private Date purchaseDate;
+
+    @Column(nullable = false)
     private Date paymentDate;
+
+    @Column(nullable = false)
     private Date paymentExpirationDate;
+
+    @Column(nullable = false, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal clientId;
+
+    @Column(nullable = false)
     private BillState billState;
 
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)

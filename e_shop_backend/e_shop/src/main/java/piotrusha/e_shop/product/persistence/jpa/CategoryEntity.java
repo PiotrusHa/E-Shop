@@ -19,7 +19,7 @@ import javax.persistence.Table;
 class CategoryEntity {
 
     @Id
-    @Column(name = "name", length = 30, nullable = false, unique = true)
+    @Column(length = 30, nullable = false, unique = true)
     private String name;
 
     Category toDomainCategory() {

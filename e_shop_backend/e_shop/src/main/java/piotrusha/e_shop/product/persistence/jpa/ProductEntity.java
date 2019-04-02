@@ -40,8 +40,10 @@ class ProductEntity {
     @Column(nullable = false)
     private Integer availablePiecesNumber;
 
+    @Column(nullable = false)
     private Integer bookedPiecesNumber;
 
+    @Column(nullable = false)
     private Integer soldPiecesNumber;
 
     @Column(length = 200)
