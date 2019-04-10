@@ -2,8 +2,8 @@ package piotrusha.e_shop.product.persistence.jpa;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import piotrusha.e_shop.product.domain.Category;
 import piotrusha.e_shop.product.domain.CategoryRepository;
+import piotrusha.e_shop.product.domain.dto.ProductCategoryDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,8 +19,8 @@ class CategoryJpaRepositoryAdapter implements CategoryRepository {
     }
 
     @Override
-    public List<Category> findAll() {
-        return toDomainCategories(repository.findAll());
+    public List<ProductCategoryDto> findAll() {
+        return toDtos(repository.findAll());
     }
 
     @Override
@@ -29,13 +29,13 @@ class CategoryJpaRepositoryAdapter implements CategoryRepository {
     }
 
     @Override
-    public void save(Category category) {
-        repository.save(CategoryEntity.fromDomainCategory(category));
+    public void save(ProductCategoryDto category) {
+        repository.save(CategoryEntity.fromDto(category));
     }
 
-    private List<Category> toDomainCategories(List<CategoryEntity> entities) {
+    private List<ProductCategoryDto> toDtos(List<CategoryEntity> entities) {
         return entities.stream()
-                       .map(CategoryEntity::toDomainCategory)
+                       .map(CategoryEntity::toDto)
                        .collect(Collectors.toList());
     }
 

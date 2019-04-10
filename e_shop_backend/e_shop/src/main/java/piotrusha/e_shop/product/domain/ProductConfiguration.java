@@ -10,9 +10,8 @@ class ProductConfiguration {
 
     @Bean
     ProductFacade productFacade(CategoryRepository categoryRepository, ProductRepository productRepository) {
-        CategoryConverter categoryConverter = new CategoryConverter();
         CategoryCreator categoryCreator = new CategoryCreator();
-        CategoryFinder categoryFinder = new CategoryFinder(categoryRepository, categoryConverter);
+        CategoryFinder categoryFinder = new CategoryFinder(categoryRepository);
 
         ProductIdGenerator productIdGenerator = new ProductIdGenerator(productRepository);
         DtoValidator dtoValidator = new DtoValidator(categoryRepository, productRepository);

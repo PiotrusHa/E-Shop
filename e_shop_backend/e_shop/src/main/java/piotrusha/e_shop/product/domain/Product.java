@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-public class Product {
+class Product {
 
     private BigDecimal productId;
     private String name;
@@ -74,18 +74,38 @@ public class Product {
 
     ProductDto toDto() {
         List<String> categories = this.getCategories()
-                                         .stream()
-                                         .map(Category::getName)
-                                         .collect(Collectors.toList());
+                                      .stream()
+                                      .map(Category::getName)
+                                      .collect(Collectors.toList());
 
-        return new ProductDto().setProductId(this.getProductId())
-                               .setName(this.getName())
-                               .setPrice(this.getPrice())
-                               .setAvailablePiecesNumber(this.getAvailablePiecesNumber())
-                               .setBookedPiecesNumber(this.getBookedPiecesNumber())
-                               .setSoldPiecesNumber(this.getSoldPiecesNumber())
-                               .setDescription(this.getDescription())
-                               .setCategories(categories);
+        return ProductDto.builder()
+                         .productId(this.getProductId())
+                         .name(this.getName())
+                         .price(this.getPrice())
+                         .availablePiecesNumber(this.getAvailablePiecesNumber())
+                         .bookedPiecesNumber(this.getBookedPiecesNumber())
+                         .soldPiecesNumber(this.getSoldPiecesNumber())
+                         .description(this.getDescription())
+                         .categories(categories)
+                         .build();
+    }
+
+    static Product fromDto(ProductDto dto) {
+        Set<Category> categories = dto.getCategories()
+                                      .stream()
+                                      .map(Category::new)
+                                      .collect(Collectors.toSet());
+
+        return Product.builder()
+                      .productId(dto.getProductId())
+                      .name(dto.getName())
+                      .price(dto.getPrice())
+                      .availablePiecesNumber(dto.getAvailablePiecesNumber())
+                      .bookedPiecesNumber(dto.getBookedPiecesNumber())
+                      .soldPiecesNumber(dto.getSoldPiecesNumber())
+                      .description(dto.getDescription())
+                      .categories(categories)
+                      .build();
     }
 
 }

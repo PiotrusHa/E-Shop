@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import piotrusha.e_shop.product.domain.Category;
+import piotrusha.e_shop.product.domain.dto.ProductCategoryDto;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,11 +22,11 @@ class CategoryEntity {
     @Column(length = 30, nullable = false, unique = true)
     private String name;
 
-    Category toDomainCategory() {
-        return new Category(name);
+    ProductCategoryDto toDto() {
+        return new ProductCategoryDto(name);
     }
 
-    static CategoryEntity fromDomainCategory(Category category) {
+    static CategoryEntity fromDto(ProductCategoryDto category) {
         return new CategoryEntity(category.getName());
     }
 

@@ -4,8 +4,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import piotrusha.e_shop.product.domain.Category;
-import piotrusha.e_shop.product.domain.Product;
+import piotrusha.e_shop.product.domain.dto.ProductCategoryDto;
+import piotrusha.e_shop.product.domain.dto.ProductDto;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -17,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,26 +57,28 @@ class ProductEntity {
     )
     private Set<CategoryEntity> categories;
 
-    Product toDomainProduct() {
-        Set<Category> domainCategories = categories.stream()
-                                                   .map(CategoryEntity::toDomainCategory)
-                                                   .collect(Collectors.toSet());
-        return Product.builder()
-                      .productId(productId)
-                      .name(name)
-                      .price(price)
-                      .availablePiecesNumber(availablePiecesNumber)
-                      .bookedPiecesNumber(bookedPiecesNumber)
-                      .soldPiecesNumber(soldPiecesNumber)
-                      .description(description)
-                      .categories(domainCategories)
-                      .build();
+    ProductDto toDto() {
+        List<String> categories = this.categories.stream()
+                                                 .map(CategoryEntity::toDto)
+                                                 .map(ProductCategoryDto::getName)
+                                                 .collect(Collectors.toList());
+        return ProductDto.builder()
+                         .productId(productId)
+                         .name(name)
+                         .price(price)
+                         .availablePiecesNumber(availablePiecesNumber)
+                         .bookedPiecesNumber(bookedPiecesNumber)
+                         .soldPiecesNumber(soldPiecesNumber)
+                         .description(description)
+                         .categories(categories)
+                         .build();
     }
 
-    static ProductEntity fromDomainProduct(Product product) {
+    static ProductEntity fromDto(ProductDto product) {
         Set<CategoryEntity> categories = product.getCategories()
                                                 .stream()
-                                                .map(CategoryEntity::fromDomainCategory)
+                                                .map(ProductCategoryDto::new)
+                                                .map(CategoryEntity::fromDto)
                                                 .collect(Collectors.toSet());
         return new ProductEntity().setProductId(product.getProductId())
                                   .setName(product.getName())

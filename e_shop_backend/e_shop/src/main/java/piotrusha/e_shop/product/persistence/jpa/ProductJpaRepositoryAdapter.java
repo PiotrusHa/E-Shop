@@ -3,8 +3,8 @@ package piotrusha.e_shop.product.persistence.jpa;
 import io.vavr.control.Option;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import piotrusha.e_shop.product.domain.Product;
 import piotrusha.e_shop.product.domain.ProductRepository;
+import piotrusha.e_shop.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,18 +21,13 @@ class ProductJpaRepositoryAdapter implements ProductRepository {
     }
 
     @Override
-    public List<Product> findAll() {
-        return toDomainProducts(repository.findAll());
-    }
-
-    @Override
-    public Option<Product> findByProductId(BigDecimal productId) {
+    public Option<ProductDto> findByProductId(BigDecimal productId) {
         return Option.ofOptional(repository.findById(productId)
-                                           .map(ProductEntity::toDomainProduct));
+                                           .map(ProductEntity::toDto));
     }
 
     @Override
-    public List<Product> findByCategoryName(String categoryName) {
+    public List<ProductDto> findByCategoryName(String categoryName) {
         return toDomainProducts(repository.findByCategoryName(categoryName));
     }
 
@@ -42,24 +37,24 @@ class ProductJpaRepositoryAdapter implements ProductRepository {
     }
 
     @Override
-    public void save(Product product) {
-        repository.save(ProductEntity.fromDomainProduct(product));
+    public void save(ProductDto product) {
+        repository.save(ProductEntity.fromDto(product));
     }
 
     @Override
-    public void saveAll(List<Product> products) {
-        repository.saveAll(fromDomainProducts(products));
+    public void saveAll(List<ProductDto> products) {
+        repository.saveAll(fromDtos(products));
     }
 
-    private List<Product> toDomainProducts(List<ProductEntity> entities) {
+    private List<ProductDto> toDomainProducts(List<ProductEntity> entities) {
         return entities.stream()
-                       .map(ProductEntity::toDomainProduct)
+                       .map(ProductEntity::toDto)
                        .collect(Collectors.toList());
     }
 
-    private List<ProductEntity> fromDomainProducts(List<Product> products) {
+    private List<ProductEntity> fromDtos(List<ProductDto> products) {
         return products.stream()
-                       .map(ProductEntity::fromDomainProduct)
+                       .map(ProductEntity::fromDto)
                        .collect(Collectors.toList());
     }
 

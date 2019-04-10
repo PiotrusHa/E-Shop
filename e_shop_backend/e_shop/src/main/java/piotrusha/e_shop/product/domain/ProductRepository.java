@@ -1,22 +1,21 @@
 package piotrusha.e_shop.product.domain;
 
 import io.vavr.control.Option;
+import piotrusha.e_shop.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductRepository {
 
-    List<Product> findAll();
+    Option<ProductDto> findByProductId(BigDecimal productId);
 
-    Option<Product> findByProductId(BigDecimal productId);
-
-    List<Product> findByCategoryName(String categoryName);
+    List<ProductDto> findByCategoryName(String categoryName);
 
     Option<BigDecimal> findMaxProductId();
 
-    void save(Product product);
+    void save(ProductDto product);
 
-    void saveAll(List<Product> products);
+    void saveAll(List<ProductDto> products);
 
 }

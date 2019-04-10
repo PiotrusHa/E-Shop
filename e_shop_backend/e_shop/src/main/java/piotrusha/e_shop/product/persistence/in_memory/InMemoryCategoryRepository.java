@@ -1,7 +1,7 @@
 package piotrusha.e_shop.product.persistence.in_memory;
 
-import piotrusha.e_shop.product.domain.Category;
 import piotrusha.e_shop.product.domain.CategoryRepository;
+import piotrusha.e_shop.product.domain.dto.ProductCategoryDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class InMemoryCategoryRepository implements CategoryRepository {
 
-    private Map<String, Category> map = new ConcurrentHashMap<>();
+    private Map<String, ProductCategoryDto> map = new ConcurrentHashMap<>();
 
     @Override
-    public List<Category> findAll() {
+    public List<ProductCategoryDto> findAll() {
         return new ArrayList<>(map.values());
     }
 
@@ -23,7 +23,7 @@ public class InMemoryCategoryRepository implements CategoryRepository {
     }
 
     @Override
-    public void save(Category category) {
+    public void save(ProductCategoryDto category) {
         map.put(category.getName(), category);
     }
 

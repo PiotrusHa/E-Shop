@@ -97,6 +97,7 @@ class DtoValidator {
         }
 
         return productRepository.findByProductId(productId)
+                                .map(Product::fromDto)
                                 .toEither(() -> AppError.notFound(String.format("Product with productId %s not found", productId)));
     }
 
