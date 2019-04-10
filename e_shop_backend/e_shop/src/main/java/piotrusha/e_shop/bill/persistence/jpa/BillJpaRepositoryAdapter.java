@@ -3,9 +3,8 @@ package piotrusha.e_shop.bill.persistence.jpa;
 import io.vavr.control.Option;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import piotrusha.e_shop.bill.domain.Bill;
 import piotrusha.e_shop.bill.domain.BillRepository;
-import piotrusha.e_shop.bill.domain.BillState;
+import piotrusha.e_shop.bill.domain.dto.BillDto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -22,19 +21,19 @@ class BillJpaRepositoryAdapter implements BillRepository {
     }
 
     @Override
-    public Option<Bill> findByBillId(BigDecimal id) {
+    public Option<BillDto> findByBillId(BigDecimal id) {
         return Option.ofOptional(repository.findById(id)
-                                           .map(BillEntity::toDomainBill));
+                                           .map(BillEntity::toDto));
     }
 
     @Override
-    public List<Bill> findBillByClientId(BigDecimal clientId) {
-        return toDomainBills(repository.findByClientId(clientId));
+    public List<BillDto> findBillByClientId(BigDecimal clientId) {
+        return toDtos(repository.findByClientId(clientId));
     }
 
     @Override
-    public List<Bill> findBillByClientIdAndBillState(BigDecimal clientId, BillState billState) {
-        return toDomainBills(repository.findByClientIdAndBillState(clientId, billState));
+    public List<BillDto> findBillByClientIdAndBillState(BigDecimal clientId, String billState) {
+        return toDtos(repository.findByClientIdAndBillState(clientId, billState));
     }
 
     @Override
@@ -43,18 +42,13 @@ class BillJpaRepositoryAdapter implements BillRepository {
     }
 
     @Override
-    public void create(Bill bill) {
-        repository.save(BillEntity.fromDomainBill(bill, true));
+    public void save(BillDto bill) {
+        repository.save(BillEntity.fromDto(bill));
     }
 
-    @Override
-    public void update(Bill bill) {
-        repository.save(BillEntity.fromDomainBill(bill, false));
-    }
-
-    private List<Bill> toDomainBills(List<BillEntity> entities) {
+    private List<BillDto> toDtos(List<BillEntity> entities) {
         return entities.stream()
-                       .map(BillEntity::toDomainBill)
+                       .map(BillEntity::toDto)
                        .collect(Collectors.toList());
     }
 

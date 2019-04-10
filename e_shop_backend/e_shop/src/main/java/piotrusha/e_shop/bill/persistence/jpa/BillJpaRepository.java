@@ -2,7 +2,6 @@ package piotrusha.e_shop.bill.persistence.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import piotrusha.e_shop.bill.domain.BillState;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,6 +14,6 @@ interface BillJpaRepository extends JpaRepository<BillEntity, BigDecimal> {
 
     List<BillEntity> findByClientId(BigDecimal clientId);
 
-    List<BillEntity> findByClientIdAndBillState(BigDecimal clientId, BillState billState);
+    List<BillEntity> findByClientIdAndBillState(BigDecimal clientId, String billState);
 
 }

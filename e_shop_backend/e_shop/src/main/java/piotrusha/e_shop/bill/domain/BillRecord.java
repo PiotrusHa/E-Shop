@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @Getter
 @AllArgsConstructor
-public class BillRecord {
+class BillRecord {
 
     private BigDecimal productId;
     private Integer piecesNumber;
@@ -19,7 +19,11 @@ public class BillRecord {
     }
 
     BillRecordDto toDto() {
-        return new BillRecordDto(productId, piecesNumber, piecePrice, getPriceSum());
+        return new BillRecordDto(productId, piecesNumber, piecePrice);
+    }
+
+    static BillRecord fromDto(BillRecordDto dto) {
+        return new BillRecord(dto.getProductId(), dto.getPiecesNumber(), dto.getPiecePrice());
     }
 
 }

@@ -32,6 +32,7 @@ class DtoValidator {
             return Either.left(AppError.validation("Bill id cannot be empty."));
         }
         return billRepository.findByBillId(billId)
+                             .map(Bill::fromDto)
                              .toEither(() -> AppError.notFound(String.format("Bill with billId %s not found.", billId)));
     }
 

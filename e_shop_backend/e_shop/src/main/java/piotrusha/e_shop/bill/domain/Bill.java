@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Bill {
+class Bill {
 
     private BigDecimal billId;
     private BigDecimal priceSum;
@@ -47,14 +47,34 @@ public class Bill {
         List<BillRecordDto> recordDtos = billRecords.stream()
                                                     .map(BillRecord::toDto)
                                                     .collect(Collectors.toList());
-        return new BillDto().setBillId(billId)
-                            .setPriceSum(priceSum)
-                            .setPurchaseDate(purchaseDate)
-                            .setPaymentDate(paymentDate)
-                            .setPaymentExpirationDate(paymentExpirationDate)
-                            .setClientId(clientId)
-                            .setBillState(billState.toString())
-                            .setBillRecords(recordDtos);
+        return BillDto.builder()
+                      .billId(billId)
+                      .priceSum(priceSum)
+                      .purchaseDate(purchaseDate)
+                      .paymentDate(paymentDate)
+                      .paymentExpirationDate(paymentExpirationDate)
+                      .clientId(clientId)
+                      .billState(billState.toString())
+                      .billRecords(recordDtos)
+                      .build();
+    }
+
+    static Bill fromDto(BillDto dto) {
+        Set<BillRecord> records = dto.getBillRecords()
+                                     .stream()
+                                     .map(BillRecord::fromDto)
+                                     .collect(Collectors.toSet());
+
+        return Bill.builder()
+                   .billId(dto.getBillId())
+                   .priceSum(dto.getPriceSum())
+                   .purchaseDate(dto.getPurchaseDate())
+                   .paymentDate(dto.getPaymentDate())
+                   .paymentExpirationDate(dto.getPaymentExpirationDate())
+                   .clientId(dto.getClientId())
+                   .billState(BillState.valueOf(dto.getBillState()))
+                   .billRecords(records)
+                   .build();
     }
 
 }

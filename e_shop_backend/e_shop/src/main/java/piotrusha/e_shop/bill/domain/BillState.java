@@ -1,6 +1,6 @@
 package piotrusha.e_shop.bill.domain;
 
-public enum BillState {
+enum BillState {
     WAITING_FOR_PAYMENT,
     PAID,
     CANCELLED,

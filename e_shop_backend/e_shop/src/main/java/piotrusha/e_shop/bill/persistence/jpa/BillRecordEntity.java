@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import piotrusha.e_shop.bill.domain.BillRecord;
+import piotrusha.e_shop.bill.domain.dto.BillRecordDto;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,14 +37,14 @@ class BillRecordEntity {
     @Column(nullable = false, scale = 2)
     private BigDecimal piecePrice;
 
-    BillRecord toDomainBillRecord() {
-        return new BillRecord(productId, piecesNumber, piecePrice);
+    BillRecordDto toDto() {
+        return new BillRecordDto(productId, piecesNumber, piecePrice);
     }
 
-    static BillRecordEntity fromDomainBillRecord(BillRecord billRecord) {
-        return new BillRecordEntity().setProductId(billRecord.getProductId())
-                                     .setPiecesNumber(billRecord.getPiecesNumber())
-                                     .setPiecePrice(billRecord.getPiecePrice());
+    static BillRecordEntity fromDto(BillRecordDto dto) {
+        return new BillRecordEntity().setProductId(dto.getProductId())
+                                     .setPiecesNumber(dto.getPiecesNumber())
+                                     .setPiecePrice(dto.getPiecePrice());
     }
 
 }

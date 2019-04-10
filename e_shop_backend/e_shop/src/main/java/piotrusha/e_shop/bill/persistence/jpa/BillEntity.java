@@ -4,9 +4,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import piotrusha.e_shop.bill.domain.Bill;
-import piotrusha.e_shop.bill.domain.BillRecord;
-import piotrusha.e_shop.bill.domain.BillState;
+import piotrusha.e_shop.bill.domain.dto.BillDto;
+import piotrusha.e_shop.bill.domain.dto.BillRecordDto;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,6 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -48,33 +48,33 @@ class BillEntity {
     private BigDecimal clientId;
 
     @Column(nullable = false)
-    private BillState billState;
+    private String billState;
 
     @OneToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "bill_id")
     private Set<BillRecordEntity> billRecords;
 
-    Bill toDomainBill() {
-        Set<BillRecord> billRecordEntities = billRecords.stream()
-                                                        .map(BillRecordEntity::toDomainBillRecord)
-                                                        .collect(Collectors.toSet());
-        return Bill.builder()
-                   .billId(billId)
-                   .priceSum(priceSum)
-                   .purchaseDate(purchaseDate)
-                   .paymentDate(paymentDate)
-                   .paymentExpirationDate(paymentExpirationDate)
-                   .clientId(clientId)
-                   .billState(billState)
-                   .billRecords(billRecordEntities)
-                   .build();
+    BillDto toDto() {
+        List<BillRecordDto> dtos = billRecords.stream()
+                                              .map(BillRecordEntity::toDto)
+                                              .collect(Collectors.toList());
+        return BillDto.builder()
+                      .billId(billId)
+                      .priceSum(priceSum)
+                      .purchaseDate(purchaseDate)
+                      .paymentDate(paymentDate)
+                      .paymentExpirationDate(paymentExpirationDate)
+                      .clientId(clientId)
+                      .billState(billState)
+                      .billRecords(dtos)
+                      .build();
     }
 
-    static BillEntity fromDomainBill(Bill bill, boolean includeBillRecords) {
-        Set<BillRecordEntity> recordEntities = includeBillRecords ? bill.getBillRecords()
-                                                                        .stream()
-                                                                        .map(BillRecordEntity::fromDomainBillRecord)
-                                                                        .collect(Collectors.toSet()) : null;
+    static BillEntity fromDto(BillDto bill) {
+        Set<BillRecordEntity> records = bill.getBillRecords()
+                                            .stream()
+                                            .map(BillRecordEntity::fromDto)
+                                            .collect(Collectors.toSet());
         return new BillEntity().setBillId(bill.getBillId())
                                .setPriceSum(bill.getPriceSum())
                                .setPurchaseDate(bill.getPurchaseDate())
@@ -82,7 +82,7 @@ class BillEntity {
                                .setPaymentExpirationDate(bill.getPaymentExpirationDate())
                                .setClientId(bill.getClientId())
                                .setBillState(bill.getBillState())
-                               .setBillRecords(recordEntities);
+                               .setBillRecords(records);
     }
 
 }
