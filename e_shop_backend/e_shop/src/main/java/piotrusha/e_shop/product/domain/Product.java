@@ -1,9 +1,11 @@
 package piotrusha.e_shop.product.domain;
 
+import io.vavr.control.Either;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.product.domain.dto.ProductCategoryDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
@@ -11,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 class Product {
@@ -33,33 +34,6 @@ class Product {
         this.categories.removeAll(categories);
     }
 
-    boolean canBook(int piecesNumber) {
-        return availablePiecesNumber >= piecesNumber;
-    }
-
-    boolean canCancel(int piecesNumber) {
-        return bookedPiecesNumber >= piecesNumber;
-    }
-
-    boolean canSell(int piecesNumber) {
-        return bookedPiecesNumber >= piecesNumber;
-    }
-
-    void bookProduct(int piecesNumber) {
-        availablePiecesNumber -= piecesNumber;
-        bookedPiecesNumber += piecesNumber;
-    }
-
-    void cancelBooking(int piecesNumber) {
-        bookedPiecesNumber -= piecesNumber;
-        availablePiecesNumber += piecesNumber;
-    }
-
-    void sellProduct(int piecesNumber) {
-        bookedPiecesNumber -= piecesNumber;
-        soldPiecesNumber += piecesNumber;
-    }
-
     void modifyPrice(BigDecimal newPrice) {
         price = newPrice;
     }
@@ -72,21 +46,63 @@ class Product {
         availablePiecesNumber = newAvailablePiecesNumber;
     }
 
+    Either<AppError, Product> bookProduct(int piecesNumber) {
+        if (!canBook(piecesNumber)) {
+            return Either.left(AppError.cannotBookProduct(name, piecesNumber, availablePiecesNumber));
+        }
+
+        availablePiecesNumber -= piecesNumber;
+        bookedPiecesNumber += piecesNumber;
+        return Either.right(this);
+    }
+
+    private boolean canBook(int piecesNumber) {
+        return availablePiecesNumber >= piecesNumber;
+    }
+
+    Either<AppError, Product> cancelBooking(int piecesNumber) {
+        if (!canCancel(piecesNumber)) {
+            return Either.left(AppError.cannotCancelProductBooking(name, piecesNumber));
+        }
+
+        bookedPiecesNumber -= piecesNumber;
+        availablePiecesNumber += piecesNumber;
+        return Either.right(this);
+    }
+
+    private boolean canCancel(int piecesNumber) {
+        return bookedPiecesNumber >= piecesNumber;
+    }
+
+    Either<AppError, Product> sellProduct(int piecesNumber) {
+        if (!canSell(piecesNumber)) {
+            return Either.left(AppError.cannotSellProduct(name, piecesNumber, bookedPiecesNumber));
+        }
+
+        bookedPiecesNumber -= piecesNumber;
+        soldPiecesNumber += piecesNumber;
+        return Either.right(this);
+    }
+
+    private boolean canSell(int piecesNumber) {
+        return bookedPiecesNumber >= piecesNumber;
+    }
+
     ProductDto toDto() {
-        List<String> categories = this.getCategories()
-                                      .stream()
-                                      .map(Category::getName)
-                                      .collect(Collectors.toList());
+        List<String> categoriesDto = categories.stream()
+                                               .map(Category::toDto)
+                                               .map(ProductCategoryDto::getName)
+                                               .collect(Collectors.toList());
 
         return ProductDto.builder()
-                         .productId(this.getProductId())
-                         .name(this.getName())
-                         .price(this.getPrice())
-                         .availablePiecesNumber(this.getAvailablePiecesNumber())
-                         .bookedPiecesNumber(this.getBookedPiecesNumber())
-                         .soldPiecesNumber(this.getSoldPiecesNumber())
-                         .description(this.getDescription())
-                         .categories(categories)
+                         .productId(productId)
+                         .name(name)
+                         .price(price)
+                         .availablePiecesNumber(availablePiecesNumber)
+                         .bookedPiecesNumber(bookedPiecesNumber)
+                         .soldPiecesNumber(soldPiecesNumber)
+                         .description(description)
+                         .categories(categoriesDto)
                          .build();
     }
 
