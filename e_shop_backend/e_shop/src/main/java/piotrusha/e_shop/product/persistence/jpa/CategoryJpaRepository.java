@@ -1,7 +1,15 @@
 package piotrusha.e_shop.product.persistence.jpa;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.Repository;
 
-interface CategoryJpaRepository extends JpaRepository<CategoryEntity, String> {
+import java.util.List;
+
+interface CategoryJpaRepository extends Repository<CategoryEntity, String> {
+
+    List<CategoryEntity> findAll();
+
+    boolean existsByName(String name);
+
+    void save(CategoryEntity categoryEntity);
 
 }

@@ -22,7 +22,7 @@ class BillJpaRepositoryAdapter implements BillRepository {
 
     @Override
     public Option<BillDto> findByBillId(BigDecimal id) {
-        return Option.ofOptional(repository.findById(id)
+        return Option.ofOptional(repository.findByBillId(id)
                                            .map(BillEntity::toDto));
     }
 

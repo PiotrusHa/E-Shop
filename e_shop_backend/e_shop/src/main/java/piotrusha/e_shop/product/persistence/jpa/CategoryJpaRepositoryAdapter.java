@@ -25,7 +25,7 @@ class CategoryJpaRepositoryAdapter implements CategoryRepository {
 
     @Override
     public boolean existsByName(String name) {
-        return repository.existsById(name);
+        return repository.existsByName(name);
     }
 
     @Override

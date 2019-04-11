@@ -22,7 +22,7 @@ class ProductJpaRepositoryAdapter implements ProductRepository {
 
     @Override
     public Option<ProductDto> findByProductId(BigDecimal productId) {
-        return Option.ofOptional(repository.findById(productId)
+        return Option.ofOptional(repository.findByProductId(productId)
                                            .map(ProductEntity::toDto));
     }
 
@@ -43,18 +43,14 @@ class ProductJpaRepositoryAdapter implements ProductRepository {
 
     @Override
     public void saveAll(List<ProductDto> products) {
-        repository.saveAll(fromDtos(products));
+        for (ProductDto productDto : products) {
+            repository.save(ProductEntity.fromDto(productDto));
+        }
     }
 
     private List<ProductDto> toDomainProducts(List<ProductEntity> entities) {
         return entities.stream()
                        .map(ProductEntity::toDto)
-                       .collect(Collectors.toList());
-    }
-
-    private List<ProductEntity> fromDtos(List<ProductDto> products) {
-        return products.stream()
-                       .map(ProductEntity::fromDto)
                        .collect(Collectors.toList());
     }
 
