@@ -1,7 +1,10 @@
 package piotrusha.e_shop.product.domain.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -12,6 +15,9 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 @Accessors(chain = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductDto {
 
     private BigDecimal productId;
@@ -21,6 +27,6 @@ public class ProductDto {
     private Integer bookedPiecesNumber;
     private Integer soldPiecesNumber;
     private String description;
-    private List<String> categories;
+    private List<String> categories;    // TODO ProductCategoryDto
 
 }

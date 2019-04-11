@@ -2,6 +2,7 @@ package piotrusha.e_shop.bill.domain;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import piotrusha.e_shop.bill.persistence.in_memory.InMemoryBillRepository;
 import piotrusha.e_shop.product.domain.ProductFacade;
 
 @Configuration

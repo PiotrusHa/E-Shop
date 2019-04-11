@@ -21,14 +21,16 @@ class ProductCreator {
                                       .map(Category::new)
                                       .collect(Collectors.toSet());
 
-        return new Product().setProductId(generatedId)
-                            .setName(dto.getProductName())
-                            .setPrice(dto.getPrice())
-                            .setAvailablePiecesNumber(dto.getAvailablePiecesNumber())
-                            .setBookedPiecesNumber(0)
-                            .setSoldPiecesNumber(0)
-                            .setDescription(dto.getDescription())
-                            .setCategories(categories);
+        return Product.builder()
+                      .productId(generatedId)
+                      .name(dto.getProductName())
+                      .price(dto.getPrice())
+                      .availablePiecesNumber(dto.getAvailablePiecesNumber())
+                      .bookedPiecesNumber(0)
+                      .soldPiecesNumber(0)
+                      .description(dto.getDescription())
+                      .categories(categories)
+                      .build();
     }
 
 }

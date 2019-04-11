@@ -1,15 +1,15 @@
 package piotrusha.e_shop.product.domain;
 
-import org.springframework.data.repository.Repository;
+import piotrusha.e_shop.product.domain.dto.ProductCategoryDto;
 
 import java.util.List;
 
-interface CategoryRepository extends Repository<Category, String> {
+public interface CategoryRepository {
 
-    List<Category> findAll();
+    List<ProductCategoryDto> findAll();
 
     boolean existsByName(String name);
 
-    void save(Category category);
+    void save(ProductCategoryDto category);
 
 }

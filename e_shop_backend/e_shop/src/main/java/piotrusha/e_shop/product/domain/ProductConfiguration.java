@@ -2,15 +2,16 @@ package piotrusha.e_shop.product.domain;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import piotrusha.e_shop.product.persistence.in_memory.InMemoryCategoryRepository;
+import piotrusha.e_shop.product.persistence.in_memory.InMemoryProductRepository;
 
 @Configuration
 class ProductConfiguration {
 
     @Bean
     ProductFacade productFacade(CategoryRepository categoryRepository, ProductRepository productRepository) {
-        CategoryConverter categoryConverter = new CategoryConverter();
         CategoryCreator categoryCreator = new CategoryCreator();
-        CategoryFinder categoryFinder = new CategoryFinder(categoryRepository, categoryConverter);
+        CategoryFinder categoryFinder = new CategoryFinder(categoryRepository);
 
         ProductIdGenerator productIdGenerator = new ProductIdGenerator(productRepository);
         DtoValidator dtoValidator = new DtoValidator(categoryRepository, productRepository);

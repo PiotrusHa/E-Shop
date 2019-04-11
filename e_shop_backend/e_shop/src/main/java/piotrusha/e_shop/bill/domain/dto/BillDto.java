@@ -1,7 +1,10 @@
 package piotrusha.e_shop.bill.domain.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -13,6 +16,9 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 @Accessors(chain = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class BillDto {
 
     private BigDecimal billId;
