@@ -1,7 +1,6 @@
 package piotrusha.e_shop.product.domain;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static piotrusha.e_shop.product.domain.Assertions.assertProductDto;
 
 import io.vavr.control.Either;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,7 @@ class ProductModificationTest extends ProductTest {
         createCategory(ASSIGNED_CATEGORY_2);
         createCategory(CATEGORY_TO_ASSIGN2);
 
-        productToModify = createProduct(List.of(ASSIGNED_CATEGORY, ASSIGNED_CATEGORY_2));
+        productToModify = createProductWithCategories(List.of(ASSIGNED_CATEGORY, ASSIGNED_CATEGORY_2));
     }
 
     @ParameterizedTest

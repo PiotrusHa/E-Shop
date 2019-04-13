@@ -1,7 +1,6 @@
 package piotrusha.e_shop.product.domain;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static piotrusha.e_shop.product.domain.Assertions.assertProductDto;
 
 import io.vavr.control.Either;
 import org.junit.jupiter.api.Test;
