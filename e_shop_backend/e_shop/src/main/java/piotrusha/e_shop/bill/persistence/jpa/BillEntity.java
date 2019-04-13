@@ -16,7 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -36,13 +37,13 @@ class BillEntity {
     private BigDecimal priceSum;
 
     @Column(nullable = false)
-    private Date purchaseDate;
+    private LocalDateTime purchaseDate;
 
     @Column(nullable = false)
-    private Date paymentDate;
+    private LocalDate paymentDate;
 
     @Column(nullable = false)
-    private Date paymentExpirationDate;
+    private LocalDate paymentExpirationDate;
 
     @Column(nullable = false, columnDefinition = "DECIMAL(19,0)")
     private BigDecimal clientId;

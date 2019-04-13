@@ -8,7 +8,8 @@ import piotrusha.e_shop.bill.domain.dto.BillDto;
 import piotrusha.e_shop.bill.domain.dto.BillRecordDto;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,9 +21,9 @@ class Bill {
 
     private BigDecimal billId;
     private BigDecimal priceSum;
-    private Date purchaseDate;
-    private Date paymentDate;
-    private Date paymentExpirationDate;
+    private LocalDateTime purchaseDate;
+    private LocalDate paymentDate;
+    private LocalDate paymentExpirationDate;
     private BigDecimal clientId;
     private BillState billState;
     private Set<BillRecord> billRecords;

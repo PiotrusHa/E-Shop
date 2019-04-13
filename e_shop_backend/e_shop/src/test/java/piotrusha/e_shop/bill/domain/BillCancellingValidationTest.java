@@ -24,7 +24,7 @@ class BillCancellingValidationTest {
 
     @BeforeEach
     void init() {
-        billFacade = new BillConfiguration().billFacade(null);
+        billFacade = new BillConfiguration().billFacade(null, null);
     }
 
     @ParameterizedTest

@@ -15,6 +15,7 @@ import io.vavr.control.Either;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.DateTimeProvider;
 import piotrusha.e_shop.bill.domain.dto.BillDto;
 import piotrusha.e_shop.bill.domain.dto.BillRecordDto;
 import piotrusha.e_shop.bill.domain.dto.CreateBillDto;
@@ -34,7 +35,7 @@ class BillCreationTest {
     @BeforeEach
     void init() {
         productFacade = mock(ProductFacade.class);
-        billFacade = new BillConfiguration().billFacade(productFacade);
+        billFacade = new BillConfiguration().billFacade(new DateTimeProvider(), productFacade);
     }
 
     @Test

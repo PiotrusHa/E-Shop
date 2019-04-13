@@ -9,7 +9,8 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -23,9 +24,9 @@ public class BillDto {
 
     private BigDecimal billId;
     private BigDecimal priceSum;
-    private Date purchaseDate;
-    private Date paymentDate;
-    private Date paymentExpirationDate;
+    private LocalDateTime purchaseDate;
+    private LocalDate paymentDate;
+    private LocalDate paymentExpirationDate;
     private BigDecimal clientId;
     private String billState;
     private List<BillRecordDto> billRecords;

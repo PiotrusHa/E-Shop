@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import piotrusha.e_shop.base.DateTimeProvider;
 import piotrusha.e_shop.product.domain.ProductFacade;
 
 class BillCancellingTest {
@@ -14,7 +15,7 @@ class BillCancellingTest {
     @BeforeEach
     void init() {
         productFacade = mock(ProductFacade.class);
-        billFacade = new BillConfiguration().billFacade(productFacade);
+        billFacade = new BillConfiguration().billFacade(new DateTimeProvider(), productFacade);
     }
 
     @Test
