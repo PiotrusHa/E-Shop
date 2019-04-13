@@ -2,26 +2,30 @@ package piotrusha.e_shop.bill.domain;
 
 import io.vavr.Tuple2;
 import io.vavr.control.Either;
-import piotrusha.e_shop.bill.domain.dto.CreateBillDto;
 import piotrusha.e_shop.base.AppError;
+import piotrusha.e_shop.base.DateTimeProvider;
+import piotrusha.e_shop.bill.domain.dto.CreateBillDto;
 import piotrusha.e_shop.product.domain.ProductFacade;
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 class BillCreator {
 
+    private static final int PAYMENT_DAYS = 7;
+
     private final ProductFacade productFacade;
+    private final DateTimeProvider dateTimeProvider;
 
     private final BillIdGenerator billIdGenerator;
 
-    BillCreator(ProductFacade productFacade, BillIdGenerator billIdGenerator) {
+    BillCreator(ProductFacade productFacade, DateTimeProvider dateTimeProvider, BillIdGenerator billIdGenerator) {
         this.productFacade = productFacade;
+        this.dateTimeProvider = dateTimeProvider;
         this.billIdGenerator = billIdGenerator;
     }
 
@@ -64,15 +68,16 @@ class BillCreator {
     private Bill createBill(BigDecimal clientId, Set<BillRecord> records) {
         BigDecimal generatedId = billIdGenerator.generate();
         BigDecimal priceSum = calculatePriceSum(records);
-        Date currentDate = new Date();
 
-        return new Bill().setBillId(generatedId)
-                         .setClientId(clientId)
-                         .setPriceSum(priceSum)
-                         .setPurchaseDate(currentDate)
-                         .setPaymentExpirationDate(currentDate)     // TODO
-                         .setBillState(BillState.WAITING_FOR_PAYMENT)
-                         .setBillRecords(records);
+        return Bill.builder()
+                   .billId(generatedId)
+                   .clientId(clientId)
+                   .priceSum(priceSum)
+                   .purchaseDate(dateTimeProvider.currentDateTime())
+                   .paymentExpirationDate(dateTimeProvider.currentDate().plusDays(PAYMENT_DAYS))
+                   .billState(BillState.WAITING_FOR_PAYMENT)
+                   .billRecords(records)
+                   .build();
     }
 
     private BigDecimal calculatePriceSum(Set<BillRecord> billRecords) {

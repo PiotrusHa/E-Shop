@@ -53,43 +53,43 @@ public class ProductFacade {
     public Either<AppError, ProductCategoryDto> createProductCategory(CreateProductCategoryDto createProductCategoryDto) {
         return dtoValidator.validateCreateCategoryDto(createProductCategoryDto)
                            .map(categoryCreator::createCategory)
-                           .peek(categoryRepository::save)
-                           .map(Category::toDto);
+                           .map(Category::toDto)
+                           .peek(categoryRepository::save);
     }
 
     public Either<AppError, ProductDto> createProduct(CreateProductDto createProductDto) {
         return dtoValidator.validateCreateProductDto(createProductDto)
                            .map(productCreator::createProduct)
-                           .peek(productRepository::save)
-                           .map(Product::toDto);
+                           .map(Product::toDto)
+                           .peek(productRepository::save);
     }
 
     public Either<AppError, ProductDto> modifyProduct(ModifyProductDto modifyProductDto) {
         return dtoValidator.validateModifyProductDto(modifyProductDto)
                            .map(productModifier::modifyProduct)
-                           .peek(productRepository::save)
-                           .map(Product::toDto);
+                           .map(Product::toDto)
+                           .peek(productRepository::save);
     }
 
     public Either<AppError, List<ProductDto>> bookProducts(List<BookProductDto> bookProductDtos) {
         return dtoValidator.validateBookDto(bookProductDtos)
                            .flatMap(productBooker::bookProducts)
-                           .peek(productRepository::saveAll)
-                           .map(this::toDto);
+                           .map(this::toDto)
+                           .peek(productRepository::saveAll);
     }
 
     public Either<AppError, List<ProductDto>> cancelBooking(List<CancelProductBookingDto> cancelProductBookingDtos) {
         return dtoValidator.validateCancelDto(cancelProductBookingDtos)
                            .flatMap(productBookingCanceler::cancelBooking)
-                           .peek(productRepository::saveAll)
-                           .map(this::toDto);
+                           .map(this::toDto)
+                           .peek(productRepository::saveAll);
     }
 
     public Either<AppError, List<ProductDto>> sellProducts(List<SellProductDto> sellProductDtos) {
         return dtoValidator.validateSellDto(sellProductDtos)
                            .flatMap(productSeller::sellProducts)
-                           .peek(productRepository::saveAll)
-                           .map(this::toDto);
+                           .map(this::toDto)
+                           .peek(productRepository::saveAll);
     }
 
     public List<ProductCategoryDto> findAllProductCategories() {

@@ -12,6 +12,5 @@ public class BillRecordDto {
     private BigDecimal productId;
     private Integer piecesNumber;
     private BigDecimal piecePrice;
-    private BigDecimal priceSum;
 
 }

@@ -2,14 +2,13 @@ package piotrusha.e_shop.bill.domain;
 
 import io.vavr.control.Either;
 import io.vavr.control.Try;
+import piotrusha.e_shop.base.AppError;
 import piotrusha.e_shop.bill.domain.dto.BillActionDto;
 import piotrusha.e_shop.bill.domain.dto.BillDto;
 import piotrusha.e_shop.bill.domain.dto.CreateBillDto;
-import piotrusha.e_shop.base.AppError;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class BillFacade {
 
@@ -33,35 +32,31 @@ public class BillFacade {
     public Either<AppError, BillDto> createBill(CreateBillDto createBillDto) {
         return dtoValidator.validateDto(createBillDto)
                            .flatMap(billCreator::createBill)
-                           .peek(billRepository::save)
-                           .map(Bill::toDto);
+                           .map(Bill::toDto)
+                           .peek(billRepository::save);
     }
 
     public Either<AppError, BillDto> cancelBill(BillActionDto billActionDto) {
         return dtoValidator.validateDto(billActionDto)
                            .flatMap(billCanceller::cancelBill)
-                           .peek(billRepository::save)
-                           .map(Bill::toDto);
+                           .map(Bill::toDto)
+                           .peek(billRepository::save);
     }
 
     public Either<AppError, BillDto> payBill(BillActionDto billActionDto) {
         return dtoValidator.validateDto(billActionDto)
                            .flatMap(billPayer::payBill)
-                           .peek(billRepository::save)
-                           .map(Bill::toDto);
+                           .map(Bill::toDto)
+                           .peek(billRepository::save);
     }
 
     public Either<AppError, BillDto>  findBillByBillId(BigDecimal billId) {
         return billRepository.findByBillId(billId)
-                             .toEither(() -> AppError.billNotFound(billId))
-                             .map(Bill::toDto);
+                             .toEither(() -> AppError.billNotFound(billId));
     }
 
     public List<BillDto> findBillsByClientId(BigDecimal clientId) {
-        return billRepository.findBillByClientId(clientId)
-                             .stream()
-                             .map(Bill::toDto)
-                             .collect(Collectors.toList());
+        return billRepository.findBillByClientId(clientId);
     }
 
     public Either<AppError, List<BillDto>> findBillsByClientIdAndBillState(BigDecimal clientId, String billState) {
@@ -71,10 +66,7 @@ public class BillFacade {
     }
 
     private List<BillDto> findBillsByClientIdAndBillState(BigDecimal clientId, BillState billState) {
-        return billRepository.findBillByClientIdAndBillState(clientId, billState)
-                      .stream()
-                      .map(Bill::toDto)
-                      .collect(Collectors.toList());
+        return billRepository.findBillByClientIdAndBillState(clientId, billState.toString());
     }
 
 }
