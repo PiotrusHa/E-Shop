@@ -94,10 +94,10 @@ class Product {
     }
 
     ProductDto toDto() {
-        List<String> categories = this.getCategories()
+        Set<String> categories = this.getCategories()
                                          .stream()
                                          .map(Category::getName)
-                                         .collect(Collectors.toList());
+                                         .collect(Collectors.toSet());
 
         return new ProductDto().setProductId(this.getProductId())
                                .setName(this.getName())

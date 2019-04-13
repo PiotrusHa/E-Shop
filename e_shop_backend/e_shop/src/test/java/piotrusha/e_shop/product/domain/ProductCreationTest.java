@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static piotrusha.e_shop.product.domain.Assertions.assertProductDto;
 
 import io.vavr.control.Either;
-import io.vavr.control.Option;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.base.AppError;
 import piotrusha.e_shop.product.domain.dto.CreateProductCategoryDto;
@@ -12,6 +11,7 @@ import piotrusha.e_shop.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
 
 class ProductCreationTest extends ProductTest {
@@ -25,13 +25,7 @@ class ProductCreationTest extends ProductTest {
 
         assertTrue(createdProduct.isRight());
         assertProductDto(expected, createdProduct.get());
-        assertWithProductFromDatabase(expected);
-    }
-
-    private void assertWithProductFromDatabase(ProductDto expected) {
-        Option<ProductDto> productOpt = productFacade.findProductByProductId(expected.getProductId());
-        assertTrue(productOpt.isDefined());
-        assertProductDto(expected, productOpt.get());
+        assertWithProductFromDatabase(expected.getProductId(), expected);
     }
 
     private CreateProductDto prepareCreateProductDto() {
@@ -49,7 +43,7 @@ class ProductCreationTest extends ProductTest {
                                .setBookedPiecesNumber(0)
                                .setSoldPiecesNumber(0)
                                .setDescription(createDto.getDescription())
-                               .setCategories(createDto.getCategories());
+                               .setCategories(new HashSet<>(createDto.getCategories()));
     }
 
 }
