@@ -17,7 +17,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,10 +57,10 @@ class ProductEntity {
     private Set<CategoryEntity> categories;
 
     ProductDto toDto() {
-        List<String> categories = this.categories.stream()
+        Set<String> categories = this.categories.stream()
                                                  .map(CategoryEntity::toDto)
                                                  .map(ProductCategoryDto::getName)
-                                                 .collect(Collectors.toList());
+                                                 .collect(Collectors.toSet());
         return ProductDto.builder()
                          .productId(productId)
                          .name(name)

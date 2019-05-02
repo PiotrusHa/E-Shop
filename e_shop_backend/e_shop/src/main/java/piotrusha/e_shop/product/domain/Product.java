@@ -89,10 +89,10 @@ class Product {
     }
 
     ProductDto toDto() {
-        List<String> categoriesDto = categories.stream()
+        Set<String> categoriesDto = categories.stream()
                                                .map(Category::toDto)
                                                .map(ProductCategoryDto::getName)
-                                               .collect(Collectors.toList());
+                                               .collect(Collectors.toSet());
 
         return ProductDto.builder()
                          .productId(productId)

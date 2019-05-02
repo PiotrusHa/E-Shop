@@ -9,7 +9,6 @@ import static piotrusha.e_shop.product.domain.SampleDtosToValidate.sellProductDt
 import static piotrusha.e_shop.product.domain.SampleDtosToValidate.sellProductDtoWithoutProductId;
 
 import io.vavr.control.Either;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -22,14 +21,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
-class ProductSellingValidationTest {
-
-    private ProductFacade productFacade;
-
-    @BeforeEach
-    void init() {
-        productFacade = new ProductConfiguration().productFacade();
-    }
+class ProductSellingValidationTest extends ProductTest {
 
     @ParameterizedTest
     @MethodSource("sellValidationProvider")

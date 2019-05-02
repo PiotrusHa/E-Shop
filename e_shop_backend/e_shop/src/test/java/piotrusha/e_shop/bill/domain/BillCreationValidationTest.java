@@ -10,7 +10,6 @@ import static piotrusha.e_shop.bill.domain.SampleDtos.createBillDtoWithNegativeP
 import static piotrusha.e_shop.bill.domain.SampleDtos.createBillDtoWithZeroPiecesNumber;
 
 import io.vavr.control.Either;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -21,14 +20,7 @@ import piotrusha.e_shop.bill.domain.dto.CreateBillDto;
 
 import java.util.stream.Stream;
 
-class BillCreationDtoValidationTest {
-
-    private BillFacade billFacade;
-
-    @BeforeEach
-    void init() {
-        billFacade = new BillConfiguration().billFacade(null, null);
-    }
+class BillCreationValidationTest extends BillValidationTest {
 
     @ParameterizedTest
     @MethodSource("createBillValidationProvider")

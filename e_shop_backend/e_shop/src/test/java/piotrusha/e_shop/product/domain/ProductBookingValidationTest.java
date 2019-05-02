@@ -9,7 +9,6 @@ import static piotrusha.e_shop.product.domain.SampleDtosToValidate.bookProductDt
 import static piotrusha.e_shop.product.domain.SampleDtosToValidate.bookProductDtoWithoutProductId;
 
 import io.vavr.control.Either;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -22,14 +21,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
-class ProductBookingValidationTest {
-
-    private ProductFacade productFacade;
-
-    @BeforeEach
-    void init() {
-        productFacade = new ProductConfiguration().productFacade();
-    }
+class ProductBookingValidationTest extends ProductTest {
 
     @ParameterizedTest
     @MethodSource("bookValidationProvider")

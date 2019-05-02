@@ -4,71 +4,80 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.vavr.control.Either;
-import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.base.AppError;
 import piotrusha.e_shop.base.AppError.ErrorType;
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
-import piotrusha.e_shop.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-class ProductBookingTest {
+class ProductBookingTest extends ProductTest {
 
-    private static final CreateProductDto CREATE_PRODUCT_DTO = new CreateProductDto("Name", BigDecimal.TEN, 2, "", List.of());
-    private static final CreateProductDto CREATE_PRODUCT_DTO_2 = new CreateProductDto("Name2", BigDecimal.TEN, 1, "", List.of());
-
-    private ProductFacade productFacade;
-    private ProductDto product;
-    private ProductDto product2;
+    private ProductDto productToBook;
+    private ProductDto productToBook2;
 
     @BeforeEach
-    void init() {
-        productFacade = new ProductConfiguration().productFacade();
-        product = productFacade.createProduct(CREATE_PRODUCT_DTO).get();
-        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2).get();
+    protected void init() {
+        super.init();
+
+        productToBook = createProduct();
+        productToBook2 = createProduct2();
     }
 
     @Test
     void book() {
-        int piecesNumberToBook = 1;
-        BookProductDto dto = new BookProductDto(product.getProductId(), piecesNumberToBook);
+        BookProductDto bookProductDto = bookProductDto(productToBook.getProductId(), 23);
+        ProductDto expectedChangedProduct = expectedProductDto(productToBook, bookProductDto);
 
-        productFacade.bookProducts(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(bookProductDto));
 
-        Option<ProductDto> productOpt = productFacade.findProductByProductId(product.getProductId());
-        assertTrue(productOpt.isDefined());
-        ProductDto productDto = productOpt.get();
-        assertEquals(piecesNumberToBook, (int) productDto.getBookedPiecesNumber());
-        assertEquals(product.getAvailablePiecesNumber() - piecesNumberToBook, (int) productDto.getAvailablePiecesNumber());
+        assertTrue(result.isRight());
+        assertProductDto(expectedChangedProduct, result.get().get(0));
+        assertWithProductFromDatabase(productToBook.getProductId(), expectedChangedProduct);
+    }
+
+    @Test
+    void bookTwoProducts() {
+        BookProductDto bookProductDto = bookProductDto(productToBook.getProductId(), 12);
+        BookProductDto bookProductDto2 = bookProductDto(productToBook2.getProductId(), 45);
+        ProductDto expectedChangedProduct = expectedProductDto(productToBook, bookProductDto);
+        ProductDto expectedChangedProduct2 = expectedProductDto(productToBook2, bookProductDto2);
+
+        Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(bookProductDto, bookProductDto2));
+
+        assertTrue(result.isRight());
+        assertProductDto(expectedChangedProduct, result.get().get(0));
+        assertProductDto(expectedChangedProduct2, result.get().get(1));
+        assertWithProductFromDatabase(productToBook.getProductId(), expectedChangedProduct);
+        assertWithProductFromDatabase(productToBook2.getProductId(), expectedChangedProduct2);
     }
 
     @Test
     void bookNotEnoughPiecesNumber() {
-        Integer piecesNumber = product.getAvailablePiecesNumber() + 1;
-        BookProductDto dto = new BookProductDto(product.getProductId(), piecesNumber);
+        int piecesNumber = productToBook.getAvailablePiecesNumber() + 1;
+        BookProductDto bookProductDto = bookProductDto(productToBook.getProductId(), piecesNumber);
         String expectedErrorMessage = String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.",
-                                                    piecesNumber, product.getName(), product.getAvailablePiecesNumber());
+                                                    piecesNumber, productToBook.getName(), productToBook.getAvailablePiecesNumber());
         ErrorType expectedErrorType = ErrorType.CANNOT_BOOK_PRODUCT;
 
-        Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(bookProductDto));
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
         assertEquals(expectedErrorType, result.getLeft().getErrorType());
-        assertProductDidNotChange(product);
+        assertProductDidNotChange(productToBook);
     }
 
     @Test
     void bookFirstOkSecondNotEnoughPiecesNumber() {
-        Integer piecesNumber = product2.getAvailablePiecesNumber() + 1;
-        BookProductDto dto = new BookProductDto(product.getProductId(), 1);
-        BookProductDto dto2 = new BookProductDto(product2.getProductId(), piecesNumber);
+        Integer piecesNumber = productToBook2.getAvailablePiecesNumber() + 1;
+        BookProductDto dto =  bookProductDto(productToBook.getProductId(), 1);
+        BookProductDto dto2 = bookProductDto(productToBook2.getProductId(), piecesNumber);
         String expectedErrorMessage = String.format("Cannot book %s pieces of product %s. Available pieces number to book is %s.",
-                                                    piecesNumber, product2.getName(), product2.getAvailablePiecesNumber());
+                                                    piecesNumber, productToBook2.getName(), productToBook2.getAvailablePiecesNumber());
         ErrorType expectedErrorType = ErrorType.CANNOT_BOOK_PRODUCT;
 
         Either<AppError, List<ProductDto>> result = productFacade.bookProducts(List.of(dto, dto2));
@@ -76,14 +85,19 @@ class ProductBookingTest {
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
         assertEquals(expectedErrorType, result.getLeft().getErrorType());
-        assertProductDidNotChange(product);
-        assertProductDidNotChange(product2);
+        assertProductDidNotChange(productToBook);
+        assertProductDidNotChange(productToBook2);
     }
 
-    private void assertProductDidNotChange(ProductDto productDto) {
-        Option<ProductDto> productOpt = productFacade.findProductByProductId(productDto.getProductId());
-        assertTrue(productOpt.isDefined());
-        Assertions.assertProductDto(productDto, productOpt.get());
+    private ProductDto expectedProductDto(ProductDto currentProduct, BookProductDto dto) {
+        return currentProduct.toBuilder()
+                             .availablePiecesNumber(currentProduct.getAvailablePiecesNumber() - dto.getPiecesNumber())
+                             .bookedPiecesNumber(currentProduct.getBookedPiecesNumber() + dto.getPiecesNumber())
+                             .build();
+    }
+
+    private BookProductDto bookProductDto(BigDecimal productId, int piecesNumber) {
+        return new BookProductDto(productId, piecesNumber);
     }
 
 }

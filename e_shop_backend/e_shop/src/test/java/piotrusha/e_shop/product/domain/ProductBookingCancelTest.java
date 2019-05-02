@@ -2,66 +2,64 @@ package piotrusha.e_shop.product.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static piotrusha.e_shop.product.domain.Assertions.assertProductDto;
 
 import io.vavr.control.Either;
-import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import piotrusha.e_shop.base.AppError;
 import piotrusha.e_shop.base.AppError.ErrorType;
-import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.CancelProductBookingDto;
-import piotrusha.e_shop.product.domain.dto.CreateProductDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-class ProductBookingCancelTest {
+class ProductBookingCancelTest extends ProductTest {
 
-    private static final CreateProductDto CREATE_PRODUCT_DTO = new CreateProductDto("Name", BigDecimal.TEN, 20, "", List.of());
-    private static final CreateProductDto CREATE_PRODUCT_DTO_2 = new CreateProductDto("Name2", BigDecimal.TEN, 11, "", List.of());
-
-    private ProductFacade productFacade;
-    private ProductDto product;
-    private ProductDto product2;
+    private ProductDto productToCancel;
+    private ProductDto productToCancel2;
 
     @BeforeEach
-    void init() {
-        productFacade = new ProductConfiguration().productFacade();
-        product = productFacade.createProduct(CREATE_PRODUCT_DTO).get();
-        product2 = productFacade.createProduct(CREATE_PRODUCT_DTO_2).get();
+    protected void init() {
+        super.init();
 
-        BookProductDto bookProductDto = new BookProductDto(product.getProductId(), 1);
-        BookProductDto bookProduct2Dto = new BookProductDto(product2.getProductId(), 5);
-        productFacade.bookProducts(List.of(bookProductDto, bookProduct2Dto));
-
-        product = productFacade.findProductByProductId(product.getProductId())
-                               .get();
-        product2 = productFacade.findProductByProductId(product2.getProductId())
-                                .get();
+        productToCancel = createBookedProduct();
+        productToCancel2 = createBookedProduct();
     }
 
     @Test
     void cancel() {
-        int piecesNumberToCancel = 1;
-        CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), piecesNumberToCancel);
+        CancelProductBookingDto cancelProductBookingDto = cancelProductBookingDto(productToCancel.getProductId(), 23);
+        ProductDto expectedChangedProduct = expectedProductDto(productToCancel, cancelProductBookingDto);
 
-        productFacade.cancelBooking(List.of(dto));
+        Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(cancelProductBookingDto));
 
-        Option<ProductDto> productOpt = productFacade.findProductByProductId(product.getProductId());
-        assertTrue(productOpt.isDefined());
-        ProductDto productDto = productOpt.get();
-        assertEquals(product.getBookedPiecesNumber() - piecesNumberToCancel, (int) productDto.getBookedPiecesNumber());
-        assertEquals(product.getAvailablePiecesNumber() + piecesNumberToCancel, (int) productDto.getAvailablePiecesNumber());
+        assertTrue(result.isRight());
+        assertProductDto(expectedChangedProduct, result.get().get(0));
+        assertWithProductFromDatabase(productToCancel.getProductId(), expectedChangedProduct);
+    }
+
+    @Test
+    void cancelTwoProducts() {
+        CancelProductBookingDto cancelProductBookingDto = cancelProductBookingDto(productToCancel.getProductId(), 20);
+        CancelProductBookingDto cancelProductBookingDto2 = cancelProductBookingDto(productToCancel2.getProductId(), 10);
+        ProductDto expectedChangedProduct = expectedProductDto(productToCancel, cancelProductBookingDto);
+        ProductDto expectedChangedProduct2 = expectedProductDto(productToCancel2, cancelProductBookingDto2);
+
+        Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(cancelProductBookingDto, cancelProductBookingDto2));
+
+        assertTrue(result.isRight());
+        assertProductDto(expectedChangedProduct, result.get().get(0));
+        assertProductDto(expectedChangedProduct2, result.get().get(1));
+        assertWithProductFromDatabase(productToCancel.getProductId(), expectedChangedProduct);
+        assertWithProductFromDatabase(productToCancel2.getProductId(), expectedChangedProduct2);
     }
 
     @Test
     void cancelNotEnoughPiecesNumber() {
-        Integer piecesNumber = product.getAvailablePiecesNumber() + 1;
-        CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), piecesNumber);
-        String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, product.getName());
+        int piecesNumber = productToCancel.getAvailablePiecesNumber() + 1;
+        CancelProductBookingDto dto = cancelProductBookingDto(productToCancel.getProductId(), piecesNumber);
+        String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, productToCancel.getName());
         ErrorType expectedErrorType = ErrorType.CANNOT_CANCEL_PRODUCT_BOOKING;
 
         Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(dto));
@@ -69,15 +67,15 @@ class ProductBookingCancelTest {
         assertTrue(result.isLeft());
         assertEquals(expectedMessage, result.getLeft().getErrorMessage());
         assertEquals(expectedErrorType, result.getLeft().getErrorType());
-        assertProductDidNotChange(product);
+        assertProductDidNotChange(productToCancel);
     }
 
     @Test
     void cancelFirstOkSecondNotEnoughPiecesNumber() {
-        Integer piecesNumber = product2.getAvailablePiecesNumber() + 1;
-        CancelProductBookingDto dto = new CancelProductBookingDto(product.getProductId(), 1);
-        CancelProductBookingDto dto2 = new CancelProductBookingDto(product2.getProductId(), piecesNumber);
-        String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, product2.getName());
+        int piecesNumber = productToCancel2.getAvailablePiecesNumber() + 1;
+        CancelProductBookingDto dto = cancelProductBookingDto(productToCancel.getProductId(), 1);
+        CancelProductBookingDto dto2 = cancelProductBookingDto(productToCancel2.getProductId(), piecesNumber);
+        String expectedMessage = String.format("Cannot cancel booking %s pieces of product %s.", piecesNumber, productToCancel2.getName());
         ErrorType expectedErrorType = ErrorType.CANNOT_CANCEL_PRODUCT_BOOKING;
 
         Either<AppError, List<ProductDto>> result = productFacade.cancelBooking(List.of(dto, dto2));
@@ -85,14 +83,19 @@ class ProductBookingCancelTest {
         assertTrue(result.isLeft());
         assertEquals(expectedMessage, result.getLeft().getErrorMessage());
         assertEquals(expectedErrorType, result.getLeft().getErrorType());
-        assertProductDidNotChange(product);
-        assertProductDidNotChange(product2);
+        assertProductDidNotChange(productToCancel);
+        assertProductDidNotChange(productToCancel2);
     }
 
-    private void assertProductDidNotChange(ProductDto productDto) {
-        Option<ProductDto> productOpt = productFacade.findProductByProductId(productDto.getProductId());
-        assertTrue(productOpt.isDefined());
-        assertProductDto(productDto, productOpt.get());
+    private CancelProductBookingDto cancelProductBookingDto(BigDecimal productId, int piecesNumber) {
+        return new CancelProductBookingDto(productId, piecesNumber);
+    }
+
+    private ProductDto expectedProductDto(ProductDto currentProduct, CancelProductBookingDto dto) {
+        return currentProduct.toBuilder()
+                             .availablePiecesNumber(currentProduct.getAvailablePiecesNumber() + dto.getPiecesNumber())
+                             .bookedPiecesNumber(currentProduct.getBookedPiecesNumber() - dto.getPiecesNumber())
+                             .build();
     }
 
 }

@@ -9,15 +9,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 @EqualsAndHashCode
 @Accessors(chain = true)
-@NoArgsConstructor
+@Builder(toBuilder = true)
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
 public class ProductDto {
 
     private BigDecimal productId;
@@ -27,6 +27,6 @@ public class ProductDto {
     private Integer bookedPiecesNumber;
     private Integer soldPiecesNumber;
     private String description;
-    private List<String> categories;    // TODO ProductCategoryDto
+    private Set<String> categories;
 
 }
