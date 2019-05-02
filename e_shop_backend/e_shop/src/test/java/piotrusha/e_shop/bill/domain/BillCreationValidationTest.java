@@ -20,7 +20,7 @@ import piotrusha.e_shop.bill.domain.dto.CreateBillDto;
 
 import java.util.stream.Stream;
 
-class BillCreationDtoValidationTest extends BillDtoValidationTest {
+class BillCreationValidationTest extends BillValidationTest {
 
     @ParameterizedTest
     @MethodSource("createBillValidationProvider")

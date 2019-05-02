@@ -1,4 +1,4 @@
-package piotrusha.e_shop.product.domain.dto_validation_test;
+package piotrusha.e_shop.product.domain;
 
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.CancelProductBookingDto;

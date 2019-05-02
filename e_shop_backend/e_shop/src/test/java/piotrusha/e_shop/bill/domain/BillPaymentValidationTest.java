@@ -17,19 +17,19 @@ import piotrusha.e_shop.bill.domain.dto.BillDto;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-class BillCancellingDtoValidationTest extends BillDtoValidationTest {
+class BillPaymentValidationTest extends BillValidationTest {
 
     @ParameterizedTest
-    @MethodSource("cancelBillValidationProvider")
-    void cancelBillValidationTest(BillActionDto billActionDto, String expectedErrorMessage, ErrorType expectedErrorType) {
-        Either<AppError, BillDto> result = billFacade.cancelBill(billActionDto);
+    @MethodSource("payBillValidationProvider")
+    void payBillValidationTest(BillActionDto billActionDto, String expectedErrorMessage, ErrorType expectedErrorType) {
+        Either<AppError, BillDto> result = billFacade.payBill(billActionDto);
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
         assertEquals(expectedErrorType, result.getLeft().getErrorType());
     }
 
-    private static Stream<Arguments> cancelBillValidationProvider() {
+    private static Stream<Arguments> payBillValidationProvider() {
         Arguments emptyBillId = Arguments.of(billActionDtoWithEmptyBillId(),
                                              "Bill id cannot be empty.",
                                              ErrorType.EMPTY_DTO_FIELD);

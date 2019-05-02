@@ -2,7 +2,7 @@ package piotrusha.e_shop.bill.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 
-class BillDtoValidationTest {
+class BillValidationTest {
 
     protected BillFacade billFacade;
 

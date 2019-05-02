@@ -1,18 +1,17 @@
-package piotrusha.e_shop.product.domain.dto_validation_test;
+package piotrusha.e_shop.product.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.modifyProductDtoWithNegativeAvailablePiecesNumber;
-import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.modifyProductDtoWithNonexistentCategory;
-import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.modifyProductDtoWithProductId;
-import static piotrusha.e_shop.product.domain.dto_validation_test.SampleDtosToValidate.modifyProductDtoWithZeroAvailablePiecesNumber;
+import static piotrusha.e_shop.product.domain.SampleDtosToValidate.modifyProductDtoWithNegativeAvailablePiecesNumber;
+import static piotrusha.e_shop.product.domain.SampleDtosToValidate.modifyProductDtoWithNonexistentCategory;
+import static piotrusha.e_shop.product.domain.SampleDtosToValidate.modifyProductDtoWithProductId;
+import static piotrusha.e_shop.product.domain.SampleDtosToValidate.modifyProductDtoWithZeroAvailablePiecesNumber;
 
 import io.vavr.control.Either;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import piotrusha.e_shop.base.AppError;
-import piotrusha.e_shop.product.domain.ProductTest;
 import piotrusha.e_shop.product.domain.dto.ModifyProductDto;
 import piotrusha.e_shop.product.domain.dto.ProductDto;
 
