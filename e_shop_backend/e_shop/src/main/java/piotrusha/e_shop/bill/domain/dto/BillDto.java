@@ -17,7 +17,7 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 @Accessors(chain = true)
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 public class BillDto {

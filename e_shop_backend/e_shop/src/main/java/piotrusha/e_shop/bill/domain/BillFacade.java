@@ -50,7 +50,7 @@ public class BillFacade {
                            .peek(billRepository::save);
     }
 
-    public Either<AppError, BillDto>  findBillByBillId(BigDecimal billId) {
+    public Either<AppError, BillDto> findBillByBillId(BigDecimal billId) {
         return billRepository.findByBillId(billId)
                              .toEither(() -> AppError.billNotFound(billId));
     }

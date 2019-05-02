@@ -6,7 +6,6 @@ import static piotrusha.e_shop.bill.domain.SampleDtos.billActionDtoWithBillId;
 import static piotrusha.e_shop.bill.domain.SampleDtos.billActionDtoWithEmptyBillId;
 
 import io.vavr.control.Either;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -18,26 +17,19 @@ import piotrusha.e_shop.bill.domain.dto.BillDto;
 import java.math.BigDecimal;
 import java.util.stream.Stream;
 
-class BillCancellingValidationTest {
-
-    private BillFacade billFacade;
-
-    @BeforeEach
-    void init() {
-        billFacade = new BillConfiguration().billFacade(null, null);
-    }
+class BillPaymentDtoValidationTest extends BillDtoValidationTest {
 
     @ParameterizedTest
-    @MethodSource("cancelBillValidationProvider")
-    void cancelBillValidationTest(BillActionDto billActionDto, String expectedErrorMessage, ErrorType expectedErrorType) {
-        Either<AppError, BillDto> result = billFacade.cancelBill(billActionDto);
+    @MethodSource("payBillValidationProvider")
+    void payBillValidationTest(BillActionDto billActionDto, String expectedErrorMessage, ErrorType expectedErrorType) {
+        Either<AppError, BillDto> result = billFacade.payBill(billActionDto);
 
         assertTrue(result.isLeft());
         assertEquals(expectedErrorMessage, result.getLeft().getErrorMessage());
         assertEquals(expectedErrorType, result.getLeft().getErrorType());
     }
 
-    private static Stream<Arguments> cancelBillValidationProvider() {
+    private static Stream<Arguments> payBillValidationProvider() {
         Arguments emptyBillId = Arguments.of(billActionDtoWithEmptyBillId(),
                                              "Bill id cannot be empty.",
                                              ErrorType.EMPTY_DTO_FIELD);

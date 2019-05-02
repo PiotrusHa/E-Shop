@@ -20,7 +20,6 @@ class BillCanceller {
         return validateCanCancel(bill)
                 .flatMap(this::cancelProductBooking)
                 .map(this::markBillAsCancelled);
-
     }
 
     private Either<AppError, Bill> validateCanCancel(Bill bill) {
