@@ -19,13 +19,11 @@ import java.util.stream.Collectors;
 public class ProductFacade {
 
     private final CategoryCreator categoryCreator;
-    private final CategoryFinder categoryFinder;
 
     private final ProductCreator productCreator;
     private final ProductModifier productModifier;
     private final ProductBooker productBooker;
     private final ProductBookingCanceler productBookingCanceler;
-    private final ProductFinder productFinder;
     private final ProductSeller productSeller;
 
     private final ProductRepository productRepository;
@@ -33,17 +31,15 @@ public class ProductFacade {
 
     private final DtoValidator dtoValidator;
 
-    ProductFacade(CategoryCreator categoryCreator, CategoryFinder categoryFinder, ProductCreator productCreator,
+    ProductFacade(CategoryCreator categoryCreator, ProductCreator productCreator,
                   ProductModifier productModifier, ProductBooker productBooker, ProductBookingCanceler productBookingCanceler,
-                  ProductFinder productFinder, ProductSeller productSeller, ProductRepository productRepository,
-                  CategoryRepository categoryRepository, DtoValidator dtoValidator) {
+                  ProductSeller productSeller, ProductRepository productRepository, CategoryRepository categoryRepository,
+                  DtoValidator dtoValidator) {
         this.categoryCreator = categoryCreator;
-        this.categoryFinder = categoryFinder;
         this.productCreator = productCreator;
         this.productModifier = productModifier;
         this.productBooker = productBooker;
         this.productBookingCanceler = productBookingCanceler;
-        this.productFinder = productFinder;
         this.productSeller = productSeller;
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
@@ -93,15 +89,15 @@ public class ProductFacade {
     }
 
     public List<ProductCategoryDto> findAllProductCategories() {
-        return categoryFinder.findAll();
+        return categoryRepository.findAll();
     }
 
     public Option<ProductDto> findProductByProductId(BigDecimal productId) {
-        return productFinder.findByProductId(productId);
+        return productRepository.findByProductId(productId);
     }
 
     public List<ProductDto> findProductsByCategoryName(String categoryName) {
-        return productFinder.findProductsByCategoryName(categoryName);
+        return productRepository.findByCategoryName(categoryName);
     }
 
     private List<ProductDto> toDto(List<Product> products) {
