@@ -3,8 +3,10 @@ package piotrusha.e_shop.product.domain;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.vavr.control.Either;
 import io.vavr.control.Option;
 import org.junit.jupiter.api.BeforeEach;
+import piotrusha.e_shop.base.AppError;
 import piotrusha.e_shop.product.domain.dto.BookProductDto;
 import piotrusha.e_shop.product.domain.dto.CreateProductCategoryDto;
 import piotrusha.e_shop.product.domain.dto.CreateProductDto;
@@ -78,8 +80,8 @@ public class ProductTest {
     }
 
     void assertWithProductFromDatabase(BigDecimal productId, ProductDto expected) {
-        Option<ProductDto> productOpt = productFacade.findProductByProductId(productId);
-        assertTrue(productOpt.isDefined());
+        Either<AppError, ProductDto> productOpt = productFacade.findProductByProductId(productId);
+        assertTrue(productOpt.isRight());
         assertProductDto(expected, productOpt.get());
     }
 

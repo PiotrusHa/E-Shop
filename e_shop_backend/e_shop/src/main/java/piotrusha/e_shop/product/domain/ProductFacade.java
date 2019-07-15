@@ -92,8 +92,9 @@ public class ProductFacade {
         return categoryRepository.findAll();
     }
 
-    public Option<ProductDto> findProductByProductId(BigDecimal productId) {
-        return productRepository.findByProductId(productId);
+    public Either<AppError, ProductDto> findProductByProductId(BigDecimal productId) {
+        return productRepository.findByProductId(productId)
+                                .toEither(() -> AppError.productNotFound(productId));
     }
 
     public List<ProductDto> findProductsByCategoryName(String categoryName) {
