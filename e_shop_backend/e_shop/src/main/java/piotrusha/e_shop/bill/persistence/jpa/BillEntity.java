@@ -1,6 +1,7 @@
 package piotrusha.e_shop.bill.persistence.jpa;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -24,7 +25,8 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "bills")
-@Setter(AccessLevel.PRIVATE)
+@Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Accessors(chain = true)
 class BillEntity {
@@ -39,7 +41,6 @@ class BillEntity {
     @Column(nullable = false)
     private LocalDateTime purchaseDate;
 
-    @Column(nullable = false)
     private LocalDate paymentDate;
 
     @Column(nullable = false)

@@ -16,6 +16,8 @@ public interface BillRepository {
 
     Option<BigDecimal> findLastBillId();
 
-    void save(BillDto dto);
+    void add(BillDto dto);
+
+    void update(BillDto dto);
 
 }

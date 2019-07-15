@@ -46,8 +46,13 @@ public class InMemoryBillRepository implements BillRepository {
     }
 
     @Override
-    public void save(BillDto bill) {
-        map.put(bill.getBillId(), bill);
+    public void add(BillDto dto) {
+        map.put(dto.getBillId(), dto);
+    }
+
+    @Override
+    public void update(BillDto dto) {
+        map.put(dto.getBillId(), dto);
     }
 
 }

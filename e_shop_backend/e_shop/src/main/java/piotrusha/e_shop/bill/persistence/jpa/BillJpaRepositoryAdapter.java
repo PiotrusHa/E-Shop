@@ -14,10 +14,12 @@ import java.util.stream.Collectors;
 class BillJpaRepositoryAdapter implements BillRepository {
 
     private final BillJpaRepository repository;
+    private final BillRecordJpaRepository recordRepository;
 
     @Autowired
-    BillJpaRepositoryAdapter(BillJpaRepository repository) {
+    BillJpaRepositoryAdapter(BillJpaRepository repository, BillRecordJpaRepository recordRepository) {
         this.repository = repository;
+        this.recordRepository = recordRepository;
     }
 
     @Override
@@ -42,8 +44,21 @@ class BillJpaRepositoryAdapter implements BillRepository {
     }
 
     @Override
-    public void save(BillDto bill) {
-        repository.save(BillEntity.fromDto(bill));
+    public void add(BillDto bill) {
+        BillEntity billEntity = BillEntity.fromDto(bill);
+
+        for (BillRecordEntity recordEntity : billEntity.getBillRecords()) {
+            recordRepository.save(recordEntity);
+        }
+        repository.save(billEntity);
+    }
+
+    @Override
+    public void update(BillDto bill) {
+        BillEntity billEntity = BillEntity.fromDto(bill);
+        repository.findByBillId(billEntity.getBillId())
+                  .ifPresent(entity -> billEntity.setBillRecords(entity.getBillRecords()));
+        repository.save(billEntity);
     }
 
     private List<BillDto> toDtos(List<BillEntity> entities) {
