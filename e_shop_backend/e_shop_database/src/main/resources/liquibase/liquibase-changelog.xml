@@ -28,14 +28,4 @@
                   file="liquibase/csv/products_categories.csv" />
     </changeSet>
 
-    <changeSet id="update-sequences" author="piotrusha" runAlways="true">
-        <sql dbms="h2">
-            ALTER SEQUENCE products_seq RESTART WITH (SELECT MAX(ID) FROM products);
-            CALL NEXT VALUE FOR products_seq;
-
-            ALTER SEQUENCE categories_seq RESTART WITH (SELECT MAX(ID) FROM products);
-            CALL NEXT VALUE FOR categories_seq;
-        </sql>
-    </changeSet>
-
 </databaseChangeLog>
