@@ -1,7 +1,9 @@
 package piotrusha.e_shop.bill.domain.dto;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -12,6 +14,7 @@ import java.util.List;
 @Setter
 @Accessors(chain = true)
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateBillDto {
 
     private BigDecimal clientId;
@@ -19,6 +22,7 @@ public class CreateBillDto {
 
     @Getter
     @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class CreateBillRecordDto {
         private BigDecimal productId;
         private Integer piecesNumber;

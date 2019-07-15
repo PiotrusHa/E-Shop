@@ -1,6 +1,8 @@
 package piotrusha.e_shop.product.domain.dto;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -10,6 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 @Accessors(chain = true)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ModifyProductDto extends AbstractProductActionDto {
 
     private BigDecimal productPrice;
